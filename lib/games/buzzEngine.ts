@@ -49,6 +49,7 @@ export const buzzCurrent = (s: BuzzState): BuzzItem | null => {
 export type BuzzSpec = {
   id: string;
   name: string;
+  blurb: string;
   minPlayers: number;
   mode: "board" | "sequence";
   /** Wrong answer costs you the value, as in the TV show. */
@@ -97,6 +98,7 @@ export function createBuzzGame(
   return {
     id: spec.id,
     name: spec.name,
+    blurb: spec.blurb,
     minPlayers: spec.minPlayers,
     needsPhones: true,
 

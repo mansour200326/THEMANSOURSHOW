@@ -80,6 +80,8 @@ export const mostLikelyTo = createRoundGame(
   {
     id: "most-likely-to",
     name: "Most Likely To",
+    blurb:
+      "A prompt goes up, everyone votes for the friend who fits. Most votes wins the round.",
     minPlayers: 3,
     collect: null,
     rounds: 8,
@@ -106,6 +108,8 @@ export const guessWhoSaidIt = createRoundGame(
   {
     id: "guess-who-said-it",
     name: "Guess Who Said It",
+    blurb:
+      "Everyone answers anonymously. One answer goes up — guess who wrote it.",
     minPlayers: 3,
     collect: { prompt: "Answer honestly — nobody sees your name", maxLength: 90 },
     rounds: 6,
@@ -139,6 +143,8 @@ export const bluffTrivia = createRoundGame(
   {
     id: "bluff-trivia",
     name: "Bluff Trivia",
+    blurb:
+      "Invent a convincing fake answer. Points for fooling friends and for spotting the truth.",
     minPlayers: 3,
     collect: { prompt: "Invent a convincing answer", maxLength: 60 },
     rounds: 6,
@@ -181,6 +187,8 @@ export const herdMentality = createRoundGame(
   {
     id: "herd-mentality",
     name: "Herd Mentality",
+    blurb:
+      "Answer like everyone else would. Match the majority or score nothing.",
     minPlayers: 3,
     collect: { prompt: "Answer like everyone else would", maxLength: 40 },
     rounds: 8,

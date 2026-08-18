@@ -8,6 +8,8 @@ export const triviaRoyale = createBuzzGame(
   {
     id: "trivia-royale",
     name: "Trivia Royale",
+    blurb:
+      "The classic board, but everyone races to buzz first. Wrong answers cost you.",
     minPlayers: 1,
     mode: "board",
     deductOnWrong: true,
@@ -39,6 +41,8 @@ export const emojiRiddles = createBuzzGame(
   {
     id: "emoji-riddles",
     name: "Emoji Riddles",
+    blurb:
+      "Decode the emoji. First to buzz in and shout it wins the points.",
     minPlayers: 1,
     mode: "sequence",
     // Guessing wrong shouldn't cost you here — it kills the shouting.

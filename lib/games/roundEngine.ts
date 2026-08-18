@@ -44,6 +44,7 @@ export type RoundState = {
 export type RoundSpec = {
   id: string;
   name: string;
+  blurb: string;
   minPlayers: number;
   /** null = skip straight to voting (Most Likely To votes on people). */
   collect: { prompt: string; maxLength: number } | null;
@@ -124,6 +125,7 @@ export function createRoundGame(
   return {
     id: spec.id,
     name: spec.name,
+    blurb: spec.blurb,
     minPlayers: spec.minPlayers,
     needsPhones: true,
 

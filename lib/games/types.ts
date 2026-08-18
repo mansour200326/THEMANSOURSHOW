@@ -8,6 +8,8 @@ import type { Action, Room } from "@/lib/room/types";
 export type GameModule = {
   id: string;
   name: string;
+  /** One line explaining how it works, shown on the lobby card. */
+  blurb: string;
   /** Minimum connected players before the host can start it. */
   minPlayers: number;
   /** TV-only games don't need anyone to join on a phone. */
