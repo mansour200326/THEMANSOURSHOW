@@ -6,7 +6,7 @@ import type { RoundState } from "@/lib/games/roundEngine";
 import { useRoom } from "@/lib/room/useRoom";
 
 /** Survives a refresh or a phone locking itself, so you keep your score. */
-const idKey = (code: string) => `parlour:player:${code}`;
+const idKey = (code: string) => `huddle:player:${code}`;
 
 export default function PlayPage({
   params,

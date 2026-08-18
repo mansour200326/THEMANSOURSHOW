@@ -1,4 +1,4 @@
-# Parlour
+# Huddle
 
 Party games for the room. The TV is the stage, your phone is the controller —
 no downloads, no accounts.

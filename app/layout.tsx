@@ -16,7 +16,7 @@ const body = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Parlour — party games for the room",
+  title: "Huddle — party games for the room",
   description: "Party games for the room. The TV is the stage, your phone is the controller.",
 };
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ShowMark } from "@/components/ShowMark";
 import { gameList } from "@/lib/games/registry";
@@ -13,17 +14,35 @@ type Props = {
   onClearBots: () => void;
 };
 
+/**
+ * Games that run entirely on this screen. They ignore the room — no phones, no
+ * players — but they belong in the same menu, because "start a game" shouldn't
+ * mean two different places depending on which game you want.
+ */
+const TV_ONLY = [
+  {
+    id: "team-jeopardy",
+    name: "Team Jeopardy",
+    href: "/jeopardy",
+    blurb: "Classic board, two to four teams.",
+  },
+  {
+    id: "the-feud",
+    name: "The Feud",
+    href: "/feud",
+    blurb: "Survey board, two teams, three strikes.",
+  },
+];
+
 export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
   const [joinUrl, setJoinUrl] = useState("");
-
-  // Whatever address the TV used is the address the phones can reach.
   useEffect(() => setJoinUrl(`${window.location.host}/play`), []);
 
   const live = room.players.filter((p) => p.connected);
   const bots = live.filter((p) => p.bot);
 
   return (
-    <main className="flex h-dvh flex-col gap-[2vmin] overflow-hidden p-[2vmin]">
+    <main className="flex h-dvh flex-col gap-[1.6vmin] overflow-hidden p-[2vmin]">
       <header className="flex shrink-0 items-center justify-between">
         <ShowMark size="sm" />
         <span className="font-display text-xs uppercase tracking-[0.2em] text-slate-600">
@@ -33,34 +52,34 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
 
       <div className="flex min-h-0 flex-1 gap-[2vmin]">
         {/* Join instructions */}
-        <section className="flex w-[38%] shrink-0 flex-col items-center justify-center gap-[2vmin] rounded-2xl border border-white/10 bg-white/[0.02] p-[2vmin] text-center">
+        <section className="flex w-[34%] shrink-0 flex-col items-center justify-center gap-[1.5vmin] rounded-2xl border border-white/10 bg-white/[0.02] p-[2vmin] text-center">
           <p className="t-label font-display uppercase text-slate-500">
             On your phone, go to
           </p>
-          <p className="break-all font-display text-[clamp(1rem,2.2vw,2.4rem)] uppercase tracking-wide text-slate-100">
+          <p className="break-all font-display text-[clamp(0.9rem,1.9vw,2rem)] uppercase tracking-wide text-slate-100">
             {joinUrl || "…"}
           </p>
-
-          <p className="t-label mt-[2vmin] font-display uppercase text-slate-500">
+          <p className="t-label mt-[1.5vmin] font-display uppercase text-slate-500">
             Room code
           </p>
-          <p className="cream-text font-display text-[clamp(4rem,12vw,11rem)] font-bold leading-none tracking-[0.08em]">
+          <p className="cream-text font-display text-[clamp(3.5rem,10vw,9rem)] font-bold leading-none tracking-[0.08em]">
             {room.code}
+          </p>
+          <p className="mt-[1vmin] max-w-xs text-balance text-sm text-slate-500">
+            Only needed for the phone games — the two below run on this screen
+            alone.
           </p>
         </section>
 
         {/* Who's here */}
         <section className="flex min-h-0 flex-1 flex-col rounded-2xl border border-white/10 bg-white/[0.02] p-[2vmin]">
           <div className="flex shrink-0 items-baseline justify-between gap-4">
-            <h2 className="font-display text-[clamp(1rem,1.8vw,2rem)] uppercase tracking-widest text-slate-300">
+            <h2 className="font-display text-[clamp(1rem,1.7vw,1.9rem)] uppercase tracking-widest text-slate-300">
               In the room
             </h2>
             <div className="flex items-center gap-2">
               {bots.length > 0 && (
-                <button
-                  onClick={onClearBots}
-                  className="btn-ghost px-3 py-1.5 text-xs"
-                >
+                <button onClick={onClearBots} className="btn-ghost px-3 py-1.5 text-xs">
                   Clear bots
                 </button>
               )}
@@ -68,7 +87,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
                 onClick={onAddBots}
                 disabled={bots.length >= 3}
                 className="btn-ghost px-3 py-1.5 text-xs"
-                title="Fills the room so you can try a segment on your own"
+                title="Fills the room so you can try a game on your own"
               >
                 + Practice bots
               </button>
@@ -94,12 +113,10 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
                       : "border-cream/25 bg-cream/[0.06]",
                   ].join(" ")}
                 >
-                  <span className="text-[clamp(1.5rem,2.5vw,2.5rem)]">
-                    {p.emoji}
-                  </span>
+                  <span className="text-[clamp(1.4rem,2.3vw,2.3rem)]">{p.emoji}</span>
                   <span
                     className={[
-                      "truncate font-display text-[clamp(0.9rem,1.3vw,1.5rem)] uppercase tracking-wide",
+                      "truncate font-display text-[clamp(0.85rem,1.2vw,1.4rem)] uppercase tracking-wide",
                       p.bot ? "text-slate-500" : "text-slate-100",
                     ].join(" ")}
                   >
@@ -118,12 +135,29 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
         </section>
       </div>
 
-      {/* Pick a segment */}
+      {/* Every game, in one place */}
       <section className="shrink-0">
         <h2 className="mb-[1vmin] font-display text-xs uppercase tracking-[0.25em] text-slate-500">
-          Start a segment
+          Start a game
         </h2>
-        <div className="grid grid-cols-2 gap-[1vmin] sm:grid-cols-4">
+        <div className="grid grid-cols-3 gap-[1vmin] lg:grid-cols-6">
+          {/* Runs on this screen — no room needed */}
+          {TV_ONLY.map((game) => (
+            <Link
+              key={game.id}
+              href={game.href}
+              className="rounded-xl border border-cream/35 bg-cream/[0.07] px-4 py-[1.5vmin] transition-all hover:-translate-y-0.5 hover:border-cream/70 hover:shadow-glow"
+            >
+              <span className="block font-display text-[clamp(0.8rem,1.2vw,1.4rem)] uppercase tracking-wide text-slate-100">
+                {game.name}
+              </span>
+              <span className="mt-0.5 block font-display text-[0.6rem] uppercase tracking-widest text-cream/70">
+                No phones needed
+              </span>
+            </Link>
+          ))}
+
+          {/* Needs phones in the room */}
           {gameList.map((game) => {
             const ready = live.length >= game.minPlayers;
             return (
@@ -133,17 +167,17 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
                 disabled={!ready}
                 onClick={() => onStart(game.id)}
                 className={[
-                  "rounded-xl border px-4 py-[1.6vmin] text-left transition-all",
+                  "rounded-xl border px-4 py-[1.5vmin] text-left transition-all",
                   ready
-                    ? "border-cream/35 bg-cream/[0.07] hover:-translate-y-0.5 hover:border-cream/70"
-                    : "cursor-not-allowed border-white/8 bg-white/[0.02] opacity-50",
+                    ? "border-cream/35 bg-cream/[0.07] hover:-translate-y-0.5 hover:border-cream/70 hover:shadow-glow"
+                    : "cursor-not-allowed border-white/10 bg-white/[0.02] opacity-50",
                 ].join(" ")}
               >
-                <span className="block font-display text-[clamp(0.85rem,1.3vw,1.5rem)] uppercase tracking-wide text-slate-100">
+                <span className="block font-display text-[clamp(0.8rem,1.2vw,1.4rem)] uppercase tracking-wide text-slate-100">
                   {game.name}
                 </span>
-                <span className="mt-0.5 block font-display text-[0.65rem] uppercase tracking-widest text-slate-500">
-                  {ready ? "Ready" : `Needs ${game.minPlayers}`}
+                <span className="mt-0.5 block font-display text-[0.6rem] uppercase tracking-widest text-slate-500">
+                  {ready ? "Ready" : `Needs ${game.minPlayers} phones`}
                 </span>
               </button>
             );

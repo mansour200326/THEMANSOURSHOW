@@ -12,7 +12,7 @@ export function GeneratingScreen({ categories, onCancel }: Props) {
     <main className="flex min-h-dvh flex-col items-center justify-center gap-[4vmin] px-6 text-center">
       <div>
         <p className="t-label font-display uppercase text-slate-500">
-          Parlour presents
+          Huddle presents
         </p>
         <h1 className="cream-text mt-1 font-display text-4xl font-bold uppercase tracking-tight sm:text-6xl">
           Writing the board

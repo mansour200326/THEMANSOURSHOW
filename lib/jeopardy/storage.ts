@@ -1,6 +1,6 @@
 import type { GameState } from "@/lib/jeopardy/types";
 
-const KEY = "parlour:jeopardy:v1";
+const KEY = "huddle:jeopardy:v1";
 
 /** Undo history is intentionally dropped — a refresh keeps the game, not the stack. */
 export function saveGame(state: GameState) {

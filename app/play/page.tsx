@@ -16,7 +16,7 @@ export default function JoinPage() {
     <main className="flex min-h-dvh flex-col justify-center gap-6 p-6">
       <div className="text-center">
         <p className="font-display text-xs uppercase tracking-[0.3em] text-slate-500">
-          Parlour
+          Huddle
         </p>
         <h1 className="mt-2 font-display text-3xl uppercase tracking-wide text-slate-100">
           Enter the room code

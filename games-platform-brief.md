@@ -1,6 +1,6 @@
-# Parlour — Project Brief
+# Huddle — Project Brief
 
-Name: **Parlour.** The platform is a game show; the TV is the studio. Games are presented as segments ("Parlour presents: Team Jeopardy").
+Name: **Huddle.** The platform is a game show; the TV is the studio. Games are presented as segments ("Huddle presents: Team Jeopardy").
 
 ## Vision
 

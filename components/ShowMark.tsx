@@ -1,16 +1,16 @@
 export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
   if (size === "sm") {
     return (
-      <div className="flex items-baseline gap-2 font-display uppercase">
-        <span className="cream-text text-lg tracking-[0.22em]">Parlour</span>
-      </div>
+      <span className="cream-text font-display text-lg uppercase tracking-[0.24em]">
+        Huddle
+      </span>
     );
   }
 
   return (
     <div className="flex flex-col items-center font-display uppercase">
-      <h1 className="cream-text t-hero tracking-[0.06em] drop-shadow-[0_0_40px_rgba(240,228,198,0.25)]">
-        Parlour
+      <h1 className="cream-text t-hero tracking-[0.08em] drop-shadow-[0_0_50px_rgba(240,228,198,0.3)]">
+        Huddle
       </h1>
       <div className="mt-2 flex w-full items-center gap-4">
         <span className="h-px flex-1 bg-gradient-to-r from-transparent to-cream/50" />

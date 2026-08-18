@@ -15,7 +15,7 @@ import {
 import { sampleFeudPack } from "@/lib/feud/samplePack";
 import { type FeudQuestion, type FeudState, otherTeam } from "@/lib/feud/types";
 
-const KEY = "parlour:feud:v1";
+const KEY = "huddle:feud:v1";
 
 export default function FeudPage() {
   const [state, dispatch] = useReducer(feudReducer, undefined, emptyFeud);

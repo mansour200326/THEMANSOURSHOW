@@ -161,7 +161,7 @@ export function SetupScreen({
 
       <div className="mt-10">
         <p className="t-label font-display uppercase text-slate-500">
-          Parlour presents
+          Huddle presents
         </p>
         <h1 className="cream-text mt-1 font-display text-5xl font-bold uppercase tracking-tight sm:text-7xl">
           Team Jeopardy
