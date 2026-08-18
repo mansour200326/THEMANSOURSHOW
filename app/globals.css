@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --stage-bg: #050e22;
+  --stage-glow: rgba(45, 92, 200, 0.42);
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-ink-950 text-slate-100 font-body antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 50% -10%, var(--stage-glow), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 50% 110%, rgba(240, 228, 198, 0.08), transparent 70%);
+    background-attachment: fixed;
+    overscroll-behavior: none;
+  }
+
+  ::selection {
+    @apply bg-cream text-ink-950;
+  }
+
+  /* Big, clean focus ring — visible from the couch. */
+  :focus-visible {
+    outline: 3px solid theme("colors.cream.bright");
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /* ---- typography that scales from a laptop to a 4K TV ---- */
+  .t-hero {
+    font-size: clamp(2.75rem, 7vw, 9rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+  .t-clue {
+    font-size: clamp(1.75rem, 4vw, 5.5rem);
+    line-height: 1.15;
+  }
+  .t-answer {
+    font-size: clamp(1.5rem, 3vw, 4rem);
+    line-height: 1.15;
+  }
+  .t-tile-value {
+    font-size: clamp(1.5rem, 2.9vw, 4.5rem);
+    line-height: 1;
+  }
+  .t-category {
+    font-size: clamp(0.7rem, 1.1vw, 1.75rem);
+    line-height: 1.1;
+  }
+  .t-score {
+    font-size: clamp(1.5rem, 2.2vw, 3.25rem);
+    line-height: 1;
+  }
+  .t-label {
+    font-size: clamp(0.65rem, 0.85vw, 1.15rem);
+    letter-spacing: 0.22em;
+  }
+
+  .cream-text {
+    background: linear-gradient(180deg, #fdf6e6 0%, #f0e4c6 45%, #c7b48c 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .panel {
+    @apply rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 font-display
+           uppercase tracking-wider transition-all duration-150 active:scale-[0.97]
+           disabled:cursor-not-allowed disabled:opacity-35 disabled:active:scale-100;
+  }
+  .btn-cream {
+    @apply btn bg-gradient-to-b from-cream-bright to-cream-deep text-ink-950
+           shadow-[0_8px_24px_rgba(240,228,198,0.25)] hover:brightness-110;
+  }
+  .btn-ghost {
+    @apply btn border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 hover:border-white/25;
+  }
+  .btn-good {
+    @apply btn bg-emerald-500/90 text-ink-950 hover:bg-emerald-400;
+  }
+  .btn-bad {
+    @apply btn bg-rose-600/90 text-white hover:bg-rose-500;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-white/10 bg-ink-900/80 px-4 py-3 text-lg
+           text-slate-100 placeholder:text-slate-500 outline-none transition
+           focus:border-cream/60 focus:bg-ink-900;
+  }
+}
+
+/* Board tile face — the deep TV blue with a lit top edge. */
+.tile-face {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0) 42%),
+    linear-gradient(180deg, #1a4499 0%, #0e2a66 60%, #0a1c46 100%);
+}
+.tile-face-hover:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 42%),
+    linear-gradient(180deg, #2456c4 0%, #143480 60%, #0d2358 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
