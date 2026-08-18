@@ -61,17 +61,29 @@ export default function GamesMenu() {
               </div>
 
               <p className="mt-6 font-display text-xs uppercase tracking-[0.2em] text-slate-500">
-                {game.needsPhones ? "TV + phones" : "TV only"}
+                {game.liveInLobby
+                  ? "Start from the lobby"
+                  : game.needsPhones
+                    ? "TV + phones"
+                    : "TV only"}
               </p>
             </div>
           );
 
-          return live ? (
-            <Link key={game.slug} href={game.href!} className="block">
-              {card}
-            </Link>
-          ) : (
-            <div key={game.slug} className="cursor-not-allowed select-none">
+          // Only games with their own page get a link. The phone games are
+          // live but have no standalone route — they start from a room lobby.
+          if (game.href) {
+            return (
+              <Link key={game.slug} href={game.href} className="block">
+                {card}
+              </Link>
+            );
+          }
+          return (
+            <div
+              key={game.slug}
+              className={game.liveInLobby ? "" : "cursor-not-allowed select-none"}
+            >
               {card}
             </div>
           );
