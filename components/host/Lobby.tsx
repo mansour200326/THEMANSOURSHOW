@@ -32,6 +32,18 @@ const TV_ONLY = [
     href: "/feud",
     blurb: "Survey board, two teams, three strikes.",
   },
+  {
+    id: "categories",
+    name: "Categories",
+    href: "/categories",
+    blurb: "30 seconds to name as many as you can.",
+  },
+  {
+    id: "five-seconds",
+    name: "5 Second Rule",
+    href: "/five-seconds",
+    blurb: "Name three. Five seconds. Go.",
+  },
 ];
 
 export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
@@ -140,7 +152,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
         <h2 className="mb-[1vmin] font-display text-xs uppercase tracking-[0.25em] text-slate-500">
           Start a game
         </h2>
-        <div className="grid grid-cols-3 gap-[1vmin] lg:grid-cols-6">
+        <div className="grid grid-cols-3 gap-[1vmin] lg:grid-cols-5 xl:grid-cols-10">
           {/* Runs on this screen — no room needed */}
           {TV_ONLY.map((game) => (
             <Link

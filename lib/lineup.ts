@@ -12,6 +12,22 @@ export type Segment = {
 
 export const lineup: Segment[] = [
   {
+    slug: "categories",
+    name: "Categories",
+    tagline: "30 seconds. Name as many as you can. Two teams, no mercy.",
+    phase: 10,
+    href: "/categories",
+    needsPhones: false,
+  },
+  {
+    slug: "five-seconds",
+    name: "5 Second Rule",
+    tagline: "Name three. Five seconds. Watch them freeze.",
+    phase: 10,
+    href: "/five-seconds",
+    needsPhones: false,
+  },
+  {
     slug: "team-jeopardy",
     name: "Team Jeopardy",
     tagline: "Classic board, two to four teams, host runs the show.",

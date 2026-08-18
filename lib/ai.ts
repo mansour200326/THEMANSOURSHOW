@@ -318,3 +318,60 @@ export function friendlyAiError(error: unknown): string {
     ? error.message
     : "Couldn't write that one. Try again.";
 }
+
+/* ------------------------------------------------- Rapid-fire prompt packs */
+
+const GeneratedPrompts = z.object({
+  prompts: z.array(z.string()).describe("The prompts, one line each."),
+});
+
+export async function generateRapidPrompts({
+  mode,
+  count,
+  theme = "",
+  difficulty = "medium",
+}: {
+  mode: "categories" | "five-seconds";
+  count: number;
+  theme?: string;
+  difficulty?: Difficulty;
+}): Promise<string[]> {
+  const client = new Anthropic();
+
+  const brief =
+    mode === "categories"
+      ? "Each prompt is a category broad enough that someone could rattle off " +
+        "ten or more answers in 30 seconds. Phrase them as 'Things that…', " +
+        "'Types of…', or a plain plural noun. Never a question."
+      : "Each prompt asks for exactly three things and starts with 'Name 3'. " +
+        "Pick things where three examples exist but come out slowly under " +
+        "pressure — that panic is the whole game.";
+
+  const response = await client.messages.parse({
+    model: MODEL,
+    max_tokens: 4000,
+    system:
+      `You write prompts for a fast-talking party game.\n\n${brief}\n\n` +
+      "Everything must be answerable by an ordinary adult with no special " +
+      "knowledge, and clean enough for a room full of friends.\n\n" +
+      `Difficulty: ${difficultyBrief[difficulty]}`,
+    output_config: {
+      format: zodOutputFormat(GeneratedPrompts),
+      effort: "low",
+    },
+    messages: [
+      {
+        role: "user",
+        content: `Write exactly ${count} prompts${
+          theme.trim() ? ` themed around: ${theme.trim()}` : ""
+        }.`,
+      },
+    ],
+  });
+
+  const parsed = response.parsed_output;
+  if (!parsed?.prompts?.length) {
+    throw new Error("Couldn't write those prompts. Try again.");
+  }
+  return parsed.prompts.map((p) => p.trim()).filter(Boolean).slice(0, count);
+}
