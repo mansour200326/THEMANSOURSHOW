@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { BoardGrid } from "@/components/board/BoardGrid";
 import { type BuzzState, buzzCurrent } from "@/lib/games/buzzEngine";
@@ -14,6 +15,12 @@ type Props = {
 export function BuzzHost({ room, state, send }: Props) {
   const item = buzzCurrent(state);
   const buzzer = playerById(room, state.buzzedBy ?? undefined);
+
+  // The host has to know the answer to judge a buzz, but putting it on the TV
+  // spoils it for everyone still playing. This shows it small, host-side only,
+  // and resets itself on every new item so it can't leak into the next one.
+  const [peek, setPeek] = useState(false);
+  useEffect(() => setPeek(false), [item?.prompt]);
 
   return (
     <main className="flex h-dvh flex-col gap-[1.2vmin] overflow-hidden p-[1.6vmin]">
@@ -129,12 +136,32 @@ export function BuzzHost({ room, state, send }: Props) {
         {state.phase === "open" && (
           <>
             <button onClick={() => send("reveal")} className="btn-ghost text-sm">
-              Reveal answer
+              Show on TV
             </button>
             <button onClick={() => send("skip")} className="btn-ghost text-sm">
               Nobody — next
             </button>
           </>
+        )}
+
+        {/* Host-only answer check — small on purpose. */}
+        {item && (state.phase === "open" || state.phase === "buzzed") && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPeek((v) => !v)}
+              className="btn-ghost px-3 py-1.5 text-xs"
+            >
+              {peek ? "Hide" : "Peek"}
+            </button>
+            <span
+              className={[
+                "font-display text-xs uppercase tracking-wider transition-opacity",
+                peek ? "text-cream/80 opacity-100" : "select-none opacity-0",
+              ].join(" ")}
+            >
+              {item.answer}
+            </span>
+          </div>
         )}
         {state.phase === "scored" && (
           <button onClick={() => send("continue")} className="btn-cream px-10 py-3 text-lg">

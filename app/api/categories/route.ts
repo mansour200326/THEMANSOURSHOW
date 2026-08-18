@@ -1,47 +1,39 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { generateFeudPack, friendlyAiError, hasApiKey } from "@/lib/ai";
+import { generateCategoryIdeas, friendlyAiError, hasApiKey } from "@/lib/ai";
 
 export const runtime = "nodejs";
-export const maxDuration = 300;
+export const maxDuration = 120;
 
 const RequestSchema = z.object({
-  theme: z.string().max(200).optional(),
-  rounds: z.number().int().min(1).max(8).optional(),
+  count: z.number().int().min(1).max(6),
+  hint: z.string().max(200).optional(),
+  difficulty: z.enum(["easy", "medium", "hard"]).optional(),
 });
 
 export async function POST(request: Request) {
   if (!hasApiKey()) {
     return NextResponse.json(
-      {
-        error:
-          "No ANTHROPIC_API_KEY on the server. Add it to .env.local and restart — or play the sample pack.",
-      },
+      { error: "No ANTHROPIC_API_KEY on the server." },
       { status: 503 },
     );
   }
-
   let body: unknown;
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Bad request." }, { status: 400 });
   }
-
-  const parsed = RequestSchema.safeParse(body ?? {});
+  const parsed = RequestSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: "Bad request." }, { status: 400 });
   }
-
   try {
-    const questions = await generateFeudPack({
-      theme: parsed.data.theme ?? "",
-      rounds: parsed.data.rounds ?? 5,
-    });
-    return NextResponse.json({ questions });
+    const categories = await generateCategoryIdeas(parsed.data);
+    return NextResponse.json({ categories });
   } catch (error) {
     const message = friendlyAiError(error);
-    console.error("[feud] generation failed:", error);
+    console.error("[categories] failed:", error);
     return NextResponse.json({ error: message }, { status: 502 });
   }
 }

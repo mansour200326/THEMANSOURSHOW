@@ -2,7 +2,9 @@
 
 import { use } from "react";
 import Link from "next/link";
+import { useState } from "react";
 import { BuzzHost } from "@/components/host/BuzzHost";
+import { GameSetup } from "@/components/host/GameSetup";
 import { Lobby } from "@/components/host/Lobby";
 import { RoundHost } from "@/components/host/RoundHost";
 import type { BuzzState } from "@/lib/games/buzzEngine";
@@ -17,6 +19,44 @@ export default function HostPage({
   const { code } = use(params);
   const roomCode = code.toUpperCase();
   const { room, status, send } = useRoom(roomCode);
+
+  // Games that take categories get a setup step before they start.
+  const [setupFor, setSetupFor] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [setupError, setSetupError] = useState<string | null>(null);
+
+  const NEEDS_SETUP: Record<string, string> = { "trivia-royale": "Trivia Royale" };
+
+  const launch = async (
+    gameId: string,
+    config: { categories: string[]; difficulty: string },
+  ) => {
+    setSetupError(null);
+    if (config.categories.length < 3) {
+      setSetupFor(null);
+      send("game:start", { gameId });
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await fetch("/api/board", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          categories: config.categories,
+          difficulty: config.difficulty,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error ?? "Board generation failed.");
+      setSetupFor(null);
+      send("game:start", { gameId, board: data.board });
+    } catch (e) {
+      setSetupError(e instanceof Error ? e.message : "Board generation failed.");
+    } finally {
+      setBusy(false);
+    }
+  };
 
   if (status === "missing") {
     return (
@@ -45,11 +85,30 @@ export default function HostPage({
     );
   }
 
+  if (setupFor) {
+    return (
+      <GameSetup
+        gameName={NEEDS_SETUP[setupFor]}
+        busy={busy}
+        error={setupError}
+        onCancel={() => {
+          setSetupFor(null);
+          setSetupError(null);
+        }}
+        onStart={(config) => launch(setupFor, config)}
+      />
+    );
+  }
+
   if (!room.gameId) {
     return (
       <Lobby
         room={room}
-        onStart={(gameId) => send("game:start", { gameId })}
+        onStart={(gameId) =>
+          NEEDS_SETUP[gameId]
+            ? setSetupFor(gameId)
+            : send("game:start", { gameId })
+        }
         onAddBots={() => send("bots:add")}
         onClearBots={() => send("bots:clear")}
       />

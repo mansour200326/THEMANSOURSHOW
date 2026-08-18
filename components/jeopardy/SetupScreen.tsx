@@ -3,7 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
+import { DifficultyBar } from "@/components/DifficultyBar";
 import { ShowMark } from "@/components/ShowMark";
+import type { Difficulty } from "@/lib/difficulty";
 import { type Rules, defaultRules } from "@/lib/jeopardy/types";
 
 const MIN_TEAMS = 2;
@@ -37,6 +39,7 @@ export type SetupConfig = {
   categories: string[];
   vibe: string;
   rules: Rules;
+  difficulty: Difficulty;
   source: "ai" | "sample";
 };
 
@@ -110,6 +113,28 @@ export function SetupScreen({
   const [categories, setCategories] = useState<string[]>(["", "", ""]);
   const [vibe, setVibe] = useState("");
   const [rules, setRules] = useState<Rules>(defaultRules);
+  const [difficulty, setDifficulty] = useState<Difficulty>("medium");
+  const [suggesting, setSuggesting] = useState(false);
+
+  /** Fill every slot with AI-invented topics, for hosts who'd rather not think. */
+  const suggestCategories = async () => {
+    setSuggesting(true);
+    try {
+      const res = await fetch("/api/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ count: categories.length, hint: vibe, difficulty }),
+      });
+      const data = await res.json();
+      if (res.ok && Array.isArray(data.categories)) {
+        setCategories((c) => c.map((v, i) => data.categories[i] ?? v));
+      }
+    } catch {
+      /* leave what's typed — the host can still write their own */
+    } finally {
+      setSuggesting(false);
+    }
+  };
 
   const setRule = <K extends keyof Rules>(key: K, value: Rules[K]) =>
     setRules((r) => ({ ...r, [key]: value }));
@@ -143,7 +168,7 @@ export function SetupScreen({
   const canGenerate = filled.length >= MIN_CATEGORIES;
 
   const start = (source: "ai" | "sample") =>
-    onStart({ teamNames: names, categories: filled, vibe, rules, source });
+    onStart({ teamNames: names, categories: filled, vibe, rules, difficulty, source });
 
   return (
     <main className="mx-auto min-h-dvh w-full max-w-6xl px-6 py-10">
@@ -191,9 +216,19 @@ export function SetupScreen({
               <h2 className="font-display text-xl uppercase tracking-widest text-slate-300">
                 Categories
               </h2>
-              <span className="font-display text-xs uppercase tracking-widest text-slate-600">
-                {filled.length}/{MAX_CATEGORIES}
-              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={suggestCategories}
+                  disabled={suggesting}
+                  className="btn-ghost px-3 py-1.5 text-xs"
+                >
+                  {suggesting ? "Thinking…" : "✦ Suggest for me"}
+                </button>
+                <span className="font-display text-xs uppercase tracking-widest text-slate-600">
+                  {filled.length}/{MAX_CATEGORIES}
+                </span>
+              </div>
             </div>
             <p className="mt-1 text-sm text-slate-500">
               You pick the topics — anything from Game of Thrones to roasting your
@@ -335,6 +370,13 @@ export function SetupScreen({
         {/* Rules */}
         <section>
           <h2 className="font-display text-xl uppercase tracking-widest text-slate-300">
+            Difficulty
+          </h2>
+          <div className="mt-3">
+            <DifficultyBar value={difficulty} onChange={setDifficulty} />
+          </div>
+
+          <h2 className="mt-8 font-display text-xl uppercase tracking-widest text-slate-300">
             House rules
           </h2>
           <div className="mt-4 space-y-3">

@@ -6,6 +6,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod/v4";
 import type { Board, FinalClue } from "@/lib/board/types";
 import type { FeudQuestion } from "@/lib/feud/types";
+import { type Difficulty, difficultyBrief } from "@/lib/difficulty";
 
 /**
  * Server-side AI content generation. Every generator here returns the same
@@ -79,6 +80,7 @@ function buildPrompt(categories: string[], vibe: string): string {
 export type GenerateBoardInput = {
   categories: string[];
   vibe?: string;
+  difficulty?: Difficulty;
 };
 
 export type GenerateBoardResult = {
@@ -89,13 +91,14 @@ export type GenerateBoardResult = {
 export async function generateTriviaBoard({
   categories,
   vibe = "",
+  difficulty = "medium",
 }: GenerateBoardInput): Promise<GenerateBoardResult> {
   const client = new Anthropic();
 
   const response = await client.messages.parse({
     model: MODEL,
     max_tokens: 16000,
-    system: SYSTEM,
+    system: `${SYSTEM}\n\nDifficulty: ${difficultyBrief[difficulty]}`,
     output_config: {
       format: zodOutputFormat(GeneratedBoard),
       effort: "medium",
@@ -182,16 +185,18 @@ Rules:
 export async function generateFeudPack({
   theme,
   rounds,
+  difficulty = "medium",
 }: {
   theme: string;
   rounds: number;
+  difficulty?: Difficulty;
 }): Promise<FeudQuestion[]> {
   const client = new Anthropic();
 
   const response = await client.messages.parse({
     model: MODEL,
     max_tokens: 16000,
-    system: FEUD_SYSTEM,
+    system: `${FEUD_SYSTEM}\n\nDifficulty: ${difficultyBrief[difficulty]}`,
     output_config: {
       format: zodOutputFormat(GeneratedFeud),
       effort: "medium",
@@ -225,4 +230,91 @@ export async function generateFeudPack({
       .slice(0, 6)
       .map((a) => ({ text: a.text.trim(), points: Math.max(1, Math.round(a.points)) })),
   }));
+}
+
+/* --------------------------------------------------- Category suggestions */
+
+const GeneratedCategories = z.object({
+  categories: z
+    .array(z.string())
+    .describe("Short, punchy category titles — two or three words each."),
+});
+
+/** "Surprise me" — invents topics for the host instead of making them think. */
+export async function generateCategoryIdeas({
+  count,
+  hint = "",
+  difficulty = "medium",
+}: {
+  count: number;
+  hint?: string;
+  difficulty?: Difficulty;
+}): Promise<string[]> {
+  const client = new Anthropic();
+
+  const response = await client.messages.parse({
+    model: MODEL,
+    max_tokens: 2000,
+    system:
+      "You suggest categories for a living-room trivia night. Give a spread " +
+      "across different corners of general knowledge — film, music, sport, " +
+      "food, history, science, language, the internet — so no single person " +
+      "dominates the board. Titles are short and playable, never abstract " +
+      `academic headings.\n\nDifficulty: ${difficultyBrief[difficulty]}`,
+    output_config: {
+      format: zodOutputFormat(GeneratedCategories),
+      effort: "low",
+    },
+    messages: [
+      {
+        role: "user",
+        content: `Suggest exactly ${count} categories${
+          hint.trim() ? ` with this leaning: ${hint.trim()}` : ""
+        }.`,
+      },
+    ],
+  });
+
+  const parsed = response.parsed_output;
+  if (!parsed?.categories?.length) {
+    throw new Error("Couldn't think of any categories. Try again.");
+  }
+  return parsed.categories
+    .map((c) => c.trim())
+    .filter(Boolean)
+    .slice(0, count);
+}
+
+/* -------------------------------------------------------- error presentation */
+
+/**
+ * Turns SDK failures into something a host can read from the couch. Without
+ * this a busy upstream shows up as a raw JSON blob on the TV.
+ */
+export function friendlyAiError(error: unknown): string {
+  const status =
+    typeof error === "object" && error !== null && "status" in error
+      ? Number((error as { status?: unknown }).status)
+      : undefined;
+
+  switch (status) {
+    case 429:
+      return "Too many requests just now. Wait a few seconds and try again.";
+    case 529:
+    case 503:
+      return "The writing service is busy right now. Try again in a moment — or start with the sample pack.";
+    case 401:
+    case 403:
+      return "That API key was rejected. Check ANTHROPIC_API_KEY in your host's settings.";
+    case 400:
+      return "That request was rejected. Try rewording the categories.";
+    default:
+      break;
+  }
+  if (status && status >= 500) {
+    return "The writing service had a problem. Try again in a moment.";
+  }
+  return error instanceof Error && error.message.length < 120
+    ? error.message
+    : "Couldn't write that one. Try again.";
 }

@@ -132,7 +132,16 @@ function reduceRoom(room: Room, action: Action): Room {
       const id = String(action.payload?.gameId ?? "");
       const game = games[id];
       if (!game) return room;
-      return game.init({ ...room, gameId: id, game: null });
+      // Content generated during setup rides along on the start action.
+      const withBoard = {
+        ...room,
+        gameId: id,
+        game: null,
+        pendingBoard: action.payload?.board,
+      };
+      const started = game.init(withBoard as typeof room);
+      delete (started as { pendingBoard?: unknown }).pendingBoard;
+      return started;
     }
 
     case "game:end":

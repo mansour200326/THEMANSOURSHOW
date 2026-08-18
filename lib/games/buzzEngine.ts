@@ -101,11 +101,13 @@ export function createBuzzGame(
     needsPhones: true,
 
     init(room) {
+      // A board generated at setup time overrides the bundled one.
+      const supplied = (room as unknown as { pendingBoard?: Board }).pendingBoard;
       const fresh: BuzzState = {
         kind: "buzz",
         mode: spec.mode,
         phase: spec.mode === "board" ? "picking" : "open",
-        board: content.board ?? null,
+        board: supplied ?? content.board ?? null,
         spent: [],
         active: null,
         items: content.items ?? [],

@@ -95,6 +95,7 @@ export default function TeamJeopardyPage() {
         body: JSON.stringify({
           categories: config.categories,
           vibe: config.vibe,
+          difficulty: config.difficulty,
         }),
         signal: controller.signal,
       });

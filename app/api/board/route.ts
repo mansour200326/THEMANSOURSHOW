@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { generateTriviaBoard, hasApiKey } from "@/lib/ai";
+import { generateTriviaBoard, friendlyAiError, hasApiKey } from "@/lib/ai";
 
 export const runtime = "nodejs";
 /** Board generation is slow by web standards — give it room on Vercel. */
@@ -9,6 +9,7 @@ export const maxDuration = 300;
 const RequestSchema = z.object({
   categories: z.array(z.string()).min(3).max(6),
   vibe: z.string().max(300).optional(),
+  difficulty: z.enum(["easy", "medium", "hard"]).optional(),
 });
 
 export async function POST(request: Request) {
@@ -53,11 +54,11 @@ export async function POST(request: Request) {
     const result = await generateTriviaBoard({
       categories,
       vibe: parsed.data.vibe,
+      difficulty: parsed.data.difficulty,
     });
     return NextResponse.json(result);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "The board generator fell over.";
+    const message = friendlyAiError(error);
     console.error("[board] generation failed:", error);
     return NextResponse.json({ error: message }, { status: 502 });
   }
