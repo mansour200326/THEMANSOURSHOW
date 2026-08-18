@@ -21,6 +21,7 @@ export const lineup: Segment[] = [
   },
   {
     slug: "trivia-royale",
+    liveInLobby: true,
     name: "Trivia Royale",
     tagline: "Same board, but everyone buzzes from their phone.",
     phase: 4,
@@ -74,6 +75,7 @@ export const lineup: Segment[] = [
   },
   {
     slug: "emoji-riddles",
+    liveInLobby: true,
     name: "Emoji Riddles",
     tagline: "🎬🍿👻 — decode it before anyone else.",
     phase: 7,

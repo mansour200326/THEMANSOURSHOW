@@ -1,7 +1,9 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
+import { BuzzPlayer } from "@/components/play/BuzzPlayer";
 import { RoundPlayer } from "@/components/play/RoundPlayer";
+import type { BuzzState } from "@/lib/games/buzzEngine";
 import type { RoundState } from "@/lib/games/roundEngine";
 import { useRoom } from "@/lib/room/useRoom";
 
@@ -99,7 +101,19 @@ export default function PlayPage({
     );
   }
 
-  const state = room.game as RoundState | null;
+  const state = room.game as (RoundState | BuzzState) | null;
+
+  if (room.gameId && state?.kind === "buzz") {
+    return (
+      <BuzzPlayer
+        room={room}
+        state={state}
+        me={me}
+        onBuzz={() => send("buzz", undefined, me.id)}
+        onPick={(c, r) => send("pick", { c, r }, me.id)}
+      />
+    );
+  }
 
   if (room.gameId && state?.kind === "round") {
     return (

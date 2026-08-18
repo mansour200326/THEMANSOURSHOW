@@ -2,8 +2,10 @@
 
 import { use } from "react";
 import Link from "next/link";
+import { BuzzHost } from "@/components/host/BuzzHost";
 import { Lobby } from "@/components/host/Lobby";
 import { RoundHost } from "@/components/host/RoundHost";
+import type { BuzzState } from "@/lib/games/buzzEngine";
 import type { RoundState } from "@/lib/games/roundEngine";
 import { useRoom } from "@/lib/room/useRoom";
 
@@ -54,7 +56,17 @@ export default function HostPage({
     );
   }
 
-  const state = room.game as RoundState | null;
+  const state = room.game as (RoundState | BuzzState) | null;
+
+  if (state?.kind === "buzz") {
+    return (
+      <BuzzHost
+        room={room}
+        state={state}
+        send={(type, payload) => send(type, payload)}
+      />
+    );
+  }
 
   if (state?.kind === "round") {
     return (
