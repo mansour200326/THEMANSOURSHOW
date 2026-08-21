@@ -14,7 +14,39 @@ import { type Difficulty, difficultyBrief } from "@/lib/difficulty";
  * between a generated board and the bundled sample pack.
  */
 
-const MODEL = "claude-opus-5";
+/**
+ * Which model does which job. Set these in the host's environment to swap
+ * models without a deploy of new code — the defaults below are what runs if
+ * the variables are absent.
+ *
+ *   HUDDLE_MODEL_BOARD  boards and surveys — structured, has to be accurate
+ *   HUDDLE_MODEL_PACKS  short prompt lists — cheap and fast is the point
+ */
+const MODELS = {
+  board: process.env.HUDDLE_MODEL_BOARD?.trim() || "claude-sonnet-5",
+  packs: process.env.HUDDLE_MODEL_PACKS?.trim() || "claude-haiku-4-5",
+};
+
+/**
+ * `output_config.effort` is rejected outright by some models — Haiku 4.5 and
+ * Sonnet 4.5 among them — so it can only be sent where it's supported. This
+ * matters because the model names are configurable: someone can point the pack
+ * generators at a model that would 400 on a parameter they never chose.
+ */
+const EFFORT_UNSUPPORTED = [/haiku/i, /sonnet-4-5/i];
+
+const supportsEffort = (model: string) =>
+  !EFFORT_UNSUPPORTED.some((pattern) => pattern.test(model));
+
+type Effort = "low" | "medium" | "high";
+
+// Generic over the format so the schema's type survives and `parse()` can
+// still infer parsed_output.
+function outputConfig<F>(model: string, format: F, effort: Effort) {
+  return supportsEffort(model)
+    ? { format, effort }
+    : { format, effort: undefined };
+}
 
 /** Ascending values down each category — assigned here, never trusted to the model. */
 const VALUES = [100, 200, 300, 400, 500];
@@ -96,13 +128,14 @@ export async function generateTriviaBoard({
   const client = new Anthropic();
 
   const response = await client.messages.parse({
-    model: MODEL,
+    model: MODELS.board,
     max_tokens: 16000,
     system: `${SYSTEM}\n\nDifficulty: ${difficultyBrief[difficulty]}`,
-    output_config: {
-      format: zodOutputFormat(GeneratedBoard),
-      effort: "medium",
-    },
+    output_config: outputConfig(
+      MODELS.board,
+      zodOutputFormat(GeneratedBoard),
+      "medium",
+    ),
     messages: [{ role: "user", content: buildPrompt(categories, vibe) }],
   });
 
@@ -194,13 +227,14 @@ export async function generateFeudPack({
   const client = new Anthropic();
 
   const response = await client.messages.parse({
-    model: MODEL,
+    model: MODELS.board,
     max_tokens: 16000,
     system: `${FEUD_SYSTEM}\n\nDifficulty: ${difficultyBrief[difficulty]}`,
-    output_config: {
-      format: zodOutputFormat(GeneratedFeud),
-      effort: "medium",
-    },
+    output_config: outputConfig(
+      MODELS.board,
+      zodOutputFormat(GeneratedFeud),
+      "medium",
+    ),
     messages: [
       {
         role: "user",
@@ -253,7 +287,7 @@ export async function generateCategoryIdeas({
   const client = new Anthropic();
 
   const response = await client.messages.parse({
-    model: MODEL,
+    model: MODELS.packs,
     max_tokens: 2000,
     system:
       "You suggest categories for a living-room trivia night. Give a spread " +
@@ -261,10 +295,11 @@ export async function generateCategoryIdeas({
       "food, history, science, language, the internet — so no single person " +
       "dominates the board. Titles are short and playable, never abstract " +
       `academic headings.\n\nDifficulty: ${difficultyBrief[difficulty]}`,
-    output_config: {
-      format: zodOutputFormat(GeneratedCategories),
-      effort: "low",
-    },
+    output_config: outputConfig(
+      MODELS.packs,
+      zodOutputFormat(GeneratedCategories),
+      "low",
+    ),
     messages: [
       {
         role: "user",
@@ -308,6 +343,8 @@ export function friendlyAiError(error: unknown): string {
       return "That API key was rejected. Check ANTHROPIC_API_KEY in your host's settings.";
     case 400:
       return "That request was rejected. Try rewording the categories.";
+    case 404:
+      return "That model doesn't exist. Check HUDDLE_MODEL_BOARD and HUDDLE_MODEL_PACKS in your host's settings.";
     default:
       break;
   }
@@ -348,17 +385,18 @@ export async function generateRapidPrompts({
         "pressure — that panic is the whole game.";
 
   const response = await client.messages.parse({
-    model: MODEL,
+    model: MODELS.packs,
     max_tokens: 4000,
     system:
       `You write prompts for a fast-talking party game.\n\n${brief}\n\n` +
       "Everything must be answerable by an ordinary adult with no special " +
       "knowledge, and clean enough for a room full of friends.\n\n" +
       `Difficulty: ${difficultyBrief[difficulty]}`,
-    output_config: {
-      format: zodOutputFormat(GeneratedPrompts),
-      effort: "low",
-    },
+    output_config: outputConfig(
+      MODELS.packs,
+      zodOutputFormat(GeneratedPrompts),
+      "low",
+    ),
     messages: [
       {
         role: "user",

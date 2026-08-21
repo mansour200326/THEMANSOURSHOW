@@ -24,6 +24,20 @@ ANTHROPIC_API_KEY=sk-ant-...
 Without it the AI generators are disabled and every game falls back to its
 bundled content pack.
 
+### Choosing models
+
+Both are optional; the defaults below are what runs if they're unset. Change
+them in the environment and restart — no code change needed.
+
+| Variable | Default | Used for |
+|---|---|---|
+| `HUDDLE_MODEL_BOARD` | `claude-sonnet-5` | Jeopardy boards, Feud surveys — structured output that has to be accurate |
+| `HUDDLE_MODEL_PACKS` | `claude-haiku-4-5` | Category ideas and rapid-fire prompt lists — short, cheap, high volume |
+
+One caveat if you swap these: `output_config.effort` is rejected by some models
+(Haiku 4.5 and Sonnet 4.5 among them). The code detects those by name and omits
+the parameter, so pointing either variable at one of them still works.
+
 ## The games
 
 | Segment | Devices |
