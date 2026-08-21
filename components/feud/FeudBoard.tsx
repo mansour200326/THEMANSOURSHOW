@@ -13,6 +13,7 @@ type Props = {
   onGuess: (text: string) => void;
   onReveal: (index: number) => void;
   onStrike: () => void;
+  onNextRound: () => void;
 };
 
 export function FeudBoard({
@@ -20,6 +21,7 @@ export function FeudBoard({
   onGuess,
   onReveal,
   onStrike,
+  onNextRound,
 }: Props) {
   const [draft, setDraft] = useState("");
   const box = useRef<HTMLInputElement>(null);
@@ -40,6 +42,8 @@ export function FeudBoard({
   };
 
   const feedback = state.lastGuess;
+  const over = state.phase === "round-end";
+  const lastRound = state.round + 1 >= state.questions.length;
 
   const controlTeam = state.teams[state.control];
 
@@ -53,7 +57,11 @@ export function FeudBoard({
       {/* Who's up + strikes */}
       <div className="flex shrink-0 items-center justify-center gap-[2vmin]">
         <span className="font-display text-[clamp(0.9rem,1.6vw,1.8rem)] uppercase tracking-[0.2em] text-cream">
-          {controlTeam?.name}
+          {over
+            ? state.outcome === "cleared"
+              ? "Board cleared"
+              : "Both teams struck out"
+            : controlTeam?.name}
         </span>
         <span className="flex gap-2">
           {Array.from({ length: STRIKES_ALLOWED }).map((_, i) => (
@@ -138,7 +146,29 @@ export function FeudBoard({
         })}
       </div>
 
+      {/* Round over — the board above stays up so everything can be read */}
+      {over && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex shrink-0 items-center justify-between gap-6 px-[2vw]"
+        >
+          <p className="font-display text-[clamp(0.85rem,1.4vw,1.5rem)] uppercase tracking-wider text-slate-400">
+            {state.outcome === "cleared"
+              ? "Every answer found"
+              : "The rest are shown above"}
+          </p>
+          <button onClick={onNextRound} className="btn-cream px-12 py-4 text-xl">
+            {lastRound ? "Final standings" : "Next round"}
+          </button>
+          <p className="t-label font-display uppercase text-slate-500">
+            Round {state.round + 1}/{state.questions.length}
+          </p>
+        </motion.div>
+      )}
+
       {/* Answer box + pot */}
+      {!over && (
       <div className="flex shrink-0 items-end gap-[1.5vw] px-[2vw]">
         <div className="shrink-0 text-left">
           <p className="t-label font-display uppercase text-slate-500">Pot</p>
@@ -197,6 +227,7 @@ export function FeudBoard({
           </p>
         </div>
       </div>
+      )}
     </div>
   );
 }

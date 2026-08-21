@@ -49,16 +49,20 @@ const makeTeam = (name: string, i: number): FeudTeam => ({
   score: 0,
 });
 
-/** Hand the pot to a team and park on the round-end card. */
-function bank(
+/**
+ * Close the round with every answer face-up. Nothing is awarded here — teams
+ * are paid the moment they open an answer — so the board can be read for as
+ * long as the room wants before moving on, including the ones nobody got.
+ */
+function endRound(
   state: FeudState,
-  teamIndex: number,
   outcome: NonNullable<FeudState["outcome"]>,
 ): FeudState {
-  const teams = state.teams.map((t, i) =>
-    i === teamIndex ? { ...t, score: t.score + state.pot } : t,
-  );
-  return { ...state, teams, phase: "round-end", outcome };
+  const question = currentQuestion(state);
+  const everything = question
+    ? question.answers.map((_, i) => i)
+    : state.revealed;
+  return { ...state, phase: "round-end", outcome, revealed: everything };
 }
 
 export function feudReducer(state: FeudState, action: FeudAction): FeudState {
@@ -113,14 +117,18 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
         ...state,
         past: snapshot(state),
         revealed: [...state.revealed, action.index],
+        // Paid straight to the team that said it. A handover shouldn't move
+        // points a team already earned across the table.
+        teams: state.teams.map((t, i) =>
+          i === state.control ? { ...t, score: t.score + answer.points } : t,
+        ),
         pot: state.pot + answer.points,
         contributions: state.contributions.map((n, i) =>
           i === state.control ? n + 1 : n,
         ),
         handoverAt: null,
       };
-      // Board cleared — the team in control keeps everything.
-      return allRevealed(next) ? bank(next, next.control, "cleared") : next;
+      return allRevealed(next) ? endRound(next, "cleared") : next;
     }
 
     case "STRIKE": {
@@ -146,13 +154,8 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
         };
       }
 
-      // Both teams out — whoever opened more of the board takes the pot.
-      const best = next.contributions.reduce(
-        (bestIndex, count, i) =>
-          count > next.contributions[bestIndex] ? i : bestIndex,
-        0,
-      );
-      return bank(next, best, "both-out");
+      // Both teams out. Everyone keeps what they opened; show the rest.
+      return endRound(next, "both-out");
     }
 
     case "NEXT_ROUND": {

@@ -172,44 +172,14 @@ export default function FeudPage() {
               </div>
             )}
 
-            {state.phase === "play" && (
+            {(state.phase === "play" || state.phase === "round-end") && (
               <FeudBoard
                 state={state}
                 onGuess={(text) => dispatch({ type: "GUESS", text })}
                 onReveal={(index) => dispatch({ type: "REVEAL", index })}
                 onStrike={() => dispatch({ type: "STRIKE" })}
+                onNextRound={() => dispatch({ type: "NEXT_ROUND" })}
               />
-            )}
-
-            {state.phase === "round-end" && (
-              <div className="flex h-full flex-col items-center justify-center gap-[3vmin] text-center">
-                <p className="t-label font-display uppercase text-slate-500">
-                  {state.outcome === "cleared"
-                    ? "Board cleared"
-                    : "Both teams struck out"}
-                </p>
-                <p className="cream-text t-hero font-display font-bold uppercase">
-                  +{state.pot}
-                </p>
-                <p className="font-display text-[clamp(1.2rem,2.4vw,2.6rem)] uppercase tracking-wide text-slate-200">
-                  {state.outcome === "cleared"
-                    ? state.teams[state.control]?.name
-                    : state.teams[
-                        state.contributions.reduce(
-                          (best, n, i) => (n > state.contributions[best] ? i : best),
-                          0,
-                        )
-                      ]?.name}
-                </p>
-                <button
-                  onClick={() => dispatch({ type: "NEXT_ROUND" })}
-                  className="btn-cream px-12 py-4 text-xl"
-                >
-                  {state.round + 1 >= state.questions.length
-                    ? "Final standings"
-                    : "Next round"}
-                </button>
-              </div>
             )}
 
             {state.phase === "winner" && (
