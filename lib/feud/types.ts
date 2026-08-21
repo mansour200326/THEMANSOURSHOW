@@ -40,6 +40,8 @@ export type FeudState = {
   revealed: number[];
   /** How the round finished, for the round-end card. */
   outcome: "cleared" | "stolen" | "held" | null;
+  /** What the host last typed, and whether it landed. */
+  lastGuess: { text: string; matched: number | null; at: number } | null;
   past: FeudState[];
 };
 

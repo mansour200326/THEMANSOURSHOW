@@ -175,6 +175,7 @@ export default function FeudPage() {
             {(state.phase === "play" || state.phase === "steal") && (
               <FeudBoard
                 state={state}
+                onGuess={(text) => dispatch({ type: "GUESS", text })}
                 onReveal={(index) => dispatch({ type: "REVEAL", index })}
                 onStrike={() => dispatch({ type: "STRIKE" })}
                 onStealHit={(index) => dispatch({ type: "STEAL_HIT", index })}

@@ -1,3 +1,4 @@
+import { matchAnswer } from "@/lib/feud/match";
 import {
   type FeudQuestion,
   type FeudState,
@@ -21,12 +22,14 @@ export const emptyFeud = (): FeudState => ({
   pot: 0,
   revealed: [],
   outcome: null,
+  lastGuess: null,
   past: [],
 });
 
 export type FeudAction =
   | { type: "START"; teamNames: string[]; theme: string; questions: FeudQuestion[] }
   | { type: "SET_CONTROL"; team: number }
+  | { type: "GUESS"; text: string }
   | { type: "REVEAL"; index: number }
   | { type: "STRIKE" }
   | { type: "STEAL_HIT"; index: number }
@@ -71,6 +74,38 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
     case "SET_CONTROL": {
       if (state.phase !== "face-off") return state;
       return { ...state, control: action.team, phase: "play" };
+    }
+
+    /**
+     * The host types what the team shouted. A near miss still counts — the
+     * matcher decides — and anything it can't place is a strike.
+     */
+    case "GUESS": {
+      const text = action.text.trim();
+      if (!text) return state;
+      if (state.phase !== "play" && state.phase !== "steal") return state;
+
+      const q = currentQuestion(state);
+      if (!q) return state;
+
+      const hit = matchAnswer(
+        text,
+        q.answers.map((a) => a.text),
+        state.revealed,
+      );
+      const stamped = { text, matched: hit?.index ?? null, at: Date.now() };
+
+      if (state.phase === "steal") {
+        const stealing = { ...state, lastGuess: stamped };
+        return hit
+          ? feudReducer(stealing, { type: "STEAL_HIT", index: hit.index })
+          : feudReducer(stealing, { type: "STEAL_MISS" });
+      }
+
+      const playing = { ...state, lastGuess: stamped };
+      return hit
+        ? feudReducer(playing, { type: "REVEAL", index: hit.index })
+        : feudReducer(playing, { type: "STRIKE" });
     }
 
     case "REVEAL": {
@@ -132,6 +167,7 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
         pot: 0,
         revealed: [],
         outcome: null,
+        lastGuess: null,
         // Loser of the last round starts the next one.
         control: otherTeam(state),
       };

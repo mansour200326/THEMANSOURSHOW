@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   type FeudState,
@@ -10,6 +11,7 @@ import {
 
 type Props = {
   state: FeudState;
+  onGuess: (text: string) => void;
   onReveal: (index: number) => void;
   onStrike: () => void;
   onStealHit: (index: number) => void;
@@ -18,13 +20,31 @@ type Props = {
 
 export function FeudBoard({
   state,
+  onGuess,
   onReveal,
   onStrike,
   onStealHit,
   onStealMiss,
 }: Props) {
+  const [draft, setDraft] = useState("");
+  const box = useRef<HTMLInputElement>(null);
   const question = currentQuestion(state);
+
+  // Clear the box and take focus back after every guess, so the host can just
+  // keep typing as the team keeps shouting.
+  useEffect(() => {
+    setDraft("");
+    box.current?.focus();
+  }, [state.lastGuess?.at, state.round, state.phase]);
+
   if (!question) return null;
+
+  const submit = () => {
+    const text = draft.trim();
+    if (text) onGuess(text);
+  };
+
+  const feedback = state.lastGuess;
 
   const stealing = state.phase === "steal";
   const controlTeam = state.teams[state.control];
@@ -111,28 +131,68 @@ export function FeudBoard({
         })}
       </div>
 
-      {/* Pot + host controls */}
-      <div className="flex shrink-0 items-center justify-between gap-4 px-[2vw]">
-        <div className="text-left">
+      {/* Answer box + pot */}
+      <div className="flex shrink-0 items-end gap-[1.5vw] px-[2vw]">
+        <div className="shrink-0 text-left">
           <p className="t-label font-display uppercase text-slate-500">Pot</p>
           <p className="cream-text font-display text-[clamp(1.6rem,3vw,3.6rem)] font-bold tabular-nums">
             {state.pot}
           </p>
         </div>
 
-        {state.phase === "play" && (
-          <button onClick={onStrike} className="btn-bad px-10 py-4 text-xl">
-            Strike ✗
-          </button>
-        )}
-        {stealing && (
-          <button onClick={onStealMiss} className="btn-ghost px-8 py-4 text-lg">
-            Steal missed
-          </button>
-        )}
+        <div className="min-w-0 flex-1">
+          <div className="flex gap-2">
+            <input
+              ref={box}
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && submit()}
+              placeholder={
+                stealing ? "Their one steal guess…" : "Type what they said…"
+              }
+              autoFocus
+              className="field flex-1 text-[clamp(1rem,1.8vw,1.6rem)]"
+            />
+            <button onClick={submit} className="btn-cream px-8 text-lg">
+              Enter
+            </button>
+          </div>
 
-        <div className="text-right">
-          <p className="t-label font-display uppercase text-slate-500">
+          {/* Did that land? */}
+          <div className="mt-1 h-6">
+            <AnimatePresence initial={false}>
+              {feedback && (
+                <motion.p
+                  key={feedback.at}
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className={[
+                    "font-display text-sm uppercase tracking-wider",
+                    feedback.matched !== null ? "text-emerald-300" : "text-rose-400",
+                  ].join(" ")}
+                >
+                  {feedback.matched !== null
+                    ? `“${feedback.text}” → ${question.answers[feedback.matched]?.text}`
+                    : `“${feedback.text}” — not on the board`}
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        <div className="shrink-0 text-right">
+          {state.phase === "play" && (
+            <button onClick={onStrike} className="btn-bad px-6 py-3">
+              Strike ✗
+            </button>
+          )}
+          {stealing && (
+            <button onClick={onStealMiss} className="btn-ghost px-6 py-3">
+              Steal missed
+            </button>
+          )}
+          <p className="t-label mt-1 font-display uppercase text-slate-500">
             Round {state.round + 1}/{state.questions.length}
           </p>
         </div>
