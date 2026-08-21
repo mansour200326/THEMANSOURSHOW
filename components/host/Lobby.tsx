@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ShowMark } from "@/components/ShowMark";
+import { familyClass } from "@/lib/games/families";
 import { gameList } from "@/lib/games/registry";
 import type { Room } from "@/lib/room/types";
 
@@ -17,16 +18,16 @@ type Props = {
 /** Games that run on this screen alone — no room, no phones. */
 const TV_ONLY = [
   {
-    id: "team-jeopardy",
-    name: "Team Jeopardy",
-    href: "/jeopardy",
+    id: "big-board",
+    name: "Big Board",
+    href: "/big-board",
     blurb:
       "The classic board. Teams pick a tile, answer out loud, and you keep score.",
   },
   {
-    id: "the-feud",
-    name: "The Feud",
-    href: "/feud",
+    id: "face-off",
+    name: "Face-Off",
+    href: "/face-off",
     blurb:
       "We surveyed 100 people. Guess the top answers before three strikes.",
   },
@@ -38,9 +39,9 @@ const TV_ONLY = [
       "Thirty seconds to name as many as you can. Two teams, one clock.",
   },
   {
-    id: "five-seconds",
-    name: "5 Second Rule",
-    href: "/five-seconds",
+    id: "three-in-five",
+    name: "Three in Five",
+    href: "/three-in-five",
     blurb: "Name three things in five seconds. Much harder than it sounds.",
   },
 ];
@@ -59,18 +60,18 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
         <div className="flex items-center gap-5 rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-[1.4vmin]">
           <ShowMark size="sm" />
           <div className="border-l border-white/10 pl-5">
-            <p className="t-label font-display uppercase text-slate-500">
+            <p className="t-label font-display uppercase text-moon-deep">
               Room code
             </p>
-            <p className="cream-text font-display text-[clamp(2rem,4.2vw,4.5rem)] font-bold leading-none tracking-[0.1em]">
+            <p className="accent-text font-display text-[clamp(2rem,4.2vw,4.5rem)] font-bold leading-none tracking-[0.1em]">
               {room.code}
             </p>
           </div>
           <div className="max-w-[22ch] border-l border-white/10 pl-5">
-            <p className="t-label font-display uppercase text-slate-500">
+            <p className="t-label font-display uppercase text-moon-deep">
               Phones join at
             </p>
-            <p className="break-all text-[clamp(0.7rem,0.95vw,1rem)] leading-tight text-slate-300">
+            <p className="break-all text-[clamp(0.7rem,0.95vw,1rem)] leading-tight text-moon/75">
               {joinUrl || "…"}
             </p>
           </div>
@@ -78,7 +79,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
 
         <div className="flex min-w-0 flex-1 flex-col rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-[1vmin]">
           <div className="flex shrink-0 items-center justify-between gap-4">
-            <span className="t-label font-display uppercase text-slate-500">
+            <span className="t-label font-display uppercase text-moon-deep">
               In the room · {live.length}
             </span>
             <div className="flex items-center gap-2">
@@ -109,8 +110,8 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
                   className={[
                     "flex items-center gap-2 rounded-full border px-3 py-1",
                     p.bot
-                      ? "border-white/10 bg-white/[0.03] text-slate-500"
-                      : "border-cream/30 bg-cream/[0.07] text-slate-100",
+                      ? "border-white/10 bg-white/[0.03] text-moon-deep"
+                      : "border-accent/30 bg-accent/[0.07] text-moon",
                   ].join(" ")}
                 >
                   <span className="text-base">{p.emoji}</span>
@@ -121,7 +122,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
               ))}
             </AnimatePresence>
             {live.length === 0 && (
-              <p className="self-center text-sm text-slate-500">
+              <p className="self-center text-sm text-moon-deep">
                 Waiting for the first phone — the four screen-only games below
                 don&apos;t need one.
               </p>
@@ -133,7 +134,12 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
       {/* The games get the room */}
       <section className="grid min-h-0 flex-1 grid-cols-2 grid-rows-5 gap-[1.1vmin] sm:grid-cols-3 sm:grid-rows-4 xl:grid-cols-5 xl:grid-rows-2">
         {TV_ONLY.map((game) => (
-          <Link key={game.id} href={game.href} className="group block min-h-0">
+          <Link
+            key={game.id}
+            href={game.href}
+            /* Each card is lit by its own game's colour, so the grid reads as a lineup. */
+            className={`group block min-h-0 ${familyClass(game.id)}`}
+          >
             <Card name={game.name} blurb={game.blurb} status="No phones needed" ready />
           </Link>
         ))}
@@ -146,7 +152,9 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
               type="button"
               disabled={!ready}
               onClick={() => onStart(game.id)}
-              className="group block min-h-0 text-left disabled:cursor-not-allowed"
+              className={`group block min-h-0 text-left disabled:cursor-not-allowed ${familyClass(
+                game.id,
+              )}`}
             >
               <Card
                 name={game.name}
@@ -182,24 +190,28 @@ function Card({
   return (
     <div
       className={[
-        "flex h-full flex-col rounded-2xl border p-[1.6vmin] transition-all duration-200",
+        "relative flex h-full flex-col overflow-hidden rounded-2xl border p-[1.6vmin] transition-all duration-200",
         ready
-          ? "border-cream/25 bg-gradient-to-b from-cream/[0.08] to-transparent group-hover:-translate-y-1 group-hover:border-cream/70 group-hover:shadow-glow"
-          : "border-white/8 bg-white/[0.02] opacity-45",
+          ? "border-accent/40 bg-gradient-to-b from-accent/[0.14] to-transparent group-hover:-translate-y-1 group-hover:border-accent group-hover:shadow-glow"
+          : "border-white/10 bg-white/[0.02] opacity-45",
       ].join(" ")}
     >
+      {/* A lit edge in the game's colour — the lineup reads as families from the couch. */}
+      {ready && (
+        <span className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-accent to-transparent" />
+      )}
       <div className="flex min-h-0 flex-1 flex-col justify-center">
-        <h3 className="font-display text-[clamp(0.95rem,1.5vw,1.75rem)] uppercase leading-tight tracking-wide text-slate-50">
+        <h3 className="font-display text-[clamp(0.95rem,1.5vw,1.75rem)] uppercase leading-tight tracking-wide text-moon">
           {name}
         </h3>
-        <p className="mt-1.5 text-balance text-[clamp(0.7rem,0.92vw,1rem)] leading-snug text-slate-400">
+        <p className="mt-1.5 text-balance text-[clamp(0.7rem,0.92vw,1rem)] leading-snug text-moon-dim">
           {blurb}
         </p>
       </div>
       <span
         className={[
           "mt-2 block font-display text-[0.62rem] uppercase tracking-[0.18em]",
-          ready ? "text-cream/70" : "text-slate-500",
+          ready ? "text-accent" : "text-moon-deep",
         ].join(" ")}
       >
         {status}

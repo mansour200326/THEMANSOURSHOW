@@ -1,6 +1,6 @@
-import type { GameState } from "@/lib/jeopardy/types";
+import type { GameState } from "@/lib/bigboard/types";
 
-const KEY = "huddle:jeopardy:v1";
+const KEY = "bignight:bigboard:v1";
 
 /** Undo history is intentionally dropped — a refresh keeps the game, not the stack. */
 export function saveGame(state: GameState) {

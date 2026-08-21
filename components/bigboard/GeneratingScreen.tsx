@@ -11,10 +11,10 @@ export function GeneratingScreen({ categories, onCancel }: Props) {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-[4vmin] px-6 text-center">
       <div>
-        <p className="t-label font-display uppercase text-slate-500">
-          Huddle presents
+        <p className="t-label font-display uppercase text-moon-deep">
+          Big Night presents
         </p>
-        <h1 className="cream-text mt-1 font-display text-4xl font-bold uppercase tracking-tight sm:text-6xl">
+        <h1 className="accent-text mt-1 font-display text-4xl font-bold uppercase tracking-tight sm:text-6xl">
           Writing the board
         </h1>
       </div>
@@ -26,9 +26,9 @@ export function GeneratingScreen({ categories, onCancel }: Props) {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08 }}
-            className="relative flex min-w-[14rem] flex-1 items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-gradient-to-b from-stage-tile/60 to-stage-tileDeep px-4 py-6"
+            className="relative flex min-w-[14rem] flex-1 items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-gradient-to-b from-dusk-lit/60 to-midnight-deep px-4 py-6"
           >
-            <span className="font-display text-sm uppercase tracking-wider text-slate-100 sm:text-lg">
+            <span className="font-display text-sm uppercase tracking-wider text-moon sm:text-lg">
               {title}
             </span>
             <motion.span
@@ -47,8 +47,8 @@ export function GeneratingScreen({ categories, onCancel }: Props) {
         ))}
       </div>
 
-      <p className="max-w-xl text-balance text-slate-400">
-        Writing five clues for every category, plus one Final Jeopardy. This
+      <p className="max-w-xl text-balance text-moon-dim">
+        Writing five clues for every category, plus one Final Round. This
         takes a minute — the good ones are worth waiting for.
       </p>
 

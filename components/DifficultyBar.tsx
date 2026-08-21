@@ -24,8 +24,8 @@ export function DifficultyBar({ value, onChange, compact }: Props) {
                 "flex-1 rounded-xl border py-2.5 font-display uppercase tracking-wider transition-colors",
                 compact ? "text-sm" : "text-base",
                 active
-                  ? "border-cream/60 bg-cream/15 text-cream-bright"
-                  : "border-white/10 bg-white/[0.03] text-slate-400 hover:border-cream/40 hover:text-cream-bright",
+                  ? "border-accent/60 bg-accent/15 text-accent-bright"
+                  : "border-white/10 bg-white/[0.03] text-moon-dim hover:border-accent/40 hover:text-accent-bright",
               ].join(" ")}
             >
               {difficultyLabel[level]}
@@ -34,7 +34,7 @@ export function DifficultyBar({ value, onChange, compact }: Props) {
         })}
       </div>
       {!compact && (
-        <p className="mt-2 text-sm text-slate-500">{difficultyBlurb[value]}</p>
+        <p className="mt-2 text-sm text-moon-deep">{difficultyBlurb[value]}</p>
       )}
     </div>
   );

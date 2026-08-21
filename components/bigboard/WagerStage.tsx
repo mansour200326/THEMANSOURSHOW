@@ -32,7 +32,7 @@ export function WagerStage({
         animate={{ scale: 1, opacity: 1, rotateX: 0 }}
         transition={{ type: "spring", stiffness: 220, damping: 18 }}
       >
-        <p className="cream-text t-hero font-display font-bold uppercase tracking-tight drop-shadow-[0_0_60px_rgba(240,228,198,0.35)]">
+        <p className="accent-text t-hero font-display font-bold uppercase tracking-tight drop-shadow-[0_0_60px_rgb(var(--accent-rgb)/0.35)]">
           Daily Double
         </p>
       </motion.div>
@@ -43,12 +43,12 @@ export function WagerStage({
         transition={{ delay: 0.25 }}
         className="flex flex-col items-center gap-[2vmin]"
       >
-        <p className="font-display text-[clamp(1.1rem,2.2vw,2.75rem)] uppercase tracking-wide text-slate-200">
-          <span className="text-cream-bright">{teamName}</span> · {category}
+        <p className="font-display text-[clamp(1.1rem,2.2vw,2.75rem)] uppercase tracking-wide text-moon/90">
+          <span className="text-accent-bright">{teamName}</span> · {category}
         </p>
 
         <div className="panel flex flex-col items-center gap-5 px-8 py-7">
-          <p className="t-label font-display uppercase text-slate-500">
+          <p className="t-label font-display uppercase text-moon-deep">
             Wager — up to {maxWager.toLocaleString()}
           </p>
 
@@ -69,7 +69,7 @@ export function WagerStage({
             step={50}
             value={amount}
             onChange={(e) => setAmount(clamp(Number(e.target.value)))}
-            className="w-[min(72vw,26rem)] accent-[#f0e4c6]"
+            className="w-[min(72vw,26rem)] accent-[rgb(var(--accent-rgb))]"
           />
 
           <div className="flex flex-wrap justify-center gap-2">
@@ -92,7 +92,7 @@ export function WagerStage({
             </button>
           </div>
 
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-moon-deep">
             Current score {score.toLocaleString()}
           </p>
         </div>
@@ -104,7 +104,7 @@ export function WagerStage({
           <button
             type="button"
             onClick={() => onSubmit(amount)}
-            className="btn-cream px-10 text-lg"
+            className="btn-accent px-10 text-lg"
           >
             Lock it in
           </button>

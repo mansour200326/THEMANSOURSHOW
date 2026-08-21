@@ -5,7 +5,7 @@
  * Both are TV-only. Nobody types; the host listens and scores.
  */
 
-export type RapidMode = "categories" | "five-seconds";
+export type RapidMode = "categories" | "three-in-five";
 
 export type RapidTeam = {
   id: string;
@@ -38,17 +38,17 @@ export type RapidState = {
 
 export const RAPID_SECONDS: Record<RapidMode, number> = {
   categories: 30,
-  "five-seconds": 5,
+  "three-in-five": 5,
 };
 
 export const RAPID_TITLE: Record<RapidMode, string> = {
   categories: "Categories",
-  "five-seconds": "5 Second Rule",
+  "three-in-five": "Three in Five",
 };
 
 export const RAPID_RULE: Record<RapidMode, string> = {
   categories: "Name as many as you can before the clock runs out.",
-  "five-seconds": "Name three. Five seconds. Go.",
+  "three-in-five": "Name three. Five seconds. Go.",
 };
 
 export const rapidPrompt = (s: RapidState): string | undefined =>

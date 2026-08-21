@@ -22,8 +22,8 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
     const place = ranked.findIndex((p) => p.id === me.id) + 1;
     return (
       <Wrap>
-        <p className="text-center font-display text-7xl text-cream">#{place}</p>
-        <p className="text-center text-slate-400">
+        <p className="text-center font-display text-7xl text-accent">#{place}</p>
+        <p className="text-center text-moon-dim">
           {me.score.toLocaleString()} points
         </p>
       </Wrap>
@@ -35,7 +35,7 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
     if (state.picker !== me.id) {
       return (
         <Wrap>
-          <p className="text-center text-lg text-slate-400">
+          <p className="text-center text-lg text-moon-dim">
             Waiting for the board pick…
           </p>
         </Wrap>
@@ -43,13 +43,13 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
     }
     return (
       <div className="flex min-h-dvh flex-col gap-3 p-4">
-        <p className="pt-2 text-center font-display text-lg uppercase tracking-wide text-cream">
+        <p className="pt-2 text-center font-display text-lg uppercase tracking-wide text-accent">
           Your pick
         </p>
         <div className="grid flex-1 grid-cols-3 gap-2">
           {state.board.categories.map((cat, c) => (
             <div key={cat.title} className="flex flex-col gap-2">
-              <p className="truncate text-center font-display text-[0.6rem] uppercase tracking-wide text-slate-500">
+              <p className="truncate text-center font-display text-[0.6rem] uppercase tracking-wide text-moon-deep">
                 {cat.title}
               </p>
               {cat.clues.map((clue, r) => {
@@ -62,8 +62,8 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
                     className={[
                       "flex-1 rounded-lg border py-3 font-display text-sm font-bold tabular-nums",
                       spent
-                        ? "border-white/5 text-slate-700"
-                        : "tile-face border-white/10 text-cream",
+                        ? "border-white/5 text-moon-deep/40"
+                        : "tile-face border-white/10 text-accent",
                     ].join(" ")}
                   >
                     {spent ? "" : clue.value}
@@ -79,7 +79,7 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
 
   return (
     <div className="flex min-h-dvh flex-col p-4">
-      <p className="py-3 text-center font-display text-sm uppercase tracking-[0.25em] text-slate-500">
+      <p className="py-3 text-center font-display text-sm uppercase tracking-[0.25em] text-moon-deep">
         {iBuzzed
           ? "You're in — answer out loud"
           : iAmOut
@@ -104,18 +104,18 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
           iBuzzed
             ? "border-emerald-300 bg-emerald-500/30 text-emerald-100"
             : iAmOut
-              ? "border-white/10 bg-white/[0.02] text-slate-700"
+              ? "border-white/10 bg-white/[0.02] text-moon-deep/40"
               : someoneElse
-                ? "border-white/10 bg-white/[0.02] text-slate-600"
+                ? "border-white/10 bg-white/[0.02] text-moon-deep/70"
                 : state.phase === "open"
-                  ? "border-cream bg-cream/20 text-cream-bright"
-                  : "border-white/10 bg-white/[0.03] text-slate-600",
+                  ? "border-accent bg-accent/20 text-accent-bright"
+                  : "border-white/10 bg-white/[0.03] text-moon-deep/70",
         ].join(" ")}
       >
         {iBuzzed ? "YOU!" : iAmOut ? "OUT" : "BUZZ"}
       </motion.button>
 
-      <p className="py-3 text-center font-display text-sm uppercase tracking-widest text-cream">
+      <p className="py-3 text-center font-display text-sm uppercase tracking-widest text-accent">
         {me.emoji} {me.score.toLocaleString()}
       </p>
     </div>

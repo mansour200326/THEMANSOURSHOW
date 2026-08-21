@@ -102,12 +102,12 @@ export const mostLikelyTo = createRoundGame(
   MOST_LIKELY_TO,
 );
 
-/* ---------------------------------------------------------- 2. Guess Who Said It */
+/* ---------------------------------------------------------- 2. Who Said It */
 
 export const guessWhoSaidIt = createRoundGame(
   {
-    id: "guess-who-said-it",
-    name: "Guess Who Said It",
+    id: "who-said-it",
+    name: "Who Said It",
     blurb:
       "Everyone answers anonymously. One answer goes up — guess who wrote it.",
     minPlayers: 3,
@@ -178,15 +178,15 @@ export const bluffTrivia = createRoundGame(
 
 export const BLUFF_REAL_ID = REAL;
 
-/* ------------------------------------------------------------ 4. Herd Mentality */
+/* ------------------------------------------------------------ 4. Groupthink */
 
 const normalise = (text: string) =>
   text.trim().toLowerCase().replace(/[^a-z0-9؀-ۿ ]/g, "");
 
 export const herdMentality = createRoundGame(
   {
-    id: "herd-mentality",
-    name: "Herd Mentality",
+    id: "groupthink",
+    name: "Groupthink",
     blurb:
       "Answer like everyone else would. Match the majority or score nothing.",
     minPlayers: 3,
@@ -218,7 +218,7 @@ export const herdMentality = createRoundGame(
 
 export const roundGamePacks = {
   "most-likely-to": MOST_LIKELY_TO,
-  "guess-who-said-it": GUESS_WHO,
+  "who-said-it": GUESS_WHO,
   "bluff-trivia": BLUFF_TRIVIA,
-  "herd-mentality": HERD_MENTALITY,
+  "groupthink": HERD_MENTALITY,
 };

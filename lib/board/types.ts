@@ -1,6 +1,6 @@
 /**
  * Shared board shapes. These are the JSON contract the AI generator returns and
- * the shape both Team Jeopardy (Phase 1) and Trivia Royale (Phase 4) render.
+ * the shape both Big Board (Phase 1) and Trivia Royale (Phase 4) render.
  * Keep this file free of game-specific / team-specific concepts.
  */
 

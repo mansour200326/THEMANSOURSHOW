@@ -37,9 +37,9 @@ export function BoardGrid({
         {board.categories.map((cat) => (
           <div
             key={cat.title}
-            className="flex items-center justify-center rounded-lg border border-white/10 bg-gradient-to-b from-stage-tile/70 to-stage-tileDeep px-2 py-[1.6vmin] text-center"
+            className="flex items-center justify-center rounded-lg border border-white/10 bg-gradient-to-b from-dusk-lit/70 to-midnight-deep px-2 py-[1.6vmin] text-center"
           >
-            <h3 className="t-category font-display font-semibold uppercase tracking-wider text-slate-100">
+            <h3 className="t-category font-display font-semibold uppercase tracking-wider text-moon">
               {cat.title}
             </h3>
           </div>
@@ -65,10 +65,10 @@ export function BoardGrid({
               return (
                 <div
                   key={key}
-                  className="flex items-center justify-center rounded-lg border border-white/5 bg-ink-900/40"
+                  className="flex items-center justify-center rounded-lg border border-white/5 bg-dusk/40"
                 >
                   {wasDaily && (
-                    <span className="font-display text-xs uppercase tracking-widest text-cream/50">
+                    <span className="font-display text-xs uppercase tracking-widest text-accent/50">
                       DD
                     </span>
                   )}
@@ -89,7 +89,7 @@ export function BoardGrid({
                            border border-white/10 shadow-tile transition-colors
                            disabled:cursor-default"
               >
-                <span className="cream-text t-tile-value font-display font-bold tabular-nums drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">
+                <span className="accent-text t-tile-value font-display font-bold tabular-nums drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">
                   {clue.value}
                 </span>
               </motion.button>

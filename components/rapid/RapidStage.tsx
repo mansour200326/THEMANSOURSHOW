@@ -45,19 +45,19 @@ export function RapidStage({ state, onGo, onTimeUp, onScore }: Props) {
   // Fresh tally for each turn.
   useEffect(() => setCount(0), [state.round, state.turn, state.phase]);
 
-  const urgent = left <= (state.mode === "five-seconds" ? 2 : 6);
+  const urgent = left <= (state.mode === "three-in-five" ? 2 : 6);
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-[3vmin] text-center">
       <div>
-        <p className="t-label font-display uppercase text-slate-500">
+        <p className="t-label font-display uppercase text-moon-deep">
           Round {state.round + 1} of {state.prompts.length} · {team?.name}
         </p>
         <motion.p
           key={prompt}
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          className="t-clue mt-2 max-w-[80vw] text-balance font-display uppercase tracking-wide text-slate-50"
+          className="t-clue mt-2 max-w-[80vw] text-balance font-display uppercase tracking-wide text-moon"
         >
           {prompt}
         </motion.p>
@@ -72,10 +72,10 @@ export function RapidStage({ state, onGo, onTimeUp, onScore }: Props) {
             exit={{ opacity: 0 }}
             className="flex flex-col items-center gap-[2vmin]"
           >
-            <p className="font-display text-[clamp(0.9rem,1.5vw,1.6rem)] uppercase tracking-[0.25em] text-slate-500">
+            <p className="font-display text-[clamp(0.9rem,1.5vw,1.6rem)] uppercase tracking-[0.25em] text-moon-deep">
               {RAPID_RULE[state.mode]}
             </p>
-            <button onClick={onGo} className="btn-cream px-16 py-5 text-2xl">
+            <button onClick={onGo} className="btn-accent px-16 py-5 text-2xl">
               Start the clock
             </button>
           </motion.div>
@@ -95,7 +95,7 @@ export function RapidStage({ state, onGo, onTimeUp, onScore }: Props) {
               className={[
                 "font-display font-bold tabular-nums leading-none",
                 "text-[clamp(6rem,26vw,22rem)]",
-                urgent ? "text-rose-400" : "text-cream",
+                urgent ? "text-rose-400" : "text-accent",
               ].join(" ")}
             >
               {left < 10 ? left.toFixed(1) : Math.ceil(left)}
@@ -116,7 +116,7 @@ export function RapidStage({ state, onGo, onTimeUp, onScore }: Props) {
 
             {state.mode === "categories" ? (
               <>
-                <p className="t-label font-display uppercase text-slate-500">
+                <p className="t-label font-display uppercase text-moon-deep">
                   How many did {team?.name} get?
                 </p>
                 <div className="flex items-center gap-5">
@@ -126,7 +126,7 @@ export function RapidStage({ state, onGo, onTimeUp, onScore }: Props) {
                   >
                     −
                   </button>
-                  <span className="cream-text w-32 font-display text-[clamp(3rem,8vw,7rem)] font-bold tabular-nums">
+                  <span className="accent-text w-32 font-display text-[clamp(3rem,8vw,7rem)] font-bold tabular-nums">
                     {count}
                   </span>
                   <button
@@ -138,14 +138,14 @@ export function RapidStage({ state, onGo, onTimeUp, onScore }: Props) {
                 </div>
                 <button
                   onClick={() => onScore(count)}
-                  className="btn-cream px-14 py-4 text-xl"
+                  className="btn-accent px-14 py-4 text-xl"
                 >
                   Bank {count} {count === 1 ? "point" : "points"}
                 </button>
               </>
             ) : (
               <>
-                <p className="t-label font-display uppercase text-slate-500">
+                <p className="t-label font-display uppercase text-moon-deep">
                   Did {team?.name} name all three?
                 </p>
                 <div className="flex gap-4">

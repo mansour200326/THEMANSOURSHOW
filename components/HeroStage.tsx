@@ -112,7 +112,7 @@ export function HeroStage({ children }: { children: React.ReactNode }) {
                 ease: "easeInOut",
               }}
             >
-              <span className="cream-text font-display text-[3.4vmin] font-bold tabular-nums">
+              <span className="accent-text font-display text-[3.4vmin] font-bold tabular-nums">
                 {tile.label}
               </span>
             </motion.div>
@@ -126,7 +126,7 @@ export function HeroStage({ children }: { children: React.ReactNode }) {
         className="pointer-events-none absolute inset-0 opacity-40"
         style={{
           background:
-            "radial-gradient(60vmin 60vmin at 50% 40%, rgba(240,228,198,0.10), transparent 65%)",
+            "radial-gradient(60vmin 60vmin at 50% 40%, rgba(255,107,87,0.10), transparent 65%)",
         }}
         animate={{ opacity: [0.25, 0.5, 0.25] }}
         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}

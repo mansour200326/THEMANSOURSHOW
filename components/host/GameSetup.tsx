@@ -18,7 +18,7 @@ const SLOTS = 4;
 
 /**
  * The step between picking a phone game and playing it: what it's about, and
- * how hard. Same contract as the Team Jeopardy setup, condensed for the TV.
+ * how hard. Same contract as the Big Board setup, condensed for the TV.
  */
 export function GameSetup({ gameName, onCancel, onStart, busy, error }: Props) {
   const [categories, setCategories] = useState<string[]>(Array(SLOTS).fill(""));
@@ -49,15 +49,15 @@ export function GameSetup({ gameName, onCancel, onStart, busy, error }: Props) {
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-3xl flex-col justify-center gap-6 px-6 py-10">
       <div className="text-center">
-        <p className="t-label font-display uppercase text-slate-500">Setting up</p>
-        <h1 className="cream-text font-display text-4xl font-bold uppercase tracking-tight sm:text-6xl">
+        <p className="t-label font-display uppercase text-moon-deep">Setting up</p>
+        <h1 className="accent-text font-display text-4xl font-bold uppercase tracking-tight sm:text-6xl">
           {gameName}
         </h1>
       </div>
 
       <div>
         <div className="flex items-baseline justify-between gap-4">
-          <h2 className="font-display text-lg uppercase tracking-widest text-slate-300">
+          <h2 className="font-display text-lg uppercase tracking-widest text-moon/75">
             Categories
           </h2>
           <button
@@ -85,7 +85,7 @@ export function GameSetup({ gameName, onCancel, onStart, busy, error }: Props) {
       </div>
 
       <div>
-        <h2 className="mb-3 font-display text-lg uppercase tracking-widest text-slate-300">
+        <h2 className="mb-3 font-display text-lg uppercase tracking-widest text-moon/75">
           Difficulty
         </h2>
         <DifficultyBar value={difficulty} onChange={setDifficulty} />
@@ -105,12 +105,12 @@ export function GameSetup({ gameName, onCancel, onStart, busy, error }: Props) {
         <button
           onClick={() => onStart({ categories: filled, difficulty })}
           disabled={filled.length < 3 || busy}
-          className="btn-cream w-full py-5 text-xl"
+          className="btn-brand w-full py-5 text-xl"
         >
           {busy ? "Writing the board…" : "Build the board"}
         </button>
         {filled.length < 3 && (
-          <p className="text-sm text-slate-500">Add at least 3 categories.</p>
+          <p className="text-sm text-moon-deep">Add at least 3 categories.</p>
         )}
         <div className="flex gap-3">
           <button

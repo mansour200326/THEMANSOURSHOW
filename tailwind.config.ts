@@ -1,5 +1,15 @@
 import type { Config } from "tailwindcss";
 
+/**
+ * "Midnight & Coral".
+ *
+ * Two rules run this palette:
+ *   1. Coral is the brand and nothing else — the logo, primary buttons, and
+ *      celebration moments. It never belongs to a single game.
+ *   2. Everything a game lights up uses `accent`, which is a CSS variable set
+ *      per game family (see the .g-* classes in globals.css). That's why you
+ *      won't find aqua/violet/magenta/lime sprinkled through the components.
+ */
 const config: Config = {
   content: [
     "./app/**/*.{ts,tsx}",
@@ -9,24 +19,41 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        /* Deep blue — the room the show is staged in. */
-        ink: {
-          950: "#050e22",
-          900: "#08152f",
-          800: "#0d2047",
-          700: "#153064",
+        /* The room the show is staged in. Never pure black. */
+        midnight: {
+          DEFAULT: "#101A3C",
+          deep: "#0B1330",
+          soft: "#16224A",
         },
-        stage: {
-          DEFAULT: "#0e1e46",
-          tile: "#1a4499",
-          tileDeep: "#0a1c46",
-          line: "#24407e",
+        /* Cards, panels, tiles — one step up out of the dark. */
+        dusk: {
+          DEFAULT: "#1C2A55",
+          lit: "#25356A",
+          line: "#2E3F76",
         },
-        /* Cream — everything the eye is meant to land on. */
-        cream: {
-          DEFAULT: "#f0e4c6",
-          bright: "#fdf6e6",
-          deep: "#c7b48c",
+        /* Text. Never pure white. */
+        moon: {
+          DEFAULT: "#F4F2EC",
+          dim: "#C6CADA",
+          deep: "#8B93AE",
+        },
+        /* Brand only: logo, primary buttons, winners. */
+        coral: {
+          DEFAULT: "#FF6B57",
+          bright: "#FF8D7C",
+          deep: "#DE4B37",
+        },
+        /* The four game families, for reference and for the lineup dots. */
+        family: {
+          trivia: "#37D3C8",
+          deception: "#8E7CFF",
+          social: "#E8508D",
+          word: "#A8E05F",
+        },
+        /* Whatever is lighting the current screen. Set by a .g-* class. */
+        accent: {
+          DEFAULT: "rgb(var(--accent-rgb) / <alpha-value>)",
+          bright: "rgb(var(--accent-bright-rgb) / <alpha-value>)",
         },
       },
       fontFamily: {
@@ -35,7 +62,8 @@ const config: Config = {
       },
       boxShadow: {
         tile: "inset 0 1px 0 rgba(255,255,255,0.08), 0 10px 30px rgba(0,0,0,0.45)",
-        glow: "0 0 60px rgba(240,228,198,0.22)",
+        glow: "0 0 60px rgb(var(--accent-rgb) / 0.22)",
+        brand: "0 0 60px rgba(255,107,87,0.28)",
       },
       keyframes: {
         "pop-in": {

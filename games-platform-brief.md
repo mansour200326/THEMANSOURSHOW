@@ -1,25 +1,73 @@
-# Huddle — Project Brief
+# Big Night — Project Brief
 
-Name: **Huddle.** The platform is a game show; the TV is the studio. Games are presented as segments ("Huddle presents: Team Jeopardy").
+Name: **Big Night.** ("The Mansour Show" stays as the name of the private friends edition.) The platform is a game show; the TV is the studio. Games are presented as segments ("Big Night presents: Big Board").
+
+## Brand & product spec (public launch)
+
+- **Public name:** Big Night. Domain target `bignight.games` — confirm it's
+  available before any marketing goes out.
+- **Naming:** no trademarked game name appears in the public UI. Launch names
+  are Big Board, Face-Off, Three in Five, Who Said It, Groupthink, Dial It In,
+  Code Grid. Still open: an IP lawyer needs to clear "Big Night" and the final
+  game names for the UAE/GCC.
+
+### Palette — "Midnight & Coral"
+
+| Token | Hex | Role |
+|---|---|---|
+| Midnight | `#101A3C` | App and stage background. Never pure black. |
+| Dusk | `#1C2A55` | Cards, panels, tiles. |
+| Moonlight | `#F4F2EC` | Text. Never pure white. |
+| Coral Flare | `#FF6B57` | Brand only: logo, primary buttons, winners. |
+
+Coral is never assigned to a single game. Each game family gets its own colour:
+
+| Family | Colour | Games |
+|---|---|---|
+| Trivia | Aqua `#37D3C8` | Big Board, Trivia Royale, Bluff Trivia, Last One Standing |
+| Deception | Violet `#8E7CFF` | Impostor, Code Grid |
+| Social / vote | Magenta `#E8508D` | Most Likely To, Who Said It, Groupthink, Face-Off |
+| Word & drawing | Lime `#A8E05F` | Emoji Riddles, Timeline, Dial It In, Sketch & Guess, Categories, Three in Five |
+
+Phone controllers stay near-monochrome: Midnight plus the active game's accent,
+nothing else. The TV is always the most colourful thing in the room.
+
+### Subscription tiers (two only at launch)
+
+- **Free** — 3 games, 2 AI boards per night, up to 6 players.
+- **Pro Host** — AED 25/mo or AED 149/yr (push the annual). All games, unlimited
+  AI generation, 12 players, custom themes.
+- Later, B2B only: an Events/Venue tier. No other consumer tiers.
+
+**Build order:** launch free with *zero payment code* → validate that people
+host organically → add Pro Host via Stripe → ads and bundles only at real
+volume. Nothing in the codebase gates on a tier yet, by design.
+
+### AI model routing
+
+Sonnet (`claude-sonnet-5`) generates boards and surveys; Haiku
+(`claude-haiku-4-5`) generates prompt packs. Model names live in environment
+variables, never hardcoded — see the README. Do not use Opus; it's unnecessary
+cost for this content.
 
 ## Vision
 
 A private party-games platform for Mansour and friends, played in person: one shared screen (TV) runs the **stage view**, everyone's phone becomes a **controller** by entering a 4-letter room code. No app downloads, no accounts. Think "private Jackbox," with AI-generated content so no round ever repeats.
 
 Launch lineup — all 14 games ship:
-1. **Team Jeopardy** — classic full Jeopardy, team-based, host-controlled (no phones needed)
-2. **Trivia Royale** — Jeopardy-style board with individual buzzers on phones
+1. **Big Board** — classic quiz board, team-based, host-controlled (no phones needed)
+2. **Trivia Royale** — the same board with individual buzzers on phones
 3. **Impostor** — Spyfall-style hidden-role game
 4. **Most Likely To** — vote-for-a-friend party game
-5. **The Feud** — Family Feud-style team face-off
-6. **Guess Who Said It** — anonymous answers, guess the author
-7. **Bluff Trivia** — Fibbage-style fake-answer game
+5. **Face-Off** — survey-board team face-off
+6. **Who Said It** — anonymous answers, guess the author
+7. **Bluff Trivia** — invent-a-fake-answer game
 8. **Last One Standing** — elimination quiz, 1% Club-style
 9. **Emoji Riddles** — decode AI-generated emoji puzzles
 10. **Timeline** — order events chronologically
-11. **Wavelength** — spectrum guessing game
-12. **Herd Mentality** — match the majority
-13. **Codenames-style** — two-team word grid
+11. **Dial It In** — spectrum guessing game
+12. **Groupthink** — match the majority
+13. **Code Grid** — two-team word grid
 14. **Sketch & Guess** — draw on phone, guess on TV
 
 ## Core experience
@@ -34,7 +82,7 @@ Launch lineup — all 14 games ship:
 - **Next.js 14+ (App Router), TypeScript, Tailwind** — deployed on Vercel (same flow as Sumou Jet / Prairies).
 - **Realtime: Ably** (or Supabase Realtime — pick whichever integrates cleaner; Ably preferred for buzzer latency and presence). Channels per room: `room:{code}`.
 - **State authority:** a lightweight server-side room state held in a store the serverless functions can reach (Vercel KV / Upstash Redis). Clients never trust each other; all game-state transitions go through server routes, which then broadcast via the realtime channel. This prevents buzzer disputes and cheating.
-- **AI content: Anthropic API (server-side only)** — generates Jeopardy boards, Impostor location packs, and Most Likely To prompts on demand. Responses requested as strict JSON and validated with Zod before use.
+- **AI content: Anthropic API (server-side only)** — generates quiz boards, Impostor location packs, and Most Likely To prompts on demand. Responses requested as strict JSON and validated with Zod before use.
 
 ## Views
 
@@ -54,16 +102,16 @@ Core events: `player:join`, `player:leave`, `game:start`, `scene:change`, plus p
 
 ## Game specs
 
-### 0. Team Jeopardy (classic, host-controlled — no phones)
+### 0. Big Board (classic, host-controlled — no phones)
 - **The one game that needs no realtime layer at all.** Runs entirely in the host's browser, screen-mirrored to the TV. Can be played anywhere with just one device.
 - Setup: host enters team names (2–4 teams) and a theme prompt. Claude generates the board (5–6 categories × 5 clues, values 100–500), same JSON shape as Trivia Royale.
 - Flow: a turn indicator shows which team is up → that team calls out a category and value → host taps the tile → clue fills the screen → team answers out loud → host taps **✓ (award points)** or **✗ (deduct points)** → board returns with the tile spent → turn passes to the next team.
 - Rules toggle at setup: (a) wrong answer = other teams may steal (host taps which team stole it), on/off; (b) deduct points on wrong answers, on/off.
 - Team scores always visible along the bottom. End screen: winner celebration with final standings.
-- Nice-to-haves: hidden daily-double tiles (team wagers before seeing the clue), a final-Jeopardy round where all teams wager and write answers on paper, per-clue countdown timer (30s) the host can toggle.
+- Nice-to-haves: hidden daily-double tiles (team wagers before seeing the clue), a final round where all teams wager and write answers on paper, per-clue countdown timer (30s) the host can toggle.
 - State is purely local (React state + localStorage backup so a refresh doesn't kill the game).
 
-### 1. Trivia Royale (Jeopardy-style)
+### 1. Trivia Royale (buzzer board)
 - Setup: host types a theme prompt on the TV ("football, 2000s movies, roast-the-boys, Dubai"). Claude generates 4–6 categories × 5 clues with ascending values (100–500), returned as JSON: `{categories: [{title, clues: [{value, clue, answer}]}]}`.
 - Flow: last correct player picks a tile → clue shows on TV → phones show BUZZ button → first buzz locks others out (server-timestamped) → buzzer's phone shows "Answer out loud" → host (or the picker) taps ✓/✗ on their phone → score updates, wrong answer reopens buzzing for others.
 - Nice-to-haves: daily-double tiles, final round with wagers, buzzer lockout penalty (0.5s) for early buzzing.
@@ -82,16 +130,16 @@ Core events: `player:join`, `player:leave`, `game:start`, `scene:change`, plus p
 
 All in the launch scope. Ordered by how easily each slots in, with the engine each reuses.
 
-1. **The Feud** (Family Feud-style) — AI generates the survey question + ranked answers. Two teams face off; host reveals answers on the board, three strikes passes control. *Reuses: host-judges-teams pattern from Team Jeopardy.*
-2. **Guess Who Said It** — a prompt shows on TV, everyone submits an answer anonymously from their phone, then all vote on who wrote what. *Reuses: submit-and-vote engine from Most Likely To.*
-3. **Bluff Trivia** (Fibbage-style) — obscure question; everyone submits a fake answer; all vote for the real one. Points for fooling friends and for finding the truth. *Reuses: submit-and-vote engine.*
+1. **Face-Off** (survey board) — AI generates the survey question + ranked answers. Two teams face off; host reveals answers on the board, three strikes passes control. *Reuses: host-judges-teams pattern from Big Board.*
+2. **Who Said It** — a prompt shows on TV, everyone submits an answer anonymously from their phone, then all vote on who wrote what. *Reuses: submit-and-vote engine from Most Likely To.*
+3. **Bluff Trivia** (fake-answer bluffing) — obscure question; everyone submits a fake answer; all vote for the real one. Points for fooling friends and for finding the truth. *Reuses: submit-and-vote engine.*
 4. **Last One Standing** (1% Club-style) — simultaneous answers on phones, escalating difficulty, wrong answer sends you to the "bench" shown on the TV until one player remains. *Reuses: simultaneous-answer plumbing.*
 5. **Emoji Riddles** — AI generates emoji puzzles (movies, songs, Dubai spots); teams race to decode, first correct buzz or typed answer wins. *Reuses: buzzer or text-input scenes.*
 6. **Timeline** — five AI-generated events appear; teams order them chronologically on their phones; TV reveals the true order dramatically. *New: drag-to-order controller scene.*
-7. **Wavelength** — clue-giver gets a secret point on a spectrum ("overrated ↔ underrated"), gives a one-word clue; team dials in a guess on one phone. *New: dial controller scene.*
-8. **Herd Mentality** — everyone answers a prompt; score by matching the majority. *Reuses: submit-and-vote engine.*
+7. **Dial It In** — clue-giver gets a secret point on a spectrum ("overrated ↔ underrated"), gives a one-word clue; team dials in a guess on one phone. *New: dial controller scene.*
+8. **Groupthink** — everyone answers a prompt; score by matching the majority. *Reuses: submit-and-vote engine.*
 
-9. **Codenames-style word grid** — 25 AI-generated words on the TV, two teams, clue-givers see the key card on their phones, teams tap guesses. *New: shared grid scene + private key-card scene.*
+9. **Code Grid** — two-team word grid — 25 AI-generated words on the TV, two teams, clue-givers see the key card on their phones, teams tap guesses. *New: shared grid scene + private key-card scene.*
 10. **Sketch & Guess** — one player draws on their phone canvas, strokes stream live to the TV, everyone else types guesses; closest/fastest scores. *New: canvas controller scene + live stroke streaming.*
 
 ## AI content generation
@@ -111,15 +159,15 @@ All in the launch scope. Ordered by how easily each slots in, with the engine ea
 
 All 14 games are launch scope; this is still the build order — each phase produces a playable milestone, and later games get cheaper because they reuse engines from earlier ones.
 
-1. **Team Jeopardy:** the full classic game, single-screen, host-controlled. No realtime needed — playable on game night one. Build the board UI, clue reveal, team turns, scoring, and the AI board generator here (reused by Trivia Royale, The Feud, and others).
+1. **Big Board:** the full classic game, single-screen, host-controlled. No realtime needed — playable on game night one. Build the board UI, clue reveal, team turns, scoring, and the AI board generator here (reused by Trivia Royale, Face-Off, and others).
 2. **Shell:** room create/join, lobby with live player list, realtime plumbing, scene system. *Milestone: 4 phones in a lobby on the TV.*
 3. **Most Likely To:** simplest phone-controlled game loop (prompt → vote → reveal → next). Proves the engine.
 4. **Trivia Royale:** buzzer race with server-side lockout, individual scoring — reusing the board UI and generator from Phase 1.
 5. **Impostor:** private role dealing, timer, voting, reveal.
-6. **Submit-and-vote wave:** Guess Who Said It, Bluff Trivia, Herd Mentality — all three ride the Most Likely To engine.
-7. **Board-and-host wave:** The Feud (reuses Team Jeopardy's host-judging pattern), Emoji Riddles (buzzer/text-input scenes).
-8. **New-scene wave:** Last One Standing (simultaneous answers + elimination), Timeline (drag-to-order scene), Wavelength (dial scene).
-9. **Heavy-lift finale:** Codenames-style (shared grid + private key cards), Sketch & Guess (live drawing streams — the most technically involved game, so it goes last).
+6. **Submit-and-vote wave:** Who Said It, Bluff Trivia, Groupthink — all three ride the Most Likely To engine.
+7. **Board-and-host wave:** Face-Off (reuses Big Board's host-judging pattern), Emoji Riddles (buzzer/text-input scenes).
+8. **New-scene wave:** Last One Standing (simultaneous answers + elimination), Timeline (drag-to-order scene), Dial It In (dial scene).
+9. **Heavy-lift finale:** Code Grid (shared grid + private key cards), Sketch & Guess (live drawing streams — the most technically involved game, so it goes last).
 10. **Polish:** sounds, animations, session scoreboard across games, custom domain.
 
 ## Kickoff prompt (paste into Claude Code)
@@ -129,7 +177,7 @@ Read games-platform-brief.md in this directory — it's the full spec.
 
 Scaffold the project: Next.js 14 App Router + TypeScript + Tailwind + Framer Motion.
 
-Build Phase 1 first: Team Jeopardy, the complete single-screen host-controlled game
+Build Phase 1 first: Big Board, the complete single-screen host-controlled game
 (spec #0 in the brief). Setup screen for team names + theme, the board, clue reveal,
 turn rotation, ✓/✗ scoring with the steal and deduction toggles, spent tiles, winner
 screen, localStorage persistence. Use a hardcoded sample board for now — we'll wire

@@ -55,7 +55,7 @@ export function CountdownRing({ seconds, resetKey, paused }: Props) {
           cy="50"
           r={r}
           fill="none"
-          stroke={expired ? "#f43f5e" : urgent ? "#fb7185" : "#f0e4c6"}
+          stroke={expired ? "#f43f5e" : urgent ? "#fb7185" : "rgb(var(--accent-rgb))"}
           strokeWidth="8"
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -66,7 +66,7 @@ export function CountdownRing({ seconds, resetKey, paused }: Props) {
       <span
         className={[
           "absolute inset-0 flex items-center justify-center font-display text-[clamp(1rem,1.8vw,2rem)] font-bold tabular-nums",
-          expired ? "text-rose-400" : "text-slate-100",
+          expired ? "text-rose-400" : "text-moon",
         ].join(" ")}
       >
         {expired ? "0" : Math.ceil(left)}

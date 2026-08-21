@@ -4,7 +4,7 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { DifficultyBar } from "@/components/DifficultyBar";
-import { GeneratingScreen } from "@/components/jeopardy/GeneratingScreen";
+import { GeneratingScreen } from "@/components/bigboard/GeneratingScreen";
 import { RapidStage } from "@/components/rapid/RapidStage";
 import { ShowMark } from "@/components/ShowMark";
 import type { Difficulty } from "@/lib/difficulty";
@@ -31,7 +31,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
   const hydrated = useRef(false);
   const abort = useRef<AbortController | null>(null);
 
-  const KEY = `huddle:rapid:${mode}:v1`;
+  const KEY = `bignight:rapid:${mode}:v1`;
 
   useEffect(() => {
     try {
@@ -115,20 +115,20 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
           </Link>
           <Link
             href="/games"
-            className="font-display text-xs uppercase tracking-[0.2em] text-slate-500 hover:text-slate-300"
+            className="font-display text-xs uppercase tracking-[0.2em] text-moon-deep hover:text-moon/75"
           >
             ← Lineup
           </Link>
         </header>
 
         <div className="mt-10">
-          <p className="t-label font-display uppercase text-slate-500">
-            Huddle presents
+          <p className="t-label font-display uppercase text-moon-deep">
+            Big Night presents
           </p>
-          <h1 className="cream-text mt-1 font-display text-5xl font-bold uppercase tracking-tight sm:text-7xl">
+          <h1 className="accent-text mt-1 font-display text-5xl font-bold uppercase tracking-tight sm:text-7xl">
             {RAPID_TITLE[mode]}
           </h1>
-          <p className="mt-3 text-slate-400">
+          <p className="mt-3 text-moon-dim">
             {RAPID_RULE[mode]} Two teams take turns — no phones, you run the
             clock from here.
           </p>
@@ -138,12 +138,12 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-cream/40 bg-cream/[0.08] px-5 py-4"
+            className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-accent/40 bg-accent/[0.08] px-5 py-4"
           >
-            <p className="text-slate-200">There&apos;s a game in progress.</p>
+            <p className="text-moon/90">There&apos;s a game in progress.</p>
             <button
               onClick={() => dispatch({ type: "HYDRATE", state: saved })}
-              className="btn-cream"
+              className="btn-brand"
             >
               Resume game
             </button>
@@ -152,13 +152,13 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
 
         <section className="mt-10 space-y-8">
           <div>
-            <h2 className="font-display text-xl uppercase tracking-widest text-slate-300">
+            <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
               Teams
             </h2>
             <div className="mt-4 space-y-3">
               {names.map((name, i) => (
                 <div key={i} className="flex items-center gap-3">
-                  <span className="w-6 shrink-0 text-center font-display text-lg tabular-nums text-slate-600">
+                  <span className="w-6 shrink-0 text-center font-display text-lg tabular-nums text-moon-deep/70">
                     {i + 1}
                   </span>
                   <input
@@ -175,10 +175,10 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
           </div>
 
           <div>
-            <h2 className="font-display text-xl uppercase tracking-widest text-slate-300">
+            <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
               Theme
             </h2>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-moon-deep">
               What the prompts should lean towards. Leave it blank for a bit of
               everything.
             </p>
@@ -192,7 +192,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
           </div>
 
           <div>
-            <h2 className="font-display text-xl uppercase tracking-widest text-slate-300">
+            <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
               Rounds
             </h2>
             <div className="mt-3 flex gap-2">
@@ -203,21 +203,21 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
                   className={[
                     "rounded-full border px-5 py-2 font-display tabular-nums transition-colors",
                     rounds === n
-                      ? "border-cream/60 bg-cream/15 text-cream-bright"
-                      : "border-white/10 bg-white/[0.03] text-slate-300 hover:border-cream/40",
+                      ? "border-accent/60 bg-accent/15 text-accent-bright"
+                      : "border-white/10 bg-white/[0.03] text-moon/75 hover:border-accent/40",
                   ].join(" ")}
                 >
                   {n}
                 </button>
               ))}
             </div>
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-moon-deep">
               Each round, every team gets a turn.
             </p>
           </div>
 
           <div>
-            <h2 className="mb-3 font-display text-xl uppercase tracking-widest text-slate-300">
+            <h2 className="mb-3 font-display text-xl uppercase tracking-widest text-moon/75">
               Difficulty
             </h2>
             <DifficultyBar value={difficulty} onChange={setDifficulty} />
@@ -238,7 +238,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
         </AnimatePresence>
 
         <div className="mt-10 flex flex-col items-center gap-3 pb-6">
-          <button onClick={() => start(true)} className="btn-cream px-16 py-5 text-2xl">
+          <button onClick={() => start(true)} className="btn-brand px-16 py-5 text-2xl">
             Write the prompts
           </button>
           <button onClick={() => start(false)} className="btn-ghost text-sm">
@@ -255,7 +255,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
       <header className="flex shrink-0 items-center justify-between px-1">
         <div className="flex items-center gap-4">
           <ShowMark size="sm" />
-          <span className="hidden font-display text-xs uppercase tracking-[0.2em] text-slate-600 sm:inline">
+          <span className="hidden font-display text-xs uppercase tracking-[0.2em] text-moon-deep/70 sm:inline">
             presents · {RAPID_TITLE[mode]}
           </span>
         </div>
@@ -276,10 +276,10 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
       <div className="min-h-0 flex-1">
         {state.phase === "winner" ? (
           <div className="flex h-full flex-col items-center justify-center gap-[3vmin] text-center">
-            <p className="t-label font-display uppercase text-slate-500">
+            <p className="t-label font-display uppercase text-moon-deep">
               {rapidWinners(state.teams).length > 1 ? "It's a tie" : "Winner"}
             </p>
-            <h2 className="cream-text t-hero text-balance font-display font-bold uppercase tracking-tight">
+            <h2 className="brand-text t-hero drop-shadow-[0_0_80px_rgba(255,107,87,0.45)] text-balance font-display font-bold uppercase tracking-tight">
               {rapidWinners(state.teams).map((t) => t.name).join(" & ")}
             </h2>
             <div className="w-full max-w-2xl space-y-2">
@@ -288,13 +288,13 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
                   key={team.id}
                   className={[
                     "flex items-center justify-between rounded-xl border px-5 py-3",
-                    i === 0 ? "border-cream/50 bg-cream/[0.08]" : "border-white/10",
+                    i === 0 ? "border-accent/50 bg-accent/[0.08]" : "border-white/10",
                   ].join(" ")}
                 >
-                  <span className="font-display text-xl uppercase tracking-wide text-slate-100">
+                  <span className="font-display text-xl uppercase tracking-wide text-moon">
                     {team.name}
                   </span>
-                  <span className="font-display text-xl font-bold tabular-nums text-cream">
+                  <span className="font-display text-xl font-bold tabular-nums text-accent">
                     {team.score}
                   </span>
                 </div>
@@ -325,19 +325,19 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
               className={[
                 "flex flex-col items-center rounded-xl border px-4 py-[1.2vmin]",
                 i === state.turn
-                  ? "border-cream/70 bg-gradient-to-b from-cream/15 to-transparent"
+                  ? "border-accent/70 bg-gradient-to-b from-accent/15 to-transparent"
                   : "border-white/10 bg-white/[0.03]",
               ].join(" ")}
             >
               <span
                 className={[
                   "truncate font-display text-[clamp(0.8rem,1.2vw,1.6rem)] uppercase tracking-wider",
-                  i === state.turn ? "text-cream-bright" : "text-slate-400",
+                  i === state.turn ? "text-accent-bright" : "text-moon-dim",
                 ].join(" ")}
               >
                 {team.name}
               </span>
-              <span className="font-display text-[clamp(1.4rem,2.2vw,3rem)] font-bold tabular-nums text-slate-50">
+              <span className="font-display text-[clamp(1.4rem,2.2vw,3rem)] font-bold tabular-nums text-moon">
                 {team.score}
               </span>
             </div>

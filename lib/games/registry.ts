@@ -8,7 +8,7 @@ import {
 import { emojiRiddles, triviaRoyale } from "@/lib/games/buzzGames";
 
 /**
- * Every phone-controlled segment the room knows how to run. Team Jeopardy isn't
+ * Every phone-controlled segment the room knows how to run. Big Board isn't
  * here — it's the one game that runs entirely in the host's browser with no room.
  */
 export const games: Record<string, GameModule> = {

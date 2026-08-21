@@ -41,20 +41,20 @@ export function FeudSetup({
         </Link>
         <Link
           href="/games"
-          className="font-display text-xs uppercase tracking-[0.2em] text-slate-500 hover:text-slate-300"
+          className="font-display text-xs uppercase tracking-[0.2em] text-moon-deep hover:text-moon/75"
         >
           ← Lineup
         </Link>
       </header>
 
       <div className="mt-10">
-        <p className="t-label font-display uppercase text-slate-500">
-          Huddle presents
+        <p className="t-label font-display uppercase text-moon-deep">
+          Big Night presents
         </p>
-        <h1 className="cream-text mt-1 font-display text-5xl font-bold uppercase tracking-tight sm:text-7xl">
-          The Feud
+        <h1 className="accent-text mt-1 font-display text-5xl font-bold uppercase tracking-tight sm:text-7xl">
+          Face-Off
         </h1>
-        <p className="mt-3 text-slate-400">
+        <p className="mt-3 text-moon-dim">
           Two teams, one survey board, three strikes. No phones — you run it from
           here and everyone shouts.
         </p>
@@ -64,10 +64,10 @@ export function FeudSetup({
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-cream/40 bg-cream/[0.08] px-5 py-4"
+          className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-accent/40 bg-accent/[0.08] px-5 py-4"
         >
-          <p className="text-slate-200">There&apos;s a game in progress.</p>
-          <button onClick={onResume} className="btn-cream">
+          <p className="text-moon/90">There&apos;s a game in progress.</p>
+          <button onClick={onResume} className="btn-brand">
             Resume game
           </button>
         </motion.div>
@@ -75,13 +75,13 @@ export function FeudSetup({
 
       <section className="mt-10 space-y-8">
         <div>
-          <h2 className="font-display text-xl uppercase tracking-widest text-slate-300">
+          <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
             Teams
           </h2>
           <div className="mt-4 space-y-3">
             {names.map((name, i) => (
               <div key={i} className="flex items-center gap-3">
-                <span className="w-6 shrink-0 text-center font-display text-lg tabular-nums text-slate-600">
+                <span className="w-6 shrink-0 text-center font-display text-lg tabular-nums text-moon-deep/70">
                   {i + 1}
                 </span>
                 <input
@@ -100,10 +100,10 @@ export function FeudSetup({
         </div>
 
         <div>
-          <h2 className="font-display text-xl uppercase tracking-widest text-slate-300">
+          <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
             Survey theme
           </h2>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-moon-deep">
             What the questions should be about. We write the survey and rank the
             answers.
           </p>
@@ -117,7 +117,7 @@ export function FeudSetup({
         </div>
 
         <div>
-          <h2 className="font-display text-xl uppercase tracking-widest text-slate-300">
+          <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
             Rounds
           </h2>
           <div className="mt-3 flex gap-2">
@@ -129,8 +129,8 @@ export function FeudSetup({
                 className={[
                   "rounded-full border px-5 py-2 font-display tabular-nums transition-colors",
                   rounds === n
-                    ? "border-cream/60 bg-cream/15 text-cream-bright"
-                    : "border-white/10 bg-white/[0.03] text-slate-300 hover:border-cream/40",
+                    ? "border-accent/60 bg-accent/15 text-accent-bright"
+                    : "border-white/10 bg-white/[0.03] text-moon/75 hover:border-accent/40",
                 ].join(" ")}
               >
                 {n}
@@ -157,7 +157,7 @@ export function FeudSetup({
         <button
           onClick={() => onStart({ teamNames: names, theme, rounds, source: "ai" })}
           disabled={generating}
-          className="btn-cream px-16 py-5 text-2xl"
+          className="btn-brand px-16 py-5 text-2xl"
         >
           {generating ? "Writing the survey…" : "Build the survey"}
         </button>

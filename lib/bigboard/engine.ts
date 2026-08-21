@@ -11,7 +11,7 @@ import {
   type Rules,
   type Team,
   defaultRules,
-} from "@/lib/jeopardy/types";
+} from "@/lib/bigboard/types";
 import type { FinalClue } from "@/lib/board/types";
 
 const UNDO_DEPTH = 25;
@@ -95,10 +95,10 @@ export const activeValue = (state: GameState): number => {
 export const maxDailyWager = (state: GameState, teamIndex: number): number =>
   Math.max(state.teams[teamIndex]?.score ?? 0, maxClueValue(state.board));
 
-/** Generous floor so a team on zero still has a Final Jeopardy to play. */
+/** Generous floor so a team on zero still has a Final Round to play. */
 export const maxFinalWager = (team: Team): number => Math.max(team.score, 500);
 
-/** Board exhausted: either roll into Final Jeopardy or crown a winner. */
+/** Board exhausted: either roll into Final Round or crown a winner. */
 function afterBoard(state: GameState): GameState {
   if (!isBoardCleared(state)) return state;
   if (state.rules.finalRound && state.final) {

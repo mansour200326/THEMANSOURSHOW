@@ -5,10 +5,11 @@ import { BuzzPlayer } from "@/components/play/BuzzPlayer";
 import { RoundPlayer } from "@/components/play/RoundPlayer";
 import type { BuzzState } from "@/lib/games/buzzEngine";
 import type { RoundState } from "@/lib/games/roundEngine";
+import { useAccentFamily } from "@/components/useAccentFamily";
 import { useRoom } from "@/lib/room/useRoom";
 
 /** Survives a refresh or a phone locking itself, so you keep your score. */
-const idKey = (code: string) => `huddle:player:${code}`;
+const idKey = (code: string) => `bignight:player:${code}`;
 
 export default function PlayPage({
   params,
@@ -18,6 +19,9 @@ export default function PlayPage({
   const { code } = use(params);
   const roomCode = code.toUpperCase();
   const { room, status, send } = useRoom(roomCode);
+
+  // The screen takes its colour from whatever game is running.
+  useAccentFamily(room?.gameId);
 
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [name, setName] = useState("");
@@ -48,10 +52,10 @@ export default function PlayPage({
   if (status === "missing") {
     return (
       <Centered>
-        <h1 className="font-display text-2xl uppercase text-slate-200">
+        <h1 className="font-display text-2xl uppercase text-moon/90">
           No room called {roomCode}
         </h1>
-        <p className="text-slate-400">
+        <p className="text-moon-dim">
           Check the code on the TV — it might have been restarted.
         </p>
       </Centered>
@@ -61,7 +65,7 @@ export default function PlayPage({
   if (!room) {
     return (
       <Centered>
-        <p className="font-display uppercase tracking-[0.25em] text-slate-500">
+        <p className="font-display uppercase tracking-[0.25em] text-moon-deep">
           Connecting…
         </p>
       </Centered>
@@ -74,10 +78,10 @@ export default function PlayPage({
     return (
       <div className="flex min-h-dvh flex-col justify-center gap-6 p-6">
         <div className="text-center">
-          <p className="font-display text-xs uppercase tracking-[0.3em] text-slate-500">
+          <p className="font-display text-xs uppercase tracking-[0.3em] text-moon-deep">
             Room
           </p>
-          <p className="cream-text font-display text-6xl font-bold tracking-[0.1em]">
+          <p className="accent-text font-display text-6xl font-bold tracking-[0.1em]">
             {roomCode}
           </p>
         </div>
@@ -93,7 +97,7 @@ export default function PlayPage({
         <button
           onClick={join}
           disabled={!name.trim()}
-          className="btn-cream w-full py-6 text-2xl"
+          className="btn-accent w-full py-6 text-2xl"
         >
           Join
         </button>
@@ -130,11 +134,11 @@ export default function PlayPage({
   return (
     <Centered>
       <p className="text-6xl">{me.emoji}</p>
-      <h1 className="font-display text-3xl uppercase tracking-wide text-slate-100">
+      <h1 className="font-display text-3xl uppercase tracking-wide text-moon">
         {me.name}
       </h1>
-      <p className="text-slate-400">You&apos;re in. Watch the TV.</p>
-      <p className="font-display text-sm uppercase tracking-widest text-cream">
+      <p className="text-moon-dim">You&apos;re in. Watch the TV.</p>
+      <p className="font-display text-sm uppercase tracking-widest text-accent">
         {me.score.toLocaleString()} points
       </p>
     </Centered>

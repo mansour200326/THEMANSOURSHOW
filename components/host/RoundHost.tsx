@@ -13,8 +13,12 @@ type Props = {
   onQuit: () => void;
 };
 
+/**
+ * Bars are the game's own colour, stepped down in strength so a five-way race
+ * still separates. The room only ever shows midnight plus one accent.
+ */
 const barColour = (i: number) =>
-  ["bg-cream", "bg-sky-400", "bg-emerald-400", "bg-rose-400", "bg-violet-400"][
+  ["bg-accent", "bg-accent/75", "bg-accent/55", "bg-accent/40", "bg-accent/30"][
     i % 5
   ];
 
@@ -22,7 +26,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit }: Props) {
   const prompt = state.prompts[state.round];
   const live = connectedPlayers(room);
   const isBluff = room.gameId === "bluff-trivia";
-  const isHerd = room.gameId === "herd-mentality";
+  const isHerd = room.gameId === "groupthink";
 
   const waitingOn = live.filter((p) =>
     state.phase === "collect"
@@ -39,7 +43,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit }: Props) {
   return (
     <main className="flex h-dvh flex-col gap-[1.5vmin] overflow-hidden p-[2vmin]">
       <header className="flex shrink-0 items-center justify-between">
-        <span className="font-display text-xs uppercase tracking-[0.25em] text-slate-500">
+        <span className="font-display text-xs uppercase tracking-[0.25em] text-moon-deep">
           Round {state.round + 1} of {state.prompts.length}
         </span>
         <button onClick={onQuit} className="btn-ghost px-3 py-1.5 text-xs">
@@ -53,7 +57,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit }: Props) {
           key={prompt?.text}
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          className="t-clue text-balance font-display uppercase tracking-wide text-slate-50"
+          className="t-clue text-balance font-display uppercase tracking-wide text-moon"
         >
           {prompt?.text}
         </motion.p>
@@ -65,7 +69,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit }: Props) {
           <Standings room={room} />
         ) : state.phase === "collect" ? (
           <>
-            <p className="font-display text-[clamp(1rem,2vw,2.2rem)] uppercase tracking-[0.2em] text-cream">
+            <p className="font-display text-[clamp(1rem,2vw,2.2rem)] uppercase tracking-[0.2em] text-accent">
               Answering on their phones
             </p>
             <div className="flex flex-wrap justify-center gap-[1vmin]">
@@ -78,7 +82,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit }: Props) {
                       "flex items-center gap-2 rounded-full border px-4 py-2 font-display text-[clamp(0.8rem,1.2vw,1.3rem)] uppercase tracking-wide transition-colors",
                       done
                         ? "border-emerald-400/60 bg-emerald-500/15 text-emerald-200"
-                        : "border-white/10 bg-white/[0.03] text-slate-500",
+                        : "border-white/10 bg-white/[0.03] text-moon-deep",
                     ].join(" ")}
                   >
                     <span>{p.emoji}</span>
@@ -119,7 +123,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit }: Props) {
                       />
                     )}
                     <div className="relative flex items-center justify-between gap-4">
-                      <span className="truncate font-display text-[clamp(1rem,2vw,2.2rem)] uppercase tracking-wide text-slate-50">
+                      <span className="truncate font-display text-[clamp(1rem,2vw,2.2rem)] uppercase tracking-wide text-moon">
                         {option.label}
                       </span>
                       <span className="flex shrink-0 items-center gap-3">
@@ -129,12 +133,12 @@ export function RoundHost({ room, state, onForce, onNext, onQuit }: Props) {
                           </span>
                         )}
                         {revealed && author && (
-                          <span className="font-display text-sm uppercase tracking-widest text-slate-400">
+                          <span className="font-display text-sm uppercase tracking-widest text-moon-dim">
                             {author.emoji} {author.name}
                           </span>
                         )}
                         {revealed && (
-                          <span className="font-display text-[clamp(1rem,1.8vw,2rem)] font-bold tabular-nums text-cream">
+                          <span className="font-display text-[clamp(1rem,1.8vw,2rem)] font-bold tabular-nums text-accent">
                             {count}
                           </span>
                         )}
@@ -146,7 +150,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit }: Props) {
             )}
 
             {state.phase === "vote" && (
-              <p className="pt-[1vmin] text-center font-display text-[clamp(0.8rem,1.2vw,1.3rem)] uppercase tracking-[0.2em] text-slate-500">
+              <p className="pt-[1vmin] text-center font-display text-[clamp(0.8rem,1.2vw,1.3rem)] uppercase tracking-[0.2em] text-moon-deep">
                 {waitingOn.length
                   ? `Waiting on ${waitingOn.map((p) => p.name).join(", ")}`
                   : "Counting…"}
@@ -165,12 +169,12 @@ export function RoundHost({ room, state, onForce, onNext, onQuit }: Props) {
             </button>
           )}
           {state.phase === "reveal" && (
-            <button onClick={onNext} className="btn-cream px-10 py-3 text-lg">
+            <button onClick={onNext} className="btn-accent px-10 py-3 text-lg">
               Next round
             </button>
           )}
           {state.phase === "done" && (
-            <button onClick={onQuit} className="btn-cream px-10 py-3 text-lg">
+            <button onClick={onQuit} className="btn-accent px-10 py-3 text-lg">
               Back to the lobby
             </button>
           )}
@@ -198,11 +202,11 @@ function HerdResults({ room, state }: { room: Room; state: RoundState }) {
           className={[
             "flex items-center justify-between gap-4 rounded-xl border px-5 py-[1.4vmin]",
             ids.length === biggest && biggest > 1
-              ? "border-cream/60 bg-cream/10"
+              ? "border-accent/60 bg-accent/10"
               : "border-white/10 bg-white/[0.03]",
           ].join(" ")}
         >
-          <span className="truncate font-display text-[clamp(1rem,2vw,2.2rem)] uppercase tracking-wide text-slate-50">
+          <span className="truncate font-display text-[clamp(1rem,2vw,2.2rem)] uppercase tracking-wide text-moon">
             {answer}
           </span>
           <span className="flex shrink-0 gap-2">
@@ -222,7 +226,7 @@ function Standings({ room }: { room: Room }) {
   const ranked = [...room.players].sort((a, b) => b.score - a.score);
   return (
     <div className="w-full max-w-3xl space-y-2">
-      <p className="mb-[2vmin] text-center font-display text-[clamp(1.5rem,4vw,4rem)] uppercase text-cream">
+      <p className="mb-[2vmin] text-center font-display text-[clamp(1.5rem,4vw,4rem)] uppercase text-accent">
         Segment over
       </p>
       {ranked.map((p, i) => (
@@ -233,15 +237,15 @@ function Standings({ room }: { room: Room }) {
           transition={{ delay: i * 0.07 }}
           className={[
             "flex items-center justify-between rounded-xl border px-5 py-3",
-            i === 0 ? "border-cream/50 bg-cream/[0.08]" : "border-white/10",
+            i === 0 ? "border-accent/50 bg-accent/[0.08]" : "border-white/10",
           ].join(" ")}
         >
-          <span className="flex items-center gap-3 font-display text-xl uppercase tracking-wide text-slate-100">
-            <span className="w-6 tabular-nums text-slate-500">{i + 1}</span>
+          <span className="flex items-center gap-3 font-display text-xl uppercase tracking-wide text-moon">
+            <span className="w-6 tabular-nums text-moon-deep">{i + 1}</span>
             <span>{p.emoji}</span>
             {p.name}
           </span>
-          <span className="font-display text-xl font-bold tabular-nums text-cream">
+          <span className="font-display text-xl font-bold tabular-nums text-accent">
             {p.score.toLocaleString()}
           </span>
         </motion.div>
@@ -261,10 +265,10 @@ function ScoreStrip({ room, state }: { room: Room; state: RoundState }) {
             className="relative flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5"
           >
             <span className="text-lg">{p.emoji}</span>
-            <span className="font-display text-sm uppercase tracking-wide text-slate-300">
+            <span className="font-display text-sm uppercase tracking-wide text-moon/75">
               {p.name}
             </span>
-            <span className="font-display text-sm font-bold tabular-nums text-cream">
+            <span className="font-display text-sm font-bold tabular-nums text-accent">
               {p.score.toLocaleString()}
             </span>
             <AnimatePresence>

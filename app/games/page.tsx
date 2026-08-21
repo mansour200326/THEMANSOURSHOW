@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ShowMark } from "@/components/ShowMark";
+import { familyClass } from "@/lib/games/families";
 import { lineup } from "@/lib/lineup";
 
 export default function GamesMenu() {
@@ -9,13 +10,13 @@ export default function GamesMenu() {
         <Link href="/" className="opacity-80 transition hover:opacity-100">
           <ShowMark size="sm" />
         </Link>
-        <span className="t-label font-display uppercase text-slate-500">
+        <span className="t-label font-display uppercase text-moon-deep">
           Tonight&apos;s lineup
         </span>
       </header>
 
-      <h2 className="mt-10 font-display text-4xl uppercase tracking-wide text-slate-200 sm:text-6xl">
-        Pick a <span className="cream-text">segment</span>
+      <h2 className="mt-10 font-display text-4xl uppercase tracking-wide text-moon/90 sm:text-6xl">
+        Pick a <span className="accent-text">segment</span>
       </h2>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
@@ -25,8 +26,10 @@ export default function GamesMenu() {
             <div
               className={[
                 "group relative flex h-full flex-col justify-between rounded-2xl border p-6 transition-all duration-200",
+                // Every card is lit by its own family's colour.
+                familyClass(game.slug),
                 live
-                  ? "border-cream/30 bg-gradient-to-b from-cream/[0.09] to-transparent hover:-translate-y-1 hover:border-cream/70 hover:shadow-glow"
+                  ? "border-accent/30 bg-gradient-to-b from-accent/[0.09] to-transparent hover:-translate-y-1 hover:border-accent/70 hover:shadow-glow"
                   : "border-white/10 bg-white/[0.02]",
               ].join(" ")}
             >
@@ -35,17 +38,17 @@ export default function GamesMenu() {
                   <h3
                     className={[
                       "font-display text-2xl uppercase tracking-wide sm:text-3xl",
-                      live ? "text-slate-50" : "text-slate-400",
+                      live ? "text-moon" : "text-moon-dim",
                     ].join(" ")}
                   >
                     {game.name}
                   </h3>
                   {live ? (
-                    <span className="shrink-0 rounded-full bg-cream px-3 py-1 font-display text-xs uppercase tracking-widest text-ink-950">
+                    <span className="shrink-0 rounded-full bg-accent px-3 py-1 font-display text-xs uppercase tracking-widest text-midnight-deep">
                       {game.liveInLobby ? "In lobby" : "Live"}
                     </span>
                   ) : (
-                    <span className="shrink-0 rounded-full border border-white/10 px-3 py-1 font-display text-xs uppercase tracking-widest text-slate-500">
+                    <span className="shrink-0 rounded-full border border-white/10 px-3 py-1 font-display text-xs uppercase tracking-widest text-moon-deep">
                       Phase {game.phase}
                     </span>
                   )}
@@ -53,14 +56,14 @@ export default function GamesMenu() {
                 <p
                   className={[
                     "mt-3 text-sm leading-relaxed sm:text-base",
-                    live ? "text-slate-300" : "text-slate-500",
+                    live ? "text-moon/75" : "text-moon-deep",
                   ].join(" ")}
                 >
                   {game.tagline}
                 </p>
               </div>
 
-              <p className="mt-6 font-display text-xs uppercase tracking-[0.2em] text-slate-500">
+              <p className="mt-6 font-display text-xs uppercase tracking-[0.2em] text-moon-deep">
                 {game.liveInLobby
                   ? "Start from the lobby"
                   : game.needsPhones

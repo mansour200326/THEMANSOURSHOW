@@ -4,7 +4,7 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FeudBoard } from "@/components/feud/FeudBoard";
 import { type FeudConfig, FeudSetup } from "@/components/feud/FeudSetup";
-import { GeneratingScreen } from "@/components/jeopardy/GeneratingScreen";
+import { GeneratingScreen } from "@/components/bigboard/GeneratingScreen";
 import { ShowMark } from "@/components/ShowMark";
 import {
   emptyFeud,
@@ -15,9 +15,9 @@ import {
 import { sampleFeudPack } from "@/lib/feud/samplePack";
 import { type FeudQuestion, type FeudState, otherTeam } from "@/lib/feud/types";
 
-const KEY = "huddle:feud:v1";
+const KEY = "bignight:feud:v1";
 
-export default function FeudPage() {
+function FaceOffStage() {
   const [state, dispatch] = useReducer(feudReducer, undefined, emptyFeud);
   const [saved, setSaved] = useState<FeudState | null>(null);
   const [generating, setGenerating] = useState<FeudConfig | null>(null);
@@ -90,7 +90,7 @@ export default function FeudPage() {
   if (generating) {
     return (
       <GeneratingScreen
-        categories={[generating.theme.trim() || "The Feud"]}
+        categories={[generating.theme.trim() || "Face-Off"]}
         onCancel={() => {
           abort.current?.abort();
           setGenerating(null);
@@ -122,8 +122,8 @@ export default function FeudPage() {
       <header className="flex shrink-0 items-center justify-between px-1">
         <div className="flex items-center gap-4">
           <ShowMark size="sm" />
-          <span className="hidden font-display text-xs uppercase tracking-[0.2em] text-slate-600 sm:inline">
-            presents · The Feud{state.theme ? ` · ${state.theme}` : ""}
+          <span className="hidden font-display text-xs uppercase tracking-[0.2em] text-moon-deep/70 sm:inline">
+            presents · Face-Off{state.theme ? ` · ${state.theme}` : ""}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -152,10 +152,10 @@ export default function FeudPage() {
           >
             {state.phase === "face-off" && (
               <div className="flex h-full flex-col items-center justify-center gap-[3vmin] text-center">
-                <p className="t-label font-display uppercase text-slate-500">
+                <p className="t-label font-display uppercase text-moon-deep">
                   Round {state.round + 1}
                 </p>
-                <p className="t-clue max-w-[80vw] text-balance font-display uppercase tracking-wide text-slate-50">
+                <p className="t-clue max-w-[80vw] text-balance font-display uppercase tracking-wide text-moon">
                   Who takes the board?
                 </p>
                 <div className="flex flex-wrap justify-center gap-4">
@@ -163,7 +163,7 @@ export default function FeudPage() {
                     <button
                       key={team.id}
                       onClick={() => dispatch({ type: "SET_CONTROL", team: i })}
-                      className="btn-cream px-12 py-5 text-2xl"
+                      className="btn-accent px-12 py-5 text-2xl"
                     >
                       {team.name}
                     </button>
@@ -184,10 +184,10 @@ export default function FeudPage() {
 
             {state.phase === "winner" && (
               <div className="flex h-full flex-col items-center justify-center gap-[3vmin] text-center">
-                <p className="t-label font-display uppercase text-slate-500">
+                <p className="t-label font-display uppercase text-moon-deep">
                   {feudWinners(state.teams).length > 1 ? "It's a tie" : "Champions"}
                 </p>
-                <h2 className="cream-text t-hero text-balance font-display font-bold uppercase tracking-tight">
+                <h2 className="brand-text t-hero drop-shadow-[0_0_80px_rgba(255,107,87,0.45)] text-balance font-display font-bold uppercase tracking-tight">
                   {feudWinners(state.teams)
                     .map((t) => t.name)
                     .join(" & ")}
@@ -199,14 +199,14 @@ export default function FeudPage() {
                       className={[
                         "flex items-center justify-between rounded-xl border px-5 py-3",
                         i === 0
-                          ? "border-cream/50 bg-cream/[0.08]"
+                          ? "border-accent/50 bg-accent/[0.08]"
                           : "border-white/10",
                       ].join(" ")}
                     >
-                      <span className="font-display text-xl uppercase tracking-wide text-slate-100">
+                      <span className="font-display text-xl uppercase tracking-wide text-moon">
                         {team.name}
                       </span>
-                      <span className="font-display text-xl font-bold tabular-nums text-cream">
+                      <span className="font-display text-xl font-bold tabular-nums text-accent">
                         {team.score}
                       </span>
                     </div>
@@ -236,19 +236,19 @@ export default function FeudPage() {
                 className={[
                   "flex flex-col items-center rounded-xl border px-4 py-[1.2vmin]",
                   active
-                    ? "border-cream/70 bg-gradient-to-b from-cream/15 to-transparent"
+                    ? "border-accent/70 bg-gradient-to-b from-accent/15 to-transparent"
                     : "border-white/10 bg-white/[0.03]",
                 ].join(" ")}
               >
                 <span
                   className={[
                     "truncate font-display text-[clamp(0.8rem,1.2vw,1.6rem)] uppercase tracking-wider",
-                    active ? "text-cream-bright" : "text-slate-400",
+                    active ? "text-accent-bright" : "text-moon-dim",
                   ].join(" ")}
                 >
                   {team.name}
                 </span>
-                <span className="font-display text-[clamp(1.4rem,2.2vw,3rem)] font-bold tabular-nums text-slate-50">
+                <span className="font-display text-[clamp(1.4rem,2.2vw,3rem)] font-bold tabular-nums text-moon">
                   {team.score}
                 </span>
               </div>
@@ -257,5 +257,16 @@ export default function FeudPage() {
         </div>
       )}
     </main>
+  );
+}
+
+/**
+ * Face-Off is a survey of people, not a quiz — it runs on the social accent.
+ */
+export default function FaceOffPage() {
+  return (
+    <div className="g-social contents">
+      <FaceOffStage />
+    </div>
   );
 }

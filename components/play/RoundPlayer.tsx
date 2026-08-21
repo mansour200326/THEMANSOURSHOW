@@ -18,7 +18,7 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
   const prompt = state.prompts[state.round];
   const mySubmission = state.submissions[me.id];
   const myVote = state.votes[me.id];
-  const isGuessWho = room.gameId === "guess-who-said-it";
+  const isGuessWho = room.gameId === "who-said-it";
 
   // Fresh box every round.
   useEffect(() => setDraft(""), [state.round, state.phase]);
@@ -28,8 +28,8 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
     const place = ranked.findIndex((p) => p.id === me.id) + 1;
     return (
       <Shell title="Segment over">
-        <p className="text-center font-display text-6xl text-cream">#{place}</p>
-        <p className="text-center text-slate-400">
+        <p className="text-center font-display text-6xl text-accent">#{place}</p>
+        <p className="text-center text-moon-dim">
           {me.score.toLocaleString()} points tonight
         </p>
       </Shell>
@@ -40,10 +40,10 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
     if (mySubmission !== undefined) {
       return (
         <Shell title="Locked in">
-          <p className="rounded-xl border border-cream/30 bg-cream/[0.07] px-5 py-4 text-center text-lg text-slate-100">
+          <p className="rounded-xl border border-accent/30 bg-accent/[0.07] px-5 py-4 text-center text-lg text-moon">
             {mySubmission}
           </p>
-          <p className="text-center text-slate-500">Waiting for everyone else…</p>
+          <p className="text-center text-moon-deep">Waiting for everyone else…</p>
         </Shell>
       );
     }
@@ -60,7 +60,7 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
         <button
           onClick={() => draft.trim() && onSubmit(draft)}
           disabled={!draft.trim()}
-          className="btn-cream w-full py-5 text-xl"
+          className="btn-accent w-full py-5 text-xl"
         >
           Send it
         </button>
@@ -75,10 +75,10 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
       const chosen = state.options.find((o) => o.id === myVote);
       return (
         <Shell title="Vote in">
-          <p className="rounded-xl border border-cream/30 bg-cream/[0.07] px-5 py-4 text-center text-lg text-slate-100">
+          <p className="rounded-xl border border-accent/30 bg-accent/[0.07] px-5 py-4 text-center text-lg text-moon">
             {chosen?.label}
           </p>
-          <p className="text-center text-slate-500">Waiting for everyone else…</p>
+          <p className="text-center text-moon-deep">Waiting for everyone else…</p>
         </Shell>
       );
     }
@@ -86,7 +86,7 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
     return (
       <Shell title={isGuessWho ? "Who wrote this?" : prompt?.text ?? ""}>
         {isGuessWho && focusText && (
-          <p className="rounded-xl border border-white/15 bg-white/[0.04] px-5 py-4 text-center text-lg text-slate-100">
+          <p className="rounded-xl border border-white/15 bg-white/[0.04] px-5 py-4 text-center text-lg text-moon">
             “{focusText}”
           </p>
         )}
@@ -101,13 +101,13 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
                 className={[
                   "min-h-[4.5rem] rounded-xl border px-5 py-4 text-left text-lg transition-colors",
                   mine
-                    ? "cursor-not-allowed border-white/8 bg-white/[0.02] text-slate-600"
-                    : "border-white/15 bg-white/[0.04] text-slate-100 active:border-cream/70 active:bg-cream/10",
+                    ? "cursor-not-allowed border-white/8 bg-white/[0.02] text-moon-deep/70"
+                    : "border-white/15 bg-white/[0.04] text-moon active:border-accent/70 active:bg-accent/10",
                 ].join(" ")}
               >
                 {option.label}
                 {mine && (
-                  <span className="mt-1 block font-display text-xs uppercase tracking-widest text-slate-600">
+                  <span className="mt-1 block font-display text-xs uppercase tracking-widest text-moon-deep/70">
                     That&apos;s yours
                   </span>
                 )}
@@ -128,12 +128,12 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
         animate={{ scale: 1, opacity: 1 }}
         className={[
           "text-center font-display text-6xl font-bold",
-          gained ? "text-emerald-300" : "text-slate-600",
+          gained ? "text-emerald-300" : "text-moon-deep/70",
         ].join(" ")}
       >
         {gained ? `+${gained}` : "—"}
       </motion.p>
-      <p className="text-center text-slate-500">Look at the TV.</p>
+      <p className="text-center text-moon-deep">Look at the TV.</p>
     </Shell>
   );
 }
@@ -147,7 +147,7 @@ function Shell({
 }) {
   return (
     <div className="flex min-h-dvh flex-col gap-5 p-5">
-      <h1 className="text-balance pt-2 text-center font-display text-xl uppercase leading-snug tracking-wide text-slate-200">
+      <h1 className="text-balance pt-2 text-center font-display text-xl uppercase leading-snug tracking-wide text-moon/90">
         {title}
       </h1>
       <div className="flex flex-1 flex-col justify-center gap-4">{children}</div>

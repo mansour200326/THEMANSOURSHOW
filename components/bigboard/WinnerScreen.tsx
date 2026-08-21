@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { standings, winners } from "@/lib/jeopardy/engine";
-import type { Team } from "@/lib/jeopardy/types";
+import { standings, winners } from "@/lib/bigboard/engine";
+import type { Team } from "@/lib/bigboard/types";
 
-const COLORS = ["#f0e4c6", "#fdf6e6", "#c7b48c", "#e8e8ef", "#5b8cff"];
+const COLORS = ["#FF6B57", "#FF8D7C", "#DE4B37", "#F4F2EC", "#C6CADA"];
 
 type Bit = ReturnType<typeof makeBits>[number];
 
@@ -79,13 +79,13 @@ export function WinnerScreen({ teams, onRematch, onNewGame }: Props) {
         transition={{ type: "spring", stiffness: 180, damping: 16 }}
         className="relative z-10 flex flex-col items-center"
       >
-        <p className="t-label font-display uppercase text-slate-500">
+        <p className="t-label font-display uppercase text-moon-deep">
           {tie ? "It's a tie" : "Champions"}
         </p>
-        <h2 className="cream-text t-hero text-balance font-display font-bold uppercase tracking-tight drop-shadow-[0_0_80px_rgba(240,228,198,0.4)]">
+        <h2 className="brand-text t-hero text-balance font-display font-bold uppercase tracking-tight drop-shadow-[0_0_80px_rgba(255,107,87,0.45)]">
           {champs.map((t) => t.name).join(" & ")}
         </h2>
-        <p className="mt-2 font-display text-[clamp(1.5rem,3vw,3.5rem)] font-bold tabular-nums text-slate-100">
+        <p className="mt-2 font-display text-[clamp(1.5rem,3vw,3.5rem)] font-bold tabular-nums text-moon">
           {champs[0]?.score.toLocaleString()}
         </p>
       </motion.div>
@@ -100,22 +100,22 @@ export function WinnerScreen({ teams, onRematch, onNewGame }: Props) {
             className={[
               "flex items-center justify-between rounded-xl border px-5 py-3",
               i === 0
-                ? "border-cream/50 bg-cream/[0.08]"
+                ? "border-accent/50 bg-accent/[0.08]"
                 : "border-white/10 bg-white/[0.02]",
             ].join(" ")}
           >
             <div className="flex items-center gap-4">
-              <span className="w-8 font-display text-xl tabular-nums text-slate-500">
+              <span className="w-8 font-display text-xl tabular-nums text-moon-deep">
                 {i + 1}
               </span>
-              <span className="font-display text-xl uppercase tracking-wider text-slate-100 sm:text-2xl">
+              <span className="font-display text-xl uppercase tracking-wider text-moon sm:text-2xl">
                 {team.name}
               </span>
             </div>
             <span
               className={[
                 "font-display text-xl font-bold tabular-nums sm:text-2xl",
-                team.score < 0 ? "text-rose-400" : "text-slate-50",
+                team.score < 0 ? "text-rose-400" : "text-moon",
               ].join(" ")}
             >
               {team.score.toLocaleString()}
@@ -125,7 +125,7 @@ export function WinnerScreen({ teams, onRematch, onNewGame }: Props) {
       </div>
 
       <div className="relative z-10 mt-2 flex flex-wrap justify-center gap-3">
-        <button onClick={onRematch} className="btn-cream px-8 py-4 text-lg">
+        <button onClick={onRematch} className="btn-brand px-8 py-4 text-lg">
           Rematch · same teams
         </button>
         <button onClick={onNewGame} className="btn-ghost px-8 py-4 text-lg">

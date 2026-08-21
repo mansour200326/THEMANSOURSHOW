@@ -16,7 +16,7 @@ export type Rules = {
   timerSeconds: number;
   /** Hidden wager tiles. */
   dailyDoubles: boolean;
-  /** Final Jeopardy round after the board is cleared. */
+  /** Final Round round after the board is cleared. */
   finalRound: boolean;
   /** Who picks the next tile. */
   turnMode: "rotate" | "winner-picks";

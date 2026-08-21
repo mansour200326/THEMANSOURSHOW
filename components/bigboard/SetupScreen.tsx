@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { DifficultyBar } from "@/components/DifficultyBar";
 import { ShowMark } from "@/components/ShowMark";
 import type { Difficulty } from "@/lib/difficulty";
-import { type Rules, defaultRules } from "@/lib/jeopardy/types";
+import { type Rules, defaultRules } from "@/lib/bigboard/types";
 
 const MIN_TEAMS = 2;
 const MAX_TEAMS = 4;
@@ -71,14 +71,14 @@ function Toggle({
       className={[
         "flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-colors",
         checked
-          ? "border-cream/45 bg-cream/[0.07]"
+          ? "border-accent/45 bg-accent/[0.07]"
           : "border-white/10 bg-white/[0.02] hover:border-white/20",
       ].join(" ")}
     >
       <span
         className={[
           "mt-0.5 flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition-colors",
-          checked ? "bg-cream" : "bg-white/15",
+          checked ? "bg-accent" : "bg-white/15",
         ].join(" ")}
       >
         <motion.span
@@ -91,10 +91,10 @@ function Toggle({
         />
       </span>
       <span className="min-w-0">
-        <span className="block font-display text-base uppercase tracking-wider text-slate-100">
+        <span className="block font-display text-base uppercase tracking-wider text-moon">
           {label}
         </span>
-        <span className="mt-0.5 block text-sm leading-snug text-slate-400">
+        <span className="mt-0.5 block text-sm leading-snug text-moon-dim">
           {hint}
         </span>
       </span>
@@ -178,18 +178,18 @@ export function SetupScreen({
         </Link>
         <Link
           href="/games"
-          className="font-display text-xs uppercase tracking-[0.2em] text-slate-500 hover:text-slate-300"
+          className="font-display text-xs uppercase tracking-[0.2em] text-moon-deep hover:text-moon/75"
         >
           ← Lineup
         </Link>
       </header>
 
       <div className="mt-10">
-        <p className="t-label font-display uppercase text-slate-500">
-          Huddle presents
+        <p className="t-label font-display uppercase text-moon-deep">
+          Big Night presents
         </p>
-        <h1 className="cream-text mt-1 font-display text-5xl font-bold uppercase tracking-tight sm:text-7xl">
-          Team Jeopardy
+        <h1 className="accent-text mt-1 font-display text-5xl font-bold uppercase tracking-tight sm:text-7xl">
+          Big Board
         </h1>
       </div>
 
@@ -197,12 +197,12 @@ export function SetupScreen({
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-cream/40 bg-cream/[0.08] px-5 py-4"
+          className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-accent/40 bg-accent/[0.08] px-5 py-4"
         >
-          <p className="text-slate-200">
+          <p className="text-moon/90">
             There&apos;s a game in progress on this screen.
           </p>
-          <button onClick={onResume} className="btn-cream">
+          <button onClick={onResume} className="btn-brand">
             Resume game
           </button>
         </motion.div>
@@ -213,7 +213,7 @@ export function SetupScreen({
         <section className="space-y-8">
           <div>
             <div className="flex items-baseline justify-between gap-4">
-              <h2 className="font-display text-xl uppercase tracking-widest text-slate-300">
+              <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
                 Categories
               </h2>
               <div className="flex items-center gap-2">
@@ -225,12 +225,12 @@ export function SetupScreen({
                 >
                   {suggesting ? "Thinking…" : "✦ Suggest for me"}
                 </button>
-                <span className="font-display text-xs uppercase tracking-widest text-slate-600">
+                <span className="font-display text-xs uppercase tracking-widest text-moon-deep/70">
                   {filled.length}/{MAX_CATEGORIES}
                 </span>
               </div>
             </div>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-moon-deep">
               You pick the topics — anything from Game of Thrones to roasting your
               friends. We write five clues for each.
             </p>
@@ -238,7 +238,7 @@ export function SetupScreen({
             <div className="mt-4 space-y-3">
               {categories.map((value, i) => (
                 <div key={i} className="flex items-center gap-3">
-                  <span className="w-6 shrink-0 text-center font-display text-lg tabular-nums text-slate-600">
+                  <span className="w-6 shrink-0 text-center font-display text-lg tabular-nums text-moon-deep/70">
                     {i + 1}
                   </span>
                   <input
@@ -274,7 +274,7 @@ export function SetupScreen({
             )}
 
             <div className="mt-5">
-              <p className="t-label font-display uppercase text-slate-600">
+              <p className="t-label font-display uppercase text-moon-deep/70">
                 Or tap one
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
@@ -291,8 +291,8 @@ export function SetupScreen({
                       className={[
                         "rounded-full border px-3.5 py-1.5 text-sm transition-colors",
                         used
-                          ? "cursor-default border-cream/40 bg-cream/10 text-cream-bright"
-                          : "border-white/10 bg-white/[0.03] text-slate-300 hover:border-cream/50 hover:text-cream-bright",
+                          ? "cursor-default border-accent/40 bg-accent/10 text-accent-bright"
+                          : "border-white/10 bg-white/[0.03] text-moon/75 hover:border-accent/50 hover:text-accent-bright",
                       ].join(" ")}
                     >
                       {topic}
@@ -303,7 +303,7 @@ export function SetupScreen({
             </div>
 
             <div className="mt-6">
-              <label className="t-label block font-display uppercase text-slate-600">
+              <label className="t-label block font-display uppercase text-moon-deep/70">
                 Extra instructions (optional)
               </label>
               <input
@@ -318,7 +318,7 @@ export function SetupScreen({
 
           <div>
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-xl uppercase tracking-widest text-slate-300">
+              <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
                 Teams
               </h2>
               <div className="flex gap-2">
@@ -351,7 +351,7 @@ export function SetupScreen({
             <div className="mt-4 space-y-3">
               {names.map((name, i) => (
                 <div key={i} className="flex items-center gap-3">
-                  <span className="w-6 shrink-0 text-center font-display text-lg tabular-nums text-slate-600">
+                  <span className="w-6 shrink-0 text-center font-display text-lg tabular-nums text-moon-deep/70">
                     {i + 1}
                   </span>
                   <input
@@ -369,14 +369,14 @@ export function SetupScreen({
 
         {/* Rules */}
         <section>
-          <h2 className="font-display text-xl uppercase tracking-widest text-slate-300">
+          <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
             Difficulty
           </h2>
           <div className="mt-3">
             <DifficultyBar value={difficulty} onChange={setDifficulty} />
           </div>
 
-          <h2 className="mt-8 font-display text-xl uppercase tracking-widest text-slate-300">
+          <h2 className="mt-8 font-display text-xl uppercase tracking-widest text-moon/75">
             House rules
           </h2>
           <div className="mt-4 space-y-3">
@@ -399,7 +399,7 @@ export function SetupScreen({
               onChange={(v) => setRule("dailyDoubles", v)}
             />
             <Toggle
-              label="Final Jeopardy"
+              label="Final Round"
               hint="One last clue after the board clears. Everyone wagers and writes."
               checked={rules.finalRound}
               onChange={(v) => setRule("finalRound", v)}
@@ -434,10 +434,10 @@ export function SetupScreen({
                       className={[
                         "rounded-full border px-3.5 py-1.5 font-display text-sm tabular-nums transition-colors",
                         active
-                          ? "border-cream/60 bg-cream/15 text-cream-bright"
+                          ? "border-accent/60 bg-accent/15 text-accent-bright"
                           : rules.timer
-                            ? "border-white/10 bg-white/[0.03] text-slate-300 hover:border-cream/40 hover:text-cream-bright"
-                            : "border-white/10 bg-white/[0.02] text-slate-600 hover:border-white/20 hover:text-slate-400",
+                            ? "border-white/10 bg-white/[0.03] text-moon/75 hover:border-accent/40 hover:text-accent-bright"
+                            : "border-white/10 bg-white/[0.02] text-moon-deep/70 hover:border-white/20 hover:text-moon-dim",
                       ].join(" ")}
                     >
                       {seconds}s
@@ -474,12 +474,12 @@ export function SetupScreen({
           type="button"
           onClick={() => start("ai")}
           disabled={!canGenerate || generating}
-          className="btn-cream px-16 py-5 text-2xl"
+          className="btn-brand px-16 py-5 text-2xl"
         >
           {generating ? "Building the board…" : "Build my board"}
         </button>
         {!canGenerate && (
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-moon-deep">
             Add at least {MIN_CATEGORIES} categories to build a board.
           </p>
         )}

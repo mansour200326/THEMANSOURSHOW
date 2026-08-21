@@ -19,12 +19,25 @@ import { type Difficulty, difficultyBrief } from "@/lib/difficulty";
  * models without a deploy of new code — the defaults below are what runs if
  * the variables are absent.
  *
- *   HUDDLE_MODEL_BOARD  boards and surveys — structured, has to be accurate
- *   HUDDLE_MODEL_PACKS  short prompt lists — cheap and fast is the point
+ *   BIGNIGHT_MODEL_BOARD  boards and surveys — structured, has to be accurate
+ *   BIGNIGHT_MODEL_PACKS  short prompt lists — cheap and fast is the point
+ *
+ * The HUDDLE_* names are the pre-rebrand spelling. They still work so a live
+ * deploy doesn't lose its model settings the moment this ships.
  */
+const pick = (...names: string[]) => {
+  for (const name of names) {
+    const value = process.env[name]?.trim();
+    if (value) return value;
+  }
+  return undefined;
+};
+
 const MODELS = {
-  board: process.env.HUDDLE_MODEL_BOARD?.trim() || "claude-sonnet-5",
-  packs: process.env.HUDDLE_MODEL_PACKS?.trim() || "claude-haiku-4-5",
+  board:
+    pick("BIGNIGHT_MODEL_BOARD", "HUDDLE_MODEL_BOARD") || "claude-sonnet-5",
+  packs:
+    pick("BIGNIGHT_MODEL_PACKS", "HUDDLE_MODEL_PACKS") || "claude-haiku-4-5",
 };
 
 /**
@@ -70,7 +83,7 @@ const GeneratedCategory = z.object({
 const GeneratedBoard = z.object({
   categories: z.array(GeneratedCategory),
   final: GeneratedClue.extend({
-    category: z.string().describe("Final Jeopardy category title."),
+    category: z.string().describe("Final Round category title."),
   }),
 });
 
@@ -96,7 +109,7 @@ Rules:
   visual descriptions. Never open every clue the same way.
 - Keep it clean enough for a living room with everyone's friends in it.
 
-Also write one Final Jeopardy clue: harder than anything on the board, drawn from
+Also write one Final Round clue: harder than anything on the board, drawn from
 one of the requested topics, still answerable by a group thinking out loud.`;
 
 function buildPrompt(categories: string[], vibe: string): string {
@@ -178,7 +191,7 @@ export async function generateTriviaBoard({
   };
 }
 
-/* ------------------------------------------------------- The Feud packs */
+/* ------------------------------------------------------- Face-Off packs */
 
 const GeneratedFeud = z.object({
   questions: z.array(
@@ -201,7 +214,7 @@ const GeneratedFeud = z.object({
   ),
 });
 
-const FEUD_SYSTEM = `You write survey rounds for a Family Feud-style game played by a group
+const FEUD_SYSTEM = `You write survey rounds for a survey face-off game played by a group
 of friends around one TV.
 
 Rules:
@@ -344,7 +357,7 @@ export function friendlyAiError(error: unknown): string {
     case 400:
       return "That request was rejected. Try rewording the categories.";
     case 404:
-      return "That model doesn't exist. Check HUDDLE_MODEL_BOARD and HUDDLE_MODEL_PACKS in your host's settings.";
+      return "That model doesn't exist. Check BIGNIGHT_MODEL_BOARD and BIGNIGHT_MODEL_PACKS in your host's settings.";
     default:
       break;
   }
@@ -368,7 +381,7 @@ export async function generateRapidPrompts({
   theme = "",
   difficulty = "medium",
 }: {
-  mode: "categories" | "five-seconds";
+  mode: "categories" | "three-in-five";
   count: number;
   theme?: string;
   difficulty?: Difficulty;

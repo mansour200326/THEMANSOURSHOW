@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CountdownRing } from "@/components/jeopardy/CountdownRing";
-import { maxFinalWager } from "@/lib/jeopardy/engine";
-import type { FinalState, Rules, Team } from "@/lib/jeopardy/types";
+import { CountdownRing } from "@/components/bigboard/CountdownRing";
+import { maxFinalWager } from "@/lib/bigboard/engine";
+import type { FinalState, Rules, Team } from "@/lib/bigboard/types";
 
 type Props = {
   phase: "final-wager" | "final-clue" | "final-judge";
@@ -37,17 +37,17 @@ export function FinalStage({
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col items-center"
       >
-        <p className="t-label font-display uppercase text-slate-500">
-          Final Jeopardy
+        <p className="t-label font-display uppercase text-moon-deep">
+          Final Round
         </p>
-        <h2 className="cream-text font-display text-[clamp(2rem,5vw,6rem)] font-bold uppercase tracking-tight">
+        <h2 className="accent-text font-display text-[clamp(2rem,5vw,6rem)] font-bold uppercase tracking-tight">
           {final.clue.category}
         </h2>
       </motion.div>
 
       {phase === "final-wager" && (
         <>
-          <p className="max-w-3xl text-balance text-[clamp(0.95rem,1.4vw,1.5rem)] text-slate-400">
+          <p className="max-w-3xl text-balance text-[clamp(0.95rem,1.4vw,1.5rem)] text-moon-dim">
             Everyone writes a wager down, then you type them in. Nobody has seen
             the clue yet.
           </p>
@@ -62,10 +62,10 @@ export function FinalStage({
               const cap = maxFinalWager(team);
               return (
                 <div key={team.id} className="panel p-5">
-                  <p className="truncate font-display text-[clamp(0.9rem,1.3vw,1.6rem)] uppercase tracking-wider text-cream-bright">
+                  <p className="truncate font-display text-[clamp(0.9rem,1.3vw,1.6rem)] uppercase tracking-wider text-accent-bright">
                     {team.name}
                   </p>
-                  <p className="mt-1 text-sm text-slate-500">
+                  <p className="mt-1 text-sm text-moon-deep">
                     Score {team.score.toLocaleString()} · max{" "}
                     {cap.toLocaleString()}
                   </p>
@@ -84,7 +84,7 @@ export function FinalStage({
             })}
           </div>
 
-          <button onClick={onLockWagers} className="btn-cream px-12 py-4 text-xl">
+          <button onClick={onLockWagers} className="btn-accent px-12 py-4 text-xl">
             Lock wagers · show the clue
           </button>
         </>
@@ -96,7 +96,7 @@ export function FinalStage({
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4 }}
-            className="t-clue max-w-[85vw] text-balance font-display uppercase tracking-wide text-slate-50"
+            className="t-clue max-w-[85vw] text-balance font-display uppercase tracking-wide text-moon"
           >
             {final.clue.clue}
           </motion.p>
@@ -105,11 +105,11 @@ export function FinalStage({
             <CountdownRing seconds={60} resetKey="final" />
           )}
 
-          <p className="text-[clamp(0.85rem,1.2vw,1.25rem)] uppercase tracking-[0.2em] text-slate-500">
+          <p className="text-[clamp(0.85rem,1.2vw,1.25rem)] uppercase tracking-[0.2em] text-moon-deep">
             Write your answers
           </p>
 
-          <button onClick={onShowJudging} className="btn-cream px-12 py-4 text-xl">
+          <button onClick={onShowJudging} className="btn-accent px-12 py-4 text-xl">
             Reveal the answer
           </button>
         </>
@@ -117,17 +117,17 @@ export function FinalStage({
 
       {phase === "final-judge" && (
         <>
-          <p className="t-answer max-w-[80vw] text-balance font-display font-semibold uppercase text-slate-100">
+          <p className="t-answer max-w-[80vw] text-balance font-display font-semibold uppercase text-moon">
             {final.clue.clue}
           </p>
           <div className="flex flex-col items-center gap-1">
-            <span className="t-label font-display uppercase text-slate-500">
+            <span className="t-label font-display uppercase text-moon-deep">
               Answer
             </span>
             <motion.p
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              className="cream-text t-answer text-balance font-display font-bold uppercase"
+              className="accent-text t-answer text-balance font-display font-bold uppercase"
             >
               {final.clue.answer}
             </motion.p>
@@ -153,13 +153,13 @@ export function FinalStage({
                         : "border-white/10 bg-white/[0.02]",
                   ].join(" ")}
                 >
-                  <p className="truncate font-display text-[clamp(0.85rem,1.2vw,1.5rem)] uppercase tracking-wider text-slate-200">
+                  <p className="truncate font-display text-[clamp(0.85rem,1.2vw,1.5rem)] uppercase tracking-wider text-moon/90">
                     {team.name}
                   </p>
-                  <p className="mt-1 font-display text-[clamp(1.3rem,2vw,2.5rem)] font-bold tabular-nums text-slate-50">
+                  <p className="mt-1 font-display text-[clamp(1.3rem,2vw,2.5rem)] font-bold tabular-nums text-moon">
                     {team.score.toLocaleString()}
                   </p>
-                  <p className="mb-3 text-sm text-slate-500">
+                  <p className="mb-3 text-sm text-moon-deep">
                     Wagered {(final.wagers[team.id] ?? 0).toLocaleString()}
                   </p>
                   <div className="flex gap-2">
@@ -184,7 +184,7 @@ export function FinalStage({
           <button
             onClick={onFinish}
             disabled={!allJudged}
-            className="btn-cream px-12 py-4 text-xl"
+            className="btn-accent px-12 py-4 text-xl"
           >
             Final standings
           </button>

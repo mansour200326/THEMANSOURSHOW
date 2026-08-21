@@ -50,13 +50,13 @@ export function FeudBoard({
   return (
     <div className="flex h-full flex-col gap-[1.5vmin]">
       {/* Question */}
-      <p className="shrink-0 text-balance px-[4vw] text-center font-display text-[clamp(1.2rem,3vw,3.4rem)] uppercase leading-tight tracking-wide text-slate-50">
+      <p className="shrink-0 text-balance px-[4vw] text-center font-display text-[clamp(1.2rem,3vw,3.4rem)] uppercase leading-tight tracking-wide text-moon">
         {question.question}
       </p>
 
       {/* Who's up + strikes */}
       <div className="flex shrink-0 items-center justify-center gap-[2vmin]">
-        <span className="font-display text-[clamp(0.9rem,1.6vw,1.8rem)] uppercase tracking-[0.2em] text-cream">
+        <span className="font-display text-[clamp(0.9rem,1.6vw,1.8rem)] uppercase tracking-[0.2em] text-accent">
           {over
             ? state.outcome === "cleared"
               ? "Board cleared"
@@ -71,7 +71,7 @@ export function FeudBoard({
                 "flex h-[4vmin] max-h-12 min-h-8 w-[4vmin] min-w-8 max-w-12 items-center justify-center rounded-lg border font-display text-[clamp(1rem,1.8vw,2rem)] font-bold",
                 i < state.strikes
                   ? "border-rose-500/70 bg-rose-500/20 text-rose-300"
-                  : "border-white/10 text-slate-700",
+                  : "border-white/10 text-moon-deep/40",
               ].join(" ")}
             >
               ✗
@@ -112,7 +112,7 @@ export function FeudBoard({
                 open
                   ? "tile-face border-white/15 shadow-tile"
                   : clickable
-                    ? "border-white/10 bg-white/[0.03] hover:border-cream/50 hover:bg-white/[0.06]"
+                    ? "border-white/10 bg-white/[0.03] hover:border-accent/50 hover:bg-white/[0.06]"
                     : "border-white/8 bg-white/[0.02]",
               ].join(" ")}
             >
@@ -125,17 +125,17 @@ export function FeudBoard({
                     transition={{ type: "spring", stiffness: 240, damping: 20 }}
                     className="flex w-full items-center justify-between gap-4"
                   >
-                    <span className="truncate font-display text-[clamp(1rem,2vw,2.3rem)] uppercase tracking-wide text-slate-50">
+                    <span className="truncate font-display text-[clamp(1rem,2vw,2.3rem)] uppercase tracking-wide text-moon">
                       {answer.text}
                     </span>
-                    <span className="cream-text shrink-0 font-display text-[clamp(1.2rem,2.2vw,2.6rem)] font-bold tabular-nums">
+                    <span className="accent-text shrink-0 font-display text-[clamp(1.2rem,2.2vw,2.6rem)] font-bold tabular-nums">
                       {answer.points}
                     </span>
                   </motion.span>
                 ) : (
                   <motion.span
                     key="closed"
-                    className="flex w-full items-center justify-center font-display text-[clamp(1.2rem,2.2vw,2.6rem)] font-bold tabular-nums text-slate-600"
+                    className="flex w-full items-center justify-center font-display text-[clamp(1.2rem,2.2vw,2.6rem)] font-bold tabular-nums text-moon-deep/70"
                   >
                     {i + 1}
                   </motion.span>
@@ -153,15 +153,15 @@ export function FeudBoard({
           animate={{ opacity: 1, y: 0 }}
           className="flex shrink-0 items-center justify-between gap-6 px-[2vw]"
         >
-          <p className="font-display text-[clamp(0.85rem,1.4vw,1.5rem)] uppercase tracking-wider text-slate-400">
+          <p className="font-display text-[clamp(0.85rem,1.4vw,1.5rem)] uppercase tracking-wider text-moon-dim">
             {state.outcome === "cleared"
               ? "Every answer found"
               : "The rest are shown above"}
           </p>
-          <button onClick={onNextRound} className="btn-cream px-12 py-4 text-xl">
+          <button onClick={onNextRound} className="btn-accent px-12 py-4 text-xl">
             {lastRound ? "Final standings" : "Next round"}
           </button>
-          <p className="t-label font-display uppercase text-slate-500">
+          <p className="t-label font-display uppercase text-moon-deep">
             Round {state.round + 1}/{state.questions.length}
           </p>
         </motion.div>
@@ -171,8 +171,8 @@ export function FeudBoard({
       {!over && (
       <div className="flex shrink-0 items-end gap-[1.5vw] px-[2vw]">
         <div className="shrink-0 text-left">
-          <p className="t-label font-display uppercase text-slate-500">Pot</p>
-          <p className="cream-text font-display text-[clamp(1.6rem,3vw,3.6rem)] font-bold tabular-nums">
+          <p className="t-label font-display uppercase text-moon-deep">Pot</p>
+          <p className="accent-text font-display text-[clamp(1.6rem,3vw,3.6rem)] font-bold tabular-nums">
             {state.pot}
           </p>
         </div>
@@ -188,7 +188,7 @@ export function FeudBoard({
               autoFocus
               className="field flex-1 text-[clamp(1rem,1.8vw,1.6rem)]"
             />
-            <button onClick={submit} className="btn-cream px-8 text-lg">
+            <button onClick={submit} className="btn-accent px-8 text-lg">
               Enter
             </button>
           </div>
@@ -222,7 +222,7 @@ export function FeudBoard({
               Strike ✗
             </button>
           )}
-          <p className="t-label mt-1 font-display uppercase text-slate-500">
+          <p className="t-label mt-1 font-display uppercase text-moon-deep">
             Round {state.round + 1}/{state.questions.length}
           </p>
         </div>

@@ -9,6 +9,7 @@ import { Lobby } from "@/components/host/Lobby";
 import { RoundHost } from "@/components/host/RoundHost";
 import type { BuzzState } from "@/lib/games/buzzEngine";
 import type { RoundState } from "@/lib/games/roundEngine";
+import { useAccentFamily } from "@/components/useAccentFamily";
 import { useRoom } from "@/lib/room/useRoom";
 
 export default function HostPage({
@@ -19,6 +20,9 @@ export default function HostPage({
   const { code } = use(params);
   const roomCode = code.toUpperCase();
   const { room, status, send } = useRoom(roomCode);
+
+  // The screen takes its colour from whatever game is running.
+  useAccentFamily(room?.gameId);
 
   // Games that take categories get a setup step before they start.
   const [setupFor, setSetupFor] = useState<string | null>(null);
@@ -61,14 +65,14 @@ export default function HostPage({
   if (status === "missing") {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6 text-center">
-        <h1 className="font-display text-3xl uppercase tracking-wide text-slate-200">
+        <h1 className="font-display text-3xl uppercase tracking-wide text-moon/90">
           Room {roomCode} is gone
         </h1>
-        <p className="max-w-md text-slate-400">
+        <p className="max-w-md text-moon-dim">
           Rooms live in the server&apos;s memory, so restarting it clears them.
           Start a fresh one and the phones can rejoin.
         </p>
-        <Link href="/" className="btn-cream px-8 py-4 text-lg">
+        <Link href="/" className="btn-brand px-8 py-4 text-lg">
           Host a new room
         </Link>
       </main>
@@ -78,7 +82,7 @@ export default function HostPage({
   if (!room) {
     return (
       <main className="flex min-h-dvh items-center justify-center">
-        <p className="font-display uppercase tracking-[0.25em] text-slate-500">
+        <p className="font-display uppercase tracking-[0.25em] text-moon-deep">
           Opening room {roomCode}…
         </p>
       </main>

@@ -26,8 +26,8 @@ export default function Home() {
       <HeroStage>
         <ShowMark />
 
-        <p className="mt-8 max-w-2xl text-balance text-center text-lg text-slate-400 sm:text-xl">
-          Six party games on one screen. The TV is the stage, your phone is the
+        <p className="mt-8 max-w-2xl text-balance text-center text-lg text-moon-dim sm:text-xl">
+          Ten party games on one screen. The TV is the stage, your phone is the
           controller — no downloads, no accounts.
         </p>
 
@@ -36,7 +36,7 @@ export default function Home() {
             type="button"
             onClick={hostGame}
             disabled={opening}
-            className="btn-cream px-12 py-5 text-xl sm:text-2xl"
+            className="btn-brand px-12 py-5 text-xl sm:text-2xl"
           >
             {opening ? "Opening the room…" : "Host a game"}
           </button>
@@ -45,7 +45,7 @@ export default function Home() {
           </Link>
         </div>
 
-        <p className="mt-8 text-center font-display text-xs uppercase tracking-[0.2em] text-slate-600">
+        <p className="mt-8 text-center font-display text-xs uppercase tracking-[0.2em] text-moon-deep/70">
           Every game lives inside Host — phones optional
         </p>
       </HeroStage>

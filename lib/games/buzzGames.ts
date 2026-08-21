@@ -1,9 +1,9 @@
 import { type BuzzItem, createBuzzGame } from "@/lib/games/buzzEngine";
-import { sampleBoard } from "@/lib/jeopardy/sampleBoard";
+import { sampleBoard } from "@/lib/bigboard/sampleBoard";
 
 /* ------------------------------------------------------------ Trivia Royale */
 
-/** Same board as Team Jeopardy — but everyone races for it on their phone. */
+/** Same board as Big Board — but everyone races for it on their phone. */
 export const triviaRoyale = createBuzzGame(
   {
     id: "trivia-royale",

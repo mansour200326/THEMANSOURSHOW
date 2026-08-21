@@ -15,10 +15,10 @@ export default function JoinPage() {
   return (
     <main className="flex min-h-dvh flex-col justify-center gap-6 p-6">
       <div className="text-center">
-        <p className="font-display text-xs uppercase tracking-[0.3em] text-slate-500">
-          Huddle
+        <p className="font-display text-xs uppercase tracking-[0.3em] text-moon-deep">
+          Big Night
         </p>
-        <h1 className="mt-2 font-display text-3xl uppercase tracking-wide text-slate-100">
+        <h1 className="mt-2 font-display text-3xl uppercase tracking-wide text-moon">
           Enter the room code
         </h1>
       </div>
@@ -40,12 +40,12 @@ export default function JoinPage() {
       <button
         onClick={go}
         disabled={!ready}
-        className="btn-cream w-full py-6 text-2xl"
+        className="btn-brand w-full py-6 text-2xl"
       >
         Join
       </button>
 
-      <p className="text-center text-sm text-slate-500">
+      <p className="text-center text-sm text-moon-deep">
         The code is on the TV.
       </p>
     </main>

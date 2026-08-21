@@ -2,7 +2,7 @@ import type { RapidMode } from "@/lib/rapid/types";
 
 /**
  * Bundled prompts. Categories wants topics with dozens of valid answers;
- * 5 Second Rule wants ones where three is easy to think of but hard to say
+ * Three in Five wants ones where three is easy to think of but hard to say
  * under pressure.
  */
 const CATEGORIES: string[] = [
@@ -53,7 +53,7 @@ const FIVE_SECONDS: string[] = [
 
 export const rapidPack: Record<RapidMode, string[]> = {
   categories: CATEGORIES,
-  "five-seconds": FIVE_SECONDS,
+  "three-in-five": FIVE_SECONDS,
 };
 
 /** Fresh order every game so a repeat night doesn't repeat prompts. */

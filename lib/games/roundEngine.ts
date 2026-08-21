@@ -8,7 +8,7 @@ import {
 
 /**
  * The shape shared by every prompt → answer → vote → reveal game. Most Likely
- * To, Guess Who Said It, Bluff Trivia and Herd Mentality are all this machine
+ * To, Who Said It, Bluff Trivia and Groupthink are all this machine
  * with different content and a different scoring rule.
  */
 
@@ -52,7 +52,7 @@ export type RoundSpec = {
   rounds: number;
   /** Options to vote on, built once everyone has submitted. */
   buildOptions: (room: Room, state: RoundState) => VoteOption[];
-  /** Picks the submission this round is about (Guess Who Said It). */
+  /** Picks the submission this round is about (Who Said It). */
   pickFocus?: (room: Room, state: RoundState) => string | undefined;
   /** Points to award when voting closes. */
   score: (room: Room, state: RoundState) => Record<string, number>;

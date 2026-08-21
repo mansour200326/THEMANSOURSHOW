@@ -16,12 +16,13 @@ const body = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Huddle — party games for the room",
-  description: "Party games for the room. The TV is the stage, your phone is the controller.",
+  title: "Big Night — party games for the room",
+  description:
+    "One screen, everyone's phones, fourteen games. No downloads, no accounts.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#04081a",
+  themeColor: "#101A3C",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,

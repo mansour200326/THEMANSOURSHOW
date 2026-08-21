@@ -25,7 +25,7 @@ export function BuzzHost({ room, state, send }: Props) {
   return (
     <main className="flex h-dvh flex-col gap-[1.2vmin] overflow-hidden p-[1.6vmin]">
       <header className="flex shrink-0 items-center justify-between">
-        <span className="font-display text-xs uppercase tracking-[0.25em] text-slate-500">
+        <span className="font-display text-xs uppercase tracking-[0.25em] text-moon-deep">
           {state.mode === "sequence"
             ? `Riddle ${Math.min(state.index + 1, state.items.length)} of ${state.items.length}`
             : "Pick a tile, then race for it"}
@@ -40,8 +40,8 @@ export function BuzzHost({ room, state, send }: Props) {
           <Standings room={room} />
         ) : state.phase === "picking" && state.board ? (
           <div className="flex h-full w-full flex-col gap-[1.2vmin]">
-            <p className="shrink-0 text-center font-display text-[clamp(0.85rem,1.5vw,1.8rem)] uppercase tracking-[0.25em] text-slate-400">
-              <span className="text-cream-bright">
+            <p className="shrink-0 text-center font-display text-[clamp(0.85rem,1.5vw,1.8rem)] uppercase tracking-[0.25em] text-moon-dim">
+              <span className="text-accent-bright">
                 {playerById(room, state.picker ?? undefined)?.name ?? "Host"}
               </span>{" "}
               picks
@@ -64,7 +64,7 @@ export function BuzzHost({ room, state, send }: Props) {
               className={
                 state.mode === "sequence"
                   ? "text-[clamp(4rem,16vw,16rem)] leading-none"
-                  : "t-clue text-balance font-display uppercase tracking-wide text-slate-50"
+                  : "t-clue text-balance font-display uppercase tracking-wide text-moon"
               }
             >
               {item?.prompt}
@@ -80,10 +80,10 @@ export function BuzzHost({ room, state, send }: Props) {
                   className="flex flex-col items-center gap-2"
                 >
                   <span className="text-[clamp(3rem,7vw,6rem)]">{buzzer.emoji}</span>
-                  <span className="cream-text font-display text-[clamp(2rem,5vw,5rem)] font-bold uppercase">
+                  <span className="accent-text font-display text-[clamp(2rem,5vw,5rem)] font-bold uppercase">
                     {buzzer.name}
                   </span>
-                  <span className="font-display text-sm uppercase tracking-[0.25em] text-slate-500">
+                  <span className="font-display text-sm uppercase tracking-[0.25em] text-moon-deep">
                     Answer out loud
                   </span>
                 </motion.div>
@@ -92,7 +92,7 @@ export function BuzzHost({ room, state, send }: Props) {
                   key="open"
                   animate={{ opacity: [0.45, 1, 0.45] }}
                   transition={{ duration: 1.6, repeat: Infinity }}
-                  className="font-display text-[clamp(1.1rem,2.4vw,2.6rem)] uppercase tracking-[0.3em] text-cream"
+                  className="font-display text-[clamp(1.1rem,2.4vw,2.6rem)] uppercase tracking-[0.3em] text-accent"
                 >
                   Buzz in
                 </motion.p>
@@ -103,7 +103,7 @@ export function BuzzHost({ room, state, send }: Props) {
               <motion.p
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="cream-text t-answer font-display font-bold uppercase"
+                className="accent-text t-answer font-display font-bold uppercase"
               >
                 {item.answer}
               </motion.p>
@@ -156,7 +156,7 @@ export function BuzzHost({ room, state, send }: Props) {
             <span
               className={[
                 "font-display text-xs uppercase tracking-wider transition-opacity",
-                peek ? "text-cream/80 opacity-100" : "select-none opacity-0",
+                peek ? "text-accent/80 opacity-100" : "select-none opacity-0",
               ].join(" ")}
             >
               {item.answer}
@@ -164,12 +164,12 @@ export function BuzzHost({ room, state, send }: Props) {
           </div>
         )}
         {state.phase === "scored" && (
-          <button onClick={() => send("continue")} className="btn-cream px-10 py-3 text-lg">
+          <button onClick={() => send("continue")} className="btn-accent px-10 py-3 text-lg">
             Next
           </button>
         )}
         {state.phase === "done" && (
-          <button onClick={() => send("game:end")} className="btn-cream px-10 py-3 text-lg">
+          <button onClick={() => send("game:end")} className="btn-accent px-10 py-3 text-lg">
             Back to the lobby
           </button>
         )}
@@ -183,20 +183,20 @@ export function BuzzHost({ room, state, send }: Props) {
             className={[
               "flex items-center gap-2 rounded-lg border px-3 py-1.5 transition-colors",
               state.buzzedBy === p.id
-                ? "border-cream/70 bg-cream/15"
+                ? "border-accent/70 bg-accent/15"
                 : state.lockedOut.includes(p.id)
                   ? "border-rose-500/40 bg-rose-500/5 opacity-50"
                   : "border-white/10 bg-white/[0.03]",
             ].join(" ")}
           >
             <span className="text-lg">{p.emoji}</span>
-            <span className="font-display text-sm uppercase tracking-wide text-slate-300">
+            <span className="font-display text-sm uppercase tracking-wide text-moon/75">
               {p.name}
             </span>
             <span
               className={[
                 "font-display text-sm font-bold tabular-nums",
-                p.score < 0 ? "text-rose-400" : "text-cream",
+                p.score < 0 ? "text-rose-400" : "text-accent",
               ].join(" ")}
             >
               {p.score.toLocaleString()}
@@ -212,7 +212,7 @@ function Standings({ room }: { room: Room }) {
   const ranked = [...room.players].sort((a, b) => b.score - a.score);
   return (
     <div className="w-full max-w-3xl space-y-2">
-      <p className="mb-[2vmin] text-center font-display text-[clamp(1.5rem,4vw,4rem)] uppercase text-cream">
+      <p className="mb-[2vmin] text-center font-display text-[clamp(1.5rem,4vw,4rem)] uppercase text-accent">
         Game over
       </p>
       {ranked.map((p, i) => (
@@ -220,15 +220,15 @@ function Standings({ room }: { room: Room }) {
           key={p.id}
           className={[
             "flex items-center justify-between rounded-xl border px-5 py-3",
-            i === 0 ? "border-cream/50 bg-cream/[0.08]" : "border-white/10",
+            i === 0 ? "border-accent/50 bg-accent/[0.08]" : "border-white/10",
           ].join(" ")}
         >
-          <span className="flex items-center gap-3 font-display text-xl uppercase tracking-wide text-slate-100">
-            <span className="w-6 tabular-nums text-slate-500">{i + 1}</span>
+          <span className="flex items-center gap-3 font-display text-xl uppercase tracking-wide text-moon">
+            <span className="w-6 tabular-nums text-moon-deep">{i + 1}</span>
             <span>{p.emoji}</span>
             {p.name}
           </span>
-          <span className="font-display text-xl font-bold tabular-nums text-cream">
+          <span className="font-display text-xl font-bold tabular-nums text-accent">
             {p.score.toLocaleString()}
           </span>
         </div>

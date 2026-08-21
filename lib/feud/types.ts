@@ -1,4 +1,4 @@
-/** The Feud — two teams, one survey board, three strikes. */
+/** Face-Off — two teams, one survey board, three strikes. */
 
 export type FeudAnswer = {
   text: string;

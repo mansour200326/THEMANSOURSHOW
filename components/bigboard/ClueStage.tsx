@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CountdownRing } from "@/components/jeopardy/CountdownRing";
-import type { Rules, Team } from "@/lib/jeopardy/types";
+import { CountdownRing } from "@/components/bigboard/CountdownRing";
+import type { Rules, Team } from "@/lib/bigboard/types";
 
 type Props = {
   category: string;
@@ -69,20 +69,20 @@ export function ClueStage({
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0">
-          <p className="t-label font-display uppercase text-slate-500">
+          <p className="t-label font-display uppercase text-moon-deep">
             {isDaily ? "Daily Double" : category}
           </p>
-          <p className="truncate font-display text-[clamp(1.1rem,2vw,2.5rem)] uppercase tracking-wide text-slate-200">
+          <p className="truncate font-display text-[clamp(1.1rem,2vw,2.5rem)] uppercase tracking-wide text-moon/90">
             {isDaily ? category : teams[turn]?.name}
           </p>
         </div>
 
         <div className="flex items-center gap-5">
           <div className="text-right">
-            <p className="t-label font-display uppercase text-slate-500">
+            <p className="t-label font-display uppercase text-moon-deep">
               {isDaily ? "Wagered" : "For"}
             </p>
-            <p className="cream-text font-display text-[clamp(1.6rem,3vw,4rem)] font-bold tabular-nums">
+            <p className="accent-text font-display text-[clamp(1.6rem,3vw,4rem)] font-bold tabular-nums">
               {value.toLocaleString()}
             </p>
           </div>
@@ -103,7 +103,7 @@ export function ClueStage({
           initial={{ opacity: 0, y: 24, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="t-clue text-balance font-display uppercase tracking-wide text-slate-50"
+          className="t-clue text-balance font-display uppercase tracking-wide text-moon"
         >
           {clue}
         </motion.p>
@@ -117,10 +117,10 @@ export function ClueStage({
               transition={{ duration: 0.3 }}
               className="flex flex-col items-center gap-2"
             >
-              <span className="t-label font-display uppercase text-slate-500">
+              <span className="t-label font-display uppercase text-moon-deep">
                 Answer
               </span>
-              <p className="cream-text t-answer text-balance font-display font-semibold uppercase">
+              <p className="accent-text t-answer text-balance font-display font-semibold uppercase">
                 {answer}
               </p>
             </motion.div>
@@ -154,12 +154,12 @@ export function ClueStage({
                 className={[
                   "rounded-xl border p-[1vmin] transition-opacity",
                   i === turn && !stealOpen
-                    ? "border-cream/50 bg-cream/[0.07]"
+                    ? "border-accent/50 bg-accent/[0.07]"
                     : "border-white/10 bg-white/[0.02]",
                   can ? "" : "opacity-30",
                 ].join(" ")}
               >
-                <p className="mb-[0.8vmin] truncate text-center font-display text-[clamp(0.75rem,1.05vw,1.4rem)] uppercase tracking-wider text-slate-300">
+                <p className="mb-[0.8vmin] truncate text-center font-display text-[clamp(0.75rem,1.05vw,1.4rem)] uppercase tracking-wider text-moon/75">
                   {team.name}
                 </p>
                 <div className="flex gap-[0.6vmin]">
@@ -196,7 +196,7 @@ export function ClueStage({
             {revealed ? "Hide answer" : "Reveal answer"}
           </button>
 
-          <p className="hidden font-display text-xs uppercase tracking-[0.18em] text-slate-600 lg:block">
+          <p className="hidden font-display text-xs uppercase tracking-[0.18em] text-moon-deep/70 lg:block">
             Space reveal · 1–{teams.length} correct · Shift+number wrong · Esc no
             one
           </p>

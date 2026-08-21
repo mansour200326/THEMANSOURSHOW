@@ -3,8 +3,38 @@
 @tailwind utilities;
 
 :root {
-  --stage-bg: #050e22;
-  --stage-glow: rgba(45, 92, 200, 0.42);
+  --stage-bg: #101a3c;
+  --stage-glow: rgba(46, 70, 150, 0.45);
+
+  /*
+   * The colour lighting the current screen. Moonlight by default, so the
+   * landing page, the lobby and anything else that isn't a game reads neutral.
+   * A .g-* class below swaps it for the game family's colour.
+   */
+  --accent-rgb: 244 242 236;
+  --accent-bright-rgb: 255 255 255;
+}
+
+/* ---- game families ---- */
+/* Trivia: the big board, buzzer rounds, anything quiz-shaped. */
+.g-trivia {
+  --accent-rgb: 55 211 200;
+  --accent-bright-rgb: 138 240 232;
+}
+/* Deception: hidden roles and secret key cards. */
+.g-deception {
+  --accent-rgb: 142 124 255;
+  --accent-bright-rgb: 183 171 255;
+}
+/* Social: voting on each other. */
+.g-social {
+  --accent-rgb: 232 80 141;
+  --accent-bright-rgb: 246 145 186;
+}
+/* Word & drawing: anything raced against a clock or a canvas. */
+.g-word {
+  --accent-rgb: 168 224 95;
+  --accent-bright-rgb: 202 240 149;
 }
 
 @layer base {
@@ -14,21 +44,21 @@
   }
 
   body {
-    @apply bg-ink-950 text-slate-100 font-body antialiased;
+    @apply bg-midnight text-moon font-body antialiased;
     background-image:
       radial-gradient(ellipse 80% 60% at 50% -10%, var(--stage-glow), transparent 70%),
-      radial-gradient(ellipse 60% 40% at 50% 110%, rgba(240, 228, 198, 0.08), transparent 70%);
+      radial-gradient(ellipse 60% 40% at 50% 110%, rgba(255, 107, 87, 0.07), transparent 70%);
     background-attachment: fixed;
     overscroll-behavior: none;
   }
 
   ::selection {
-    @apply bg-cream text-ink-950;
+    @apply bg-coral text-moon;
   }
 
   /* Big, clean focus ring — visible from the couch. */
   :focus-visible {
-    outline: 3px solid theme("colors.cream.bright");
+    outline: 3px solid rgb(var(--accent-bright-rgb));
     outline-offset: 3px;
   }
 }
@@ -65,8 +95,22 @@
     letter-spacing: 0.22em;
   }
 
-  .cream-text {
-    background: linear-gradient(180deg, #fdf6e6 0%, #f0e4c6 45%, #c7b48c 100%);
+  /* Lit by whichever game is on screen. */
+  .accent-text {
+    background: linear-gradient(
+      180deg,
+      rgb(var(--accent-bright-rgb)) 0%,
+      rgb(var(--accent-rgb)) 55%,
+      rgb(var(--accent-rgb) / 0.6) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Brand only — the logo and the moment somebody wins. */
+  .brand-text {
+    background: linear-gradient(180deg, #ff8d7c 0%, #ff6b57 50%, #de4b37 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -81,37 +125,42 @@
            uppercase tracking-wider transition-all duration-150 active:scale-[0.97]
            disabled:cursor-not-allowed disabled:opacity-35 disabled:active:scale-100;
   }
-  .btn-cream {
-    @apply btn bg-gradient-to-b from-cream-bright to-cream-deep text-ink-950
-           shadow-[0_8px_24px_rgba(240,228,198,0.25)] hover:brightness-110;
+  /* The primary action, anywhere in the product. Always coral. */
+  .btn-brand {
+    @apply btn bg-gradient-to-b from-coral-bright to-coral-deep text-moon
+           shadow-[0_8px_24px_rgba(255,107,87,0.3)] hover:brightness-110;
+  }
+  /* A secondary action lit by the current game. */
+  .btn-accent {
+    @apply btn border border-accent/50 bg-accent/10 text-accent-bright hover:bg-accent/20;
   }
   .btn-ghost {
-    @apply btn border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10 hover:border-white/25;
+    @apply btn border border-white/15 bg-white/5 text-moon-dim hover:bg-white/10 hover:border-white/25;
   }
   .btn-good {
-    @apply btn bg-emerald-500/90 text-ink-950 hover:bg-emerald-400;
+    @apply btn bg-emerald-500/90 text-midnight-deep hover:bg-emerald-400;
   }
   .btn-bad {
-    @apply btn bg-rose-600/90 text-white hover:bg-rose-500;
+    @apply btn bg-rose-600/90 text-moon hover:bg-rose-500;
   }
 
   .field {
-    @apply w-full rounded-xl border border-white/10 bg-ink-900/80 px-4 py-3 text-lg
-           text-slate-100 placeholder:text-slate-500 outline-none transition
-           focus:border-cream/60 focus:bg-ink-900;
+    @apply w-full rounded-xl border border-white/10 bg-dusk/70 px-4 py-3 text-lg
+           text-moon placeholder:text-moon-deep outline-none transition
+           focus:border-accent/60 focus:bg-dusk;
   }
 }
 
-/* Board tile face — the deep TV blue with a lit top edge. */
+/* Board tile face — dusk, with the game's colour on the lit top edge. */
 .tile-face {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0) 42%),
-    linear-gradient(180deg, #1a4499 0%, #0e2a66 60%, #0a1c46 100%);
+    linear-gradient(180deg, rgb(var(--accent-rgb) / 0.16) 0%, transparent 45%),
+    linear-gradient(180deg, #25356a 0%, #1c2a55 60%, #16224a 100%);
 }
 .tile-face-hover:hover {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 42%),
-    linear-gradient(180deg, #2456c4 0%, #143480 60%, #0d2358 100%);
+    linear-gradient(180deg, rgb(var(--accent-rgb) / 0.3) 0%, transparent 45%),
+    linear-gradient(180deg, #2e3f76 0%, #25356a 60%, #1c2a55 100%);
 }
 
 @media (prefers-reduced-motion: reduce) {

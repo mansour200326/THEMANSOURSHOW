@@ -3,13 +3,13 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { BoardGrid } from "@/components/board/BoardGrid";
-import { ClueStage } from "@/components/jeopardy/ClueStage";
-import { FinalStage } from "@/components/jeopardy/FinalStage";
-import { GeneratingScreen } from "@/components/jeopardy/GeneratingScreen";
-import { ScoreBar } from "@/components/jeopardy/ScoreBar";
-import { SetupScreen, type SetupConfig } from "@/components/jeopardy/SetupScreen";
-import { WagerStage } from "@/components/jeopardy/WagerStage";
-import { WinnerScreen } from "@/components/jeopardy/WinnerScreen";
+import { ClueStage } from "@/components/bigboard/ClueStage";
+import { FinalStage } from "@/components/bigboard/FinalStage";
+import { GeneratingScreen } from "@/components/bigboard/GeneratingScreen";
+import { ScoreBar } from "@/components/bigboard/ScoreBar";
+import { SetupScreen, type SetupConfig } from "@/components/bigboard/SetupScreen";
+import { WagerStage } from "@/components/bigboard/WagerStage";
+import { WinnerScreen } from "@/components/bigboard/WinnerScreen";
 import { ShowMark } from "@/components/ShowMark";
 import { clueAt } from "@/lib/board/types";
 import {
@@ -17,13 +17,13 @@ import {
   emptyState,
   maxDailyWager,
   reducer,
-} from "@/lib/jeopardy/engine";
-import { sampleBoard, sampleFinalClue } from "@/lib/jeopardy/sampleBoard";
-import { clearGame, loadGame, saveGame } from "@/lib/jeopardy/storage";
-import type { GameState } from "@/lib/jeopardy/types";
+} from "@/lib/bigboard/engine";
+import { sampleBoard, sampleFinalClue } from "@/lib/bigboard/sampleBoard";
+import { clearGame, loadGame, saveGame } from "@/lib/bigboard/storage";
+import type { GameState } from "@/lib/bigboard/types";
 import type { Board, FinalClue } from "@/lib/board/types";
 
-export default function TeamJeopardyPage() {
+function BigBoardStage() {
   const [state, dispatch] = useReducer(reducer, sampleBoard, emptyState);
   const [saved, setSaved] = useState<GameState | null>(null);
   const [isFullscreen, setFullscreen] = useState(false);
@@ -147,8 +147,8 @@ export default function TeamJeopardyPage() {
       <header className="flex shrink-0 items-center justify-between gap-4 px-1">
         <div className="flex items-center gap-4">
           <ShowMark size="sm" />
-          <span className="hidden font-display text-xs uppercase tracking-[0.2em] text-slate-600 sm:inline">
-            presents · Team Jeopardy
+          <span className="hidden font-display text-xs uppercase tracking-[0.2em] text-moon-deep/70 sm:inline">
+            presents · Big Board
             {state.theme ? ` · ${state.theme}` : ""}
           </span>
         </div>
@@ -186,8 +186,8 @@ export default function TeamJeopardyPage() {
           >
             {state.phase === "board" && (
               <div className="flex h-full flex-col gap-[1.2vmin]">
-                <p className="shrink-0 text-center font-display text-[clamp(0.85rem,1.5vw,1.9rem)] uppercase tracking-[0.25em] text-slate-400">
-                  <span className="text-cream-bright">
+                <p className="shrink-0 text-center font-display text-[clamp(0.85rem,1.5vw,1.9rem)] uppercase tracking-[0.25em] text-moon-dim">
+                  <span className="text-accent-bright">
                     {state.teams[state.turn]?.name}
                   </span>{" "}
                   — pick a category
@@ -277,5 +277,16 @@ export default function TeamJeopardyPage() {
         </div>
       )}
     </main>
+  );
+}
+
+/**
+ * Big Board is a quiz, so the whole screen runs on the trivia accent.
+ */
+export default function BigBoardPage() {
+  return (
+    <div className="g-trivia contents">
+      <BigBoardStage />
+    </div>
   );
 }

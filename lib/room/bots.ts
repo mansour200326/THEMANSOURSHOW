@@ -15,7 +15,7 @@ export const BOT_ROSTER: Array<Pick<Player, "name" | "emoji">> = [
 
 /** Short, plausible answers per segment — enough to make a preview feel real. */
 const ANSWERS: Record<string, string[]> = {
-  "guess-who-said-it": [
+  "who-said-it": [
     "Sleep in and regret nothing",
     "Never trust a quiet lift",
     "I reverse park on the first try",
@@ -29,7 +29,7 @@ const ANSWERS: Record<string, string[]> = {
     "A very small horse",
     "About forty minutes",
   ],
-  "herd-mentality": ["Blue", "Coffee", "Red", "Traffic", "Apple", "Paris"],
+  "groupthink": ["Blue", "Coffee", "Red", "Traffic", "Apple", "Paris"],
 };
 
 const FALLBACK = ["Something reasonable", "No idea honestly", "Probably that"];
