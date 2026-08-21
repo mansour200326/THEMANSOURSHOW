@@ -70,6 +70,17 @@ export function matchAnswer(
   const g = normalise(guess);
   if (!g) return null;
 
+  // Words that show up on more than one answer carry no signal.
+  const seen = new Map<string, number>();
+  answers.forEach((raw) => {
+    new Set(normalise(raw).split(" ")).forEach((w) => {
+      if (w) seen.set(w, (seen.get(w) ?? 0) + 1);
+    });
+  });
+  const ambiguous = new Set(
+    [...seen.entries()].filter(([, n]) => n > 1).map(([w]) => w),
+  );
+
   let bestIndex = -1;
   let bestScore = 0;
 
@@ -89,13 +100,25 @@ export function matchAnswer(
     ) {
       score = 0.9;
     } else {
-      const words = new Set(a.split(" "));
+      const answerWords = a.split(" ");
       const guessWords = g.split(" ");
-      // A shared distinctive word is usually the same answer.
-      const sharesKeyWord = guessWords.some(
-        (w) => w.length >= 4 && words.has(w),
+
+      // A word only tells the answers apart if it isn't on several of them.
+      // "Make coffee" and "Make the bed" both start with "make", so matching
+      // on it alone would flip the wrong tile.
+      const distinctive = guessWords.filter(
+        (w) => w.length >= 3 && !ambiguous.has(w) && answerWords.includes(w),
       );
-      score = sharesKeyWord ? 0.85 : similarity(a, g);
+
+      if (distinctive.length) {
+        // Weight by how much of each side the shared words actually cover, so
+        // one word in common out of three doesn't count as a match.
+        const coverage =
+          distinctive.length / Math.max(answerWords.length, guessWords.length);
+        score = 0.7 + coverage * 0.3;
+      } else {
+        score = similarity(a, g);
+      }
     }
 
     if (score > bestScore) {

@@ -21,7 +21,6 @@ export type FeudPhase =
   | "setup"
   | "face-off"
   | "play"
-  | "steal"
   | "round-end"
   | "winner";
 
@@ -39,7 +38,13 @@ export type FeudState = {
   /** Which answers are face-up, by index. */
   revealed: number[];
   /** How the round finished, for the round-end card. */
-  outcome: "cleared" | "stolen" | "held" | null;
+  outcome: "cleared" | "both-out" | null;
+  /** Answers each team has opened this round, by team index. */
+  contributions: number[];
+  /** How many teams have already struck out this round. */
+  strikeouts: number;
+  /** Stamped when the board changes hands, so the TV can announce it. */
+  handoverAt: number | null;
   /** What the host last typed, and whether it landed. */
   lastGuess: { text: string; matched: number | null; at: number } | null;
   past: FeudState[];

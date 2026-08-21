@@ -172,33 +172,34 @@ export default function FeudPage() {
               </div>
             )}
 
-            {(state.phase === "play" || state.phase === "steal") && (
+            {state.phase === "play" && (
               <FeudBoard
                 state={state}
                 onGuess={(text) => dispatch({ type: "GUESS", text })}
                 onReveal={(index) => dispatch({ type: "REVEAL", index })}
                 onStrike={() => dispatch({ type: "STRIKE" })}
-                onStealHit={(index) => dispatch({ type: "STEAL_HIT", index })}
-                onStealMiss={() => dispatch({ type: "STEAL_MISS" })}
               />
             )}
 
             {state.phase === "round-end" && (
               <div className="flex h-full flex-col items-center justify-center gap-[3vmin] text-center">
                 <p className="t-label font-display uppercase text-slate-500">
-                  {state.outcome === "stolen"
-                    ? "Stolen"
-                    : state.outcome === "cleared"
-                      ? "Board cleared"
-                      : "Held on"}
+                  {state.outcome === "cleared"
+                    ? "Board cleared"
+                    : "Both teams struck out"}
                 </p>
                 <p className="cream-text t-hero font-display font-bold uppercase">
                   +{state.pot}
                 </p>
                 <p className="font-display text-[clamp(1.2rem,2.4vw,2.6rem)] uppercase tracking-wide text-slate-200">
-                  {state.outcome === "stolen"
-                    ? state.teams[otherTeam(state)]?.name
-                    : state.teams[state.control]?.name}
+                  {state.outcome === "cleared"
+                    ? state.teams[state.control]?.name
+                    : state.teams[
+                        state.contributions.reduce(
+                          (best, n, i) => (n > state.contributions[best] ? i : best),
+                          0,
+                        )
+                      ]?.name}
                 </p>
                 <button
                   onClick={() => dispatch({ type: "NEXT_ROUND" })}
@@ -258,9 +259,7 @@ export default function FeudPage() {
           }}
         >
           {state.teams.map((team, i) => {
-            const active =
-              (state.phase === "play" && i === state.control) ||
-              (state.phase === "steal" && i === otherTeam(state));
+            const active = state.phase === "play" && i === state.control;
             return (
               <div
                 key={team.id}

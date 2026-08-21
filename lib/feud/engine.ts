@@ -22,6 +22,9 @@ export const emptyFeud = (): FeudState => ({
   pot: 0,
   revealed: [],
   outcome: null,
+  contributions: [],
+  strikeouts: 0,
+  handoverAt: null,
   lastGuess: null,
   past: [],
 });
@@ -32,8 +35,6 @@ export type FeudAction =
   | { type: "GUESS"; text: string }
   | { type: "REVEAL"; index: number }
   | { type: "STRIKE" }
-  | { type: "STEAL_HIT"; index: number }
-  | { type: "STEAL_MISS" }
   | { type: "NEXT_ROUND" }
   | { type: "UNDO" }
   | { type: "RESET" }
@@ -69,6 +70,7 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
         theme: action.theme,
         teams: action.teamNames.map(makeTeam),
         questions: action.questions,
+        contributions: action.teamNames.map(() => 0),
       };
 
     case "SET_CONTROL": {
@@ -83,7 +85,7 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
     case "GUESS": {
       const text = action.text.trim();
       if (!text) return state;
-      if (state.phase !== "play" && state.phase !== "steal") return state;
+      if (state.phase !== "play") return state;
 
       const q = currentQuestion(state);
       if (!q) return state;
@@ -94,13 +96,6 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
         state.revealed,
       );
       const stamped = { text, matched: hit?.index ?? null, at: Date.now() };
-
-      if (state.phase === "steal") {
-        const stealing = { ...state, lastGuess: stamped };
-        return hit
-          ? feudReducer(stealing, { type: "STEAL_HIT", index: hit.index })
-          : feudReducer(stealing, { type: "STEAL_MISS" });
-      }
 
       const playing = { ...state, lastGuess: stamped };
       return hit
@@ -119,6 +114,10 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
         past: snapshot(state),
         revealed: [...state.revealed, action.index],
         pot: state.pot + answer.points,
+        contributions: state.contributions.map((n, i) =>
+          i === state.control ? n + 1 : n,
+        ),
+        handoverAt: null,
       };
       // Board cleared — the team in control keeps everything.
       return allRevealed(next) ? bank(next, next.control, "cleared") : next;
@@ -127,29 +126,33 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
     case "STRIKE": {
       if (state.phase !== "play") return state;
       const strikes = state.strikes + 1;
-      const next: FeudState = { ...state, past: snapshot(state), strikes };
-      // Three strikes hands the other team one shot at the whole pot.
-      return strikes >= STRIKES_ALLOWED ? { ...next, phase: "steal" } : next;
-    }
-
-    case "STEAL_HIT": {
-      if (state.phase !== "steal") return state;
-      const q = currentQuestion(state);
-      const answer = q?.answers[action.index];
-      if (!answer || state.revealed.includes(action.index)) return state;
-
-      const withAnswer: FeudState = {
+      const next: FeudState = {
         ...state,
         past: snapshot(state),
-        revealed: [...state.revealed, action.index],
-        pot: state.pot + answer.points,
+        strikes,
+        handoverAt: null,
       };
-      return bank(withAnswer, otherTeam(state), "stolen");
-    }
+      if (strikes < STRIKES_ALLOWED) return next;
 
-    case "STEAL_MISS": {
-      if (state.phase !== "steal") return state;
-      return bank({ ...state, past: snapshot(state) }, state.control, "held");
+      // First strikeout hands the board to the other team, who carry on with
+      // the pot already on it and a clean set of strikes.
+      if (next.strikeouts === 0) {
+        return {
+          ...next,
+          control: otherTeam(next),
+          strikes: 0,
+          strikeouts: 1,
+          handoverAt: Date.now(),
+        };
+      }
+
+      // Both teams out — whoever opened more of the board takes the pot.
+      const best = next.contributions.reduce(
+        (bestIndex, count, i) =>
+          count > next.contributions[bestIndex] ? i : bestIndex,
+        0,
+      );
+      return bank(next, best, "both-out");
     }
 
     case "NEXT_ROUND": {
@@ -168,6 +171,9 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
         revealed: [],
         outcome: null,
         lastGuess: null,
+        contributions: state.teams.map(() => 0),
+        strikeouts: 0,
+        handoverAt: null,
         // Loser of the last round starts the next one.
         control: otherTeam(state),
       };

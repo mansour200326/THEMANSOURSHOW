@@ -6,7 +6,6 @@ import {
   type FeudState,
   STRIKES_ALLOWED,
   currentQuestion,
-  otherTeam,
 } from "@/lib/feud/types";
 
 type Props = {
@@ -14,8 +13,6 @@ type Props = {
   onGuess: (text: string) => void;
   onReveal: (index: number) => void;
   onStrike: () => void;
-  onStealHit: (index: number) => void;
-  onStealMiss: () => void;
 };
 
 export function FeudBoard({
@@ -23,8 +20,6 @@ export function FeudBoard({
   onGuess,
   onReveal,
   onStrike,
-  onStealHit,
-  onStealMiss,
 }: Props) {
   const [draft, setDraft] = useState("");
   const box = useRef<HTMLInputElement>(null);
@@ -46,9 +41,7 @@ export function FeudBoard({
 
   const feedback = state.lastGuess;
 
-  const stealing = state.phase === "steal";
   const controlTeam = state.teams[state.control];
-  const stealTeam = state.teams[otherTeam(state)];
 
   return (
     <div className="flex h-full flex-col gap-[1.5vmin]">
@@ -60,7 +53,7 @@ export function FeudBoard({
       {/* Who's up + strikes */}
       <div className="flex shrink-0 items-center justify-center gap-[2vmin]">
         <span className="font-display text-[clamp(0.9rem,1.6vw,1.8rem)] uppercase tracking-[0.2em] text-cream">
-          {stealing ? `${stealTeam?.name} — one guess to steal` : controlTeam?.name}
+          {controlTeam?.name}
         </span>
         <span className="flex gap-2">
           {Array.from({ length: STRIKES_ALLOWED }).map((_, i) => (
@@ -79,19 +72,33 @@ export function FeudBoard({
         </span>
       </div>
 
+      {/* The board just changed hands */}
+      <AnimatePresence>
+        {state.handoverAt && (
+          <motion.p
+            key={state.handoverAt}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            className="shrink-0 text-center font-display text-[clamp(0.9rem,1.7vw,1.9rem)] uppercase tracking-[0.2em] text-rose-300"
+          >
+            Three strikes — {controlTeam?.name} takes over the board
+          </motion.p>
+        )}
+      </AnimatePresence>
+
       {/* Board */}
       <div className="grid min-h-0 flex-1 grid-cols-1 content-center gap-[0.8vmin] px-[6vw] sm:grid-cols-2">
         {question.answers.map((answer, i) => {
           const open = state.revealed.includes(i);
-          const clickable =
-            !open && (state.phase === "play" || state.phase === "steal");
+          const clickable = !open && state.phase === "play";
 
           return (
             <button
               key={answer.text}
               type="button"
               disabled={!clickable}
-              onClick={() => (stealing ? onStealHit(i) : onReveal(i))}
+              onClick={() => onReveal(i)}
               className={[
                 "relative flex items-center justify-between overflow-hidden rounded-xl border px-5 py-[1.6vmin] text-left transition-all",
                 open
@@ -147,9 +154,7 @@ export function FeudBoard({
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && submit()}
-              placeholder={
-                stealing ? "Their one steal guess…" : "Type what they said…"
-              }
+              placeholder="Type what they said…"
               autoFocus
               className="field flex-1 text-[clamp(1rem,1.8vw,1.6rem)]"
             />
@@ -185,11 +190,6 @@ export function FeudBoard({
           {state.phase === "play" && (
             <button onClick={onStrike} className="btn-bad px-6 py-3">
               Strike ✗
-            </button>
-          )}
-          {stealing && (
-            <button onClick={onStealMiss} className="btn-ghost px-6 py-3">
-              Steal missed
             </button>
           )}
           <p className="t-label mt-1 font-display uppercase text-slate-500">
