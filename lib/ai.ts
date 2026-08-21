@@ -207,6 +207,11 @@ const GeneratedFeud = z.object({
               .number()
               .int()
               .describe("Survey points. Highest first. All answers sum to 100."),
+            accept: z
+              .array(z.string())
+              .describe(
+                "Four to eight other ways someone would say this same answer out loud, including narrower examples of it. For 'Snacks': chips, crisps, popcorn, junk food, sweets, biscuits.",
+              ),
           }),
         )
         .describe("Six answers, most popular first."),
@@ -226,6 +231,11 @@ Rules:
 - Answers must be short and guessable — two or three words, the obvious thing
   someone would shout. Never a full sentence.
 - No two answers in a round may mean the same thing.
+- For every answer, list the other things a person would shout that should count
+  as that answer. Include synonyms and specific examples of the category, since
+  people answer with an example rather than the heading — someone who says
+  "chips" has said "snacks". Never list something that would also pass for a
+  different answer in the same round.
 - Keep it clean enough for a living room with everyone's friends in it.`;
 
 export async function generateFeudPack({
@@ -275,8 +285,87 @@ export async function generateFeudPack({
     answers: [...q.answers]
       .sort((a, b) => b.points - a.points)
       .slice(0, 6)
-      .map((a) => ({ text: a.text.trim(), points: Math.max(1, Math.round(a.points)) })),
+      .map((a) => ({
+        text: a.text.trim(),
+        points: Math.max(1, Math.round(a.points)),
+        accept: (a.accept ?? [])
+          .map((alt) => alt.trim())
+          .filter(Boolean)
+          .slice(0, 10),
+      })),
   }));
+}
+
+/* ------------------------------------------------------ Face-Off judging */
+
+const Judged = z.object({
+  index: z
+    .number()
+    .int()
+    .describe(
+      "The number of the answer the guess means, or -1 if it doesn't mean any of them.",
+    ),
+});
+
+const JUDGE_SYSTEM = `You are refereeing a survey game. A team shouted something and
+the host typed it in. Decide whether it means one of the hidden answers.
+
+Say yes when a person watching would agree the team said that answer:
+- A specific example of the answer counts as the answer. "Chips" is "Snacks".
+  "Netflix" is "Streaming". "My mum" is "A parent".
+- Synonyms and other phrasings count. "The tube" is "The train".
+- Wrong spelling or wrong tense counts.
+
+Say no otherwise, and lean towards no when it's close:
+- A fragment of the wording is not the answer. "Car" is NOT "Car trouble" — one
+  is an object, the other is a problem. "Bed" is NOT "Make the bed".
+- A related idea is not the same idea. "Rain" is NOT "The weather" unless the
+  round has nothing better. "Money" is NOT "Rent prices".
+- If it fits two of the answers, it isn't a clear enough call. Return -1.
+
+Return the number of the one answer it means, or -1.`;
+
+/**
+ * Does what a person would do when the letters don't line up: decides which
+ * answer a guess *means*, if any. It's shown the whole board, including
+ * answers already face-up — a team repeating one isn't wrong, and the caller
+ * needs to be able to tell those two cases apart. Only asked when the cheap
+ * string check couldn't call it, so this is off the hot path.
+ */
+export async function judgeGuess({
+  question,
+  guess,
+  options,
+}: {
+  question: string;
+  guess: string;
+  options: { index: number; text: string }[];
+}): Promise<number | null> {
+  if (!options.length) return null;
+  const client = new Anthropic();
+
+  const response = await client.messages.parse({
+    model: MODELS.packs,
+    max_tokens: 1000,
+    system: JUDGE_SYSTEM,
+    output_config: outputConfig(MODELS.packs, zodOutputFormat(Judged), "low"),
+    messages: [
+      {
+        role: "user",
+        content: `Question: ${question}
+
+The answers on the board:
+${options.map((o) => `${o.index}. ${o.text}`).join("\n")}
+
+The team said: "${guess}"`,
+      },
+    ],
+  });
+
+  const index = response.parsed_output?.index;
+  if (typeof index !== "number") return null;
+  // Never trust it to invent a tile that isn't on the board.
+  return options.some((o) => o.index === index) ? index : null;
 }
 
 /* --------------------------------------------------- Category suggestions */

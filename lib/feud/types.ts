@@ -3,6 +3,13 @@
 export type FeudAnswer = {
   text: string;
   points: number;
+  /**
+   * Other ways people say this one. A survey answer is a category, not a
+   * string — someone who shouts "chips" has said "snacks" — and no amount of
+   * letter-comparing gets you there. Written with the pack, so the common
+   * cases cost nothing at judging time.
+   */
+  accept?: string[];
 };
 
 export type FeudQuestion = {
@@ -46,7 +53,13 @@ export type FeudState = {
   /** Stamped when the board changes hands, so the TV can announce it. */
   handoverAt: number | null;
   /** What the host last typed, and whether it landed. */
-  lastGuess: { text: string; matched: number | null; at: number } | null;
+  lastGuess: {
+    text: string;
+    matched: number | null;
+    /** They said one that was already face-up — no strike for that. */
+    repeat?: boolean;
+    at: number;
+  } | null;
   past: FeudState[];
 };
 

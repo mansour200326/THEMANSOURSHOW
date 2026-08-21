@@ -65,6 +65,29 @@ decides the colour that lights the screen.
 | Dial It In | Word | TV + phones | Not built |
 | Sketch & Guess | Word | TV + phones | Not built |
 
+## How Face-Off judges an answer
+
+The host types what the team shouted, and three things get a go at it, cheapest
+first:
+
+1. **String matching, strict** (`lib/feud/match.ts`) — the answer itself, a
+   close typo, or one of the alternates written into the pack. No network.
+2. **The model** (`/api/feud/judge`) — the only step that knows chips are
+   snacks. Roughly a second, and only reached when step 1 can't call it.
+3. **String matching, lenient** — the fallback when there's no API key or the
+   request fails. Never let a slow network cost somebody a strike.
+
+Every answer carries an `accept` list of other ways people say it, written by
+the generator with the pack and by hand in `lib/feud/samplePack.ts`. That's what
+makes the common cases free.
+
+The judge sees the whole board, face-up answers included, so repeating one
+that's already open says "already up" instead of taking a strike.
+
+```bash
+npx tsx lib/feud/match.test.mts
+```
+
 ## Colour
 
 "Midnight & Coral", defined once in `tailwind.config.ts` and `app/globals.css`.

@@ -12,6 +12,7 @@ import {
   feudStandings,
   feudWinners,
 } from "@/lib/feud/engine";
+import { resolveGuess } from "@/lib/feud/judge";
 import { sampleFeudPack } from "@/lib/feud/samplePack";
 import { type FeudQuestion, type FeudState, otherTeam } from "@/lib/feud/types";
 
@@ -24,6 +25,9 @@ function FaceOffStage() {
   const [error, setError] = useState<string | null>(null);
   const hydrated = useRef(false);
   const abort = useRef<AbortController | null>(null);
+  /** True while a guess is still being judged. */
+  const [checking, setChecking] = useState(false);
+  const judging = useRef<AbortController | null>(null);
 
   useEffect(() => {
     try {
@@ -77,7 +81,8 @@ function FaceOffStage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error ?? "Survey generation failed.");
-      begin(config, data.questions as FeudQuestion[]);
+      // The generator sometimes hands back more rounds than were asked for.
+      begin(config, (data.questions as FeudQuestion[]).slice(0, config.rounds));
     } catch (e) {
       if (controller.signal.aborted) return;
       setGenerating(null);
@@ -109,6 +114,37 @@ function FaceOffStage() {
       />
     );
   }
+
+  /**
+   * Work out what they said, then tell the board. Deciding can mean a round
+   * trip, so the board shows a "checking" state until this resolves rather
+   * than striking a team for the network being slow.
+   */
+  const guess = async (text: string) => {
+    const question = state.questions[state.round];
+    if (!question) return;
+
+    judging.current?.abort();
+    const run = new AbortController();
+    judging.current = run;
+    setChecking(true);
+    try {
+      const { index, repeat } = await resolveGuess({
+        question: question.question,
+        guess: text,
+        answers: question.answers,
+        revealed: state.revealed,
+        signal: run.signal,
+      });
+      if (run.signal.aborted) return;
+      dispatch({ type: "GUESS", text, matched: index, repeat });
+    } finally {
+      if (judging.current === run) {
+        judging.current = null;
+        setChecking(false);
+      }
+    }
+  };
 
   const quit = () => {
     if (!window.confirm("End the game and go back to setup?")) return;
@@ -175,7 +211,8 @@ function FaceOffStage() {
             {(state.phase === "play" || state.phase === "round-end") && (
               <FeudBoard
                 state={state}
-                onGuess={(text) => dispatch({ type: "GUESS", text })}
+                onGuess={guess}
+                checking={checking}
                 onReveal={(index) => dispatch({ type: "REVEAL", index })}
                 onStrike={() => dispatch({ type: "STRIKE" })}
                 onNextRound={() => dispatch({ type: "NEXT_ROUND" })}

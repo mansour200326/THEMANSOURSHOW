@@ -11,6 +11,8 @@ import {
 type Props = {
   state: FeudState;
   onGuess: (text: string) => void;
+  /** True while we're still working out whether that guess counts. */
+  checking?: boolean;
   onReveal: (index: number) => void;
   onStrike: () => void;
   onNextRound: () => void;
@@ -19,6 +21,7 @@ type Props = {
 export function FeudBoard({
   state,
   onGuess,
+  checking = false,
   onReveal,
   onStrike,
   onNextRound,
@@ -38,7 +41,7 @@ export function FeudBoard({
 
   const submit = () => {
     const text = draft.trim();
-    if (text) onGuess(text);
+    if (text && !checking) onGuess(text);
   };
 
   const feedback = state.lastGuess;
@@ -184,19 +187,35 @@ export function FeudBoard({
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && submit()}
-              placeholder="Type what they said…"
+              placeholder={checking ? "Checking…" : "Type what they said…"}
+              disabled={checking}
               autoFocus
               className="field flex-1 text-[clamp(1rem,1.8vw,1.6rem)]"
             />
-            <button onClick={submit} className="btn-accent px-8 text-lg">
-              Enter
+            <button
+              onClick={submit}
+              disabled={checking}
+              className="btn-accent px-8 text-lg"
+            >
+              {checking ? "…" : "Enter"}
             </button>
           </div>
 
           {/* Did that land? */}
           <div className="mt-1 h-6">
             <AnimatePresence initial={false}>
-              {feedback && (
+              {checking ? (
+                <motion.p
+                  key="checking"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="font-display text-sm uppercase tracking-wider text-moon-deep"
+                >
+                  Checking the board…
+                </motion.p>
+              ) : (
+                feedback && (
                 <motion.p
                   key={feedback.at}
                   initial={{ opacity: 0, y: -4 }}
@@ -204,13 +223,20 @@ export function FeudBoard({
                   exit={{ opacity: 0 }}
                   className={[
                     "font-display text-sm uppercase tracking-wider",
-                    feedback.matched !== null ? "text-emerald-300" : "text-rose-400",
+                    feedback.matched !== null
+                      ? "text-emerald-300"
+                      : feedback.repeat
+                        ? "text-amber-300"
+                        : "text-rose-400",
                   ].join(" ")}
                 >
                   {feedback.matched !== null
                     ? `“${feedback.text}” → ${question.answers[feedback.matched]?.text}`
-                    : `“${feedback.text}” — not on the board`}
+                    : feedback.repeat
+                      ? `“${feedback.text}” — already up, no strike`
+                      : `“${feedback.text}” — not on the board`}
                 </motion.p>
+                )
               )}
             </AnimatePresence>
           </div>

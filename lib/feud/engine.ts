@@ -1,4 +1,3 @@
-import { matchAnswer } from "@/lib/feud/match";
 import {
   type FeudQuestion,
   type FeudState,
@@ -32,7 +31,7 @@ export const emptyFeud = (): FeudState => ({
 export type FeudAction =
   | { type: "START"; teamNames: string[]; theme: string; questions: FeudQuestion[] }
   | { type: "SET_CONTROL"; team: number }
-  | { type: "GUESS"; text: string }
+  | { type: "GUESS"; text: string; matched: number | null; repeat?: boolean }
   | { type: "REVEAL"; index: number }
   | { type: "STRIKE" }
   | { type: "NEXT_ROUND" }
@@ -86,6 +85,11 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
      * The host types what the team shouted. A near miss still counts — the
      * matcher decides — and anything it can't place is a strike.
      */
+    /**
+     * The verdict arrives already decided — working out whether "chips" means
+     * "snacks" can need a model, and a reducer has to stay pure and instant.
+     * See lib/feud/judge.ts for who does the deciding.
+     */
     case "GUESS": {
       const text = action.text.trim();
       if (!text) return state;
@@ -94,17 +98,21 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
       const q = currentQuestion(state);
       if (!q) return state;
 
-      const hit = matchAnswer(
-        text,
-        q.answers.map((a) => a.text),
-        state.revealed,
-      );
-      const stamped = { text, matched: hit?.index ?? null, at: Date.now() };
+      const hit =
+        action.matched !== null &&
+        action.matched >= 0 &&
+        action.matched < q.answers.length &&
+        !state.revealed.includes(action.matched)
+          ? action.matched
+          : null;
 
-      const playing = { ...state, lastGuess: stamped };
-      return hit
-        ? feudReducer(playing, { type: "REVEAL", index: hit.index })
-        : feudReducer(playing, { type: "STRIKE" });
+      const playing = {
+        ...state,
+        lastGuess: { text, matched: hit, repeat: action.repeat, at: Date.now() },
+      };
+      if (hit !== null) return feudReducer(playing, { type: "REVEAL", index: hit });
+      // Saying one that's already up isn't wrong, it's just late.
+      return action.repeat ? playing : feudReducer(playing, { type: "STRIKE" });
     }
 
     case "REVEAL": {

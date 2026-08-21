@@ -1,12 +1,19 @@
 /**
  * Matching what a team shouted against the hidden board.
  *
- * People never say the answer exactly the way it's written — "traffic" for
- * "The traffic", "sofas" for "A sofa", plus the host's typos while typing at
- * speed. Being strict here would mean the host overriding the game constantly,
- * so this leans towards accepting a near miss. The host can always tap a tile
- * directly when it gets one wrong.
+ * Comparing letters only gets you so far. Two answers can be the same thing
+ * with nothing in common on the page ("chips" is "snacks"), and two answers can
+ * share almost every letter and mean different things ("car" is not "car
+ * trouble"). So this file deliberately does the small, certain half of the job
+ * and hands everything else to a model — see lib/feud/judge.ts.
+ *
+ * `strict` is the fast path: it only says yes when the guess is, to all intents,
+ * the answer already. `lenient` is what runs when there's no API key to ask,
+ * and leans towards accepting a near miss because the host can always tap a
+ * tile directly.
  */
+
+import type { FeudAnswer } from "@/lib/feud/types";
 
 const FILLER = new Set([
   "the", "a", "an", "your", "my", "their", "his", "her", "its",
@@ -58,77 +65,79 @@ export type MatchResult = {
   score: number;
 };
 
+export type MatchMode = "strict" | "lenient";
+
+/** Every spelling of an answer we'll take at face value. */
+const formsOf = (answer: FeudAnswer): string[] =>
+  [answer.text, ...(answer.accept ?? [])].map(normalise).filter(Boolean);
+
 /**
- * Finds the best unrevealed answer for what was typed, or null for a strike.
- * Only ever considers answers still face-down.
+ * Finds the best unrevealed answer for what was typed.
+ *
+ * In `strict` mode a null means "I don't know", not "wrong" — the caller is
+ * expected to ask the judge. In `lenient` mode a null is a strike.
  */
 export function matchAnswer(
   guess: string,
-  answers: string[],
+  answers: FeudAnswer[],
   revealed: number[],
+  mode: MatchMode = "strict",
 ): MatchResult | null {
   const g = normalise(guess);
   if (!g) return null;
 
-  // Words that show up on more than one answer carry no signal.
+  // A word that sits on more than one answer can't tell them apart. "Make
+  // coffee" and "make the bed" both start with "make".
   const seen = new Map<string, number>();
-  answers.forEach((raw) => {
-    new Set(normalise(raw).split(" ")).forEach((w) => {
-      if (w) seen.set(w, (seen.get(w) ?? 0) + 1);
+  answers.forEach((answer) => {
+    formsOf(answer).forEach((form) => {
+      new Set(form.split(" ")).forEach((w) => {
+        if (w) seen.set(w, (seen.get(w) ?? 0) + 1);
+      });
     });
   });
   const ambiguous = new Set(
     [...seen.entries()].filter(([, n]) => n > 1).map(([w]) => w),
   );
 
+  const guessWords = g.split(" ");
   let bestIndex = -1;
   let bestScore = 0;
 
   for (let index = 0; index < answers.length; index++) {
     if (revealed.includes(index)) continue;
-    const a = normalise(answers[index]);
-    if (!a) continue;
 
-    let score = 0;
-
-    if (a === g) {
-      score = 1;
-    } else if (
-      // "traffic" vs "traffic jams" — one clearly contains the other.
-      (a.includes(g) || g.includes(a)) &&
-      Math.min(a.length, g.length) >= 3
-    ) {
-      score = 0.9;
-    } else {
+    for (const a of formsOf(answers[index])) {
       const answerWords = a.split(" ");
-      const guessWords = g.split(" ");
+      let score = 0;
 
-      // A word only tells the answers apart if it isn't on several of them.
-      // "Make coffee" and "Make the bed" both start with "make", so matching
-      // on it alone would flip the wrong tile.
-      const distinctive = guessWords.filter(
-        (w) => w.length >= 3 && !ambiguous.has(w) && answerWords.includes(w),
-      );
-
-      if (distinctive.length) {
-        // Weight by how much of each side the shared words actually cover, so
-        // one word in common out of three doesn't count as a match.
-        const coverage =
-          distinctive.length / Math.max(answerWords.length, guessWords.length);
-        score = 0.7 + coverage * 0.3;
-      } else {
-        score = similarity(a, g);
+      if (a === g) {
+        score = 1;
+      } else if (similarity(a, g) >= 0.85) {
+        // Typed at speed with the team still shouting — "trafic", "snaks".
+        score = 0.95;
+      } else if (mode === "lenient") {
+        // No judge available, so fall back to counting shared words. Coverage
+        // is what stops "car" opening "car trouble": one word out of two isn't
+        // enough of the answer to have said it.
+        const distinctive = guessWords.filter(
+          (w) => w.length >= 3 && !ambiguous.has(w) && answerWords.includes(w),
+        );
+        const coverage = distinctive.length
+          ? distinctive.length / Math.max(answerWords.length, guessWords.length)
+          : 0;
+        score = coverage >= 0.6 ? 0.7 + coverage * 0.3 : similarity(a, g);
       }
-    }
 
-    if (score > bestScore) {
-      bestScore = score;
-      bestIndex = index;
+      if (score > bestScore) {
+        bestScore = score;
+        bestIndex = index;
+      }
     }
   }
 
-  // Below this we'd be flipping tiles the team never actually said.
-  return bestIndex >= 0 && bestScore >= 0.7
+  const floor = mode === "strict" ? 0.9 : 0.7;
+  return bestIndex >= 0 && bestScore >= floor
     ? { index: bestIndex, score: bestScore }
     : null;
 }
