@@ -80,10 +80,18 @@ export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
       }}
       transition={{ duration: 0.7, delay: IMPACT, ease: "easeOut" }}
     >
+      {/*
+       * Everything below is centred on this box, and this box is exactly the
+       * wordmark — no strapline, no margins. Hung off the outer column instead,
+       * "the middle" is the middle of the wordmark *and* the line under it,
+       * which puts the blast somewhere around the strapline with the letters
+       * sitting above it.
+       */}
+      <div className="relative flex flex-col items-center">
       {/* Blast light, one frame of overexposure */}
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[40vmin] w-[40vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
+        className="pointer-events-none absolute inset-0 -z-10 m-auto h-[40vmin] w-[40vmin] rounded-full"
         initial={{ opacity: 0, scale: 0.3 }}
         animate={{ opacity: [0, 0.85, 0], scale: [0.3, 1.6, 2.2] }}
         transition={{ duration: 0.8, delay: IMPACT, ease: "easeOut" }}
@@ -100,7 +108,7 @@ export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
       {/* Shockwave */}
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[26vmin] w-[26vmin] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-coral"
+        className="pointer-events-none absolute inset-0 -z-10 m-auto h-[26vmin] w-[26vmin] rounded-full border-2 border-coral"
         initial={{ opacity: 0, scale: 0.15 }}
         animate={{ opacity: [0, 0.9, 0], scale: [0.15, 1.5, 2.9] }}
         transition={{ duration: 1, delay: IMPACT, ease: [0.1, 0.8, 0.3, 1] }}
@@ -113,7 +121,7 @@ export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
           <motion.span
             aria-hidden
             key={i}
-            className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[0.5vmin] w-[0.5vmin] rounded-full bg-coral-bright"
+            className="pointer-events-none absolute inset-0 -z-10 m-auto h-[0.5vmin] w-[0.5vmin] rounded-full bg-coral-bright"
             initial={{ opacity: 0, x: 0, y: 0, scale: 1 }}
             animate={{
               opacity: [0, 1, 0],
@@ -176,6 +184,7 @@ export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
           </span>
         ))}
       </h1>
+      </div>
 
       <Rule animated />
     </motion.div>
