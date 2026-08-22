@@ -10,7 +10,10 @@ export type Connection = "connecting" | "open" | "lost" | "missing";
  * EventSource reconnects on its own, but a room that 404s (server restarted,
  * wrong code) is terminal — we surface that rather than retrying forever.
  */
-export function useRoom(code: string) {
+export function useRoom(code: string, viewerId?: string | null) {
+  // Who's watching, so the server can strip what this screen shouldn't see.
+  // No id means the TV, which everybody in the room can look at.
+  const as = viewerId ? `?as=${encodeURIComponent(viewerId)}` : "";
   const [room, setRoom] = useState<Room | null>(null);
   const [status, setStatus] = useState<Connection>("connecting");
   const version = useRef(-1);
@@ -22,14 +25,14 @@ export function useRoom(code: string) {
 
     // A 404 means the room is genuinely gone — don't let EventSource loop on it.
     // Checked against the plain endpoint so we don't open a stream to close it.
-    fetch(`/api/room/${code}`)
+    fetch(`/api/room/${code}${as}`)
       .then((res) => {
         if (cancelled) return;
         if (res.status === 404) {
           setStatus("missing");
           return;
         }
-        source = new EventSource(`/api/room/${code}/stream`);
+        source = new EventSource(`/api/room/${code}/stream${as}`);
         source.onopen = () => setStatus("open");
         source.onmessage = (event) => {
           const next = JSON.parse(event.data) as Room;
@@ -49,7 +52,7 @@ export function useRoom(code: string) {
       cancelled = true;
       source?.close();
     };
-  }, [code]);
+  }, [code, as]);
 
   const send = useCallback(
     async (

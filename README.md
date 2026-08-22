@@ -43,50 +43,54 @@ the parameter, so pointing either variable at one of them still works.
 
 ## The games
 
-Ten of the fourteen are playable. Each game belongs to a family, and the family
-decides the colour that lights the screen.
+All fourteen from the brief, plus Categories and Three in Five. Each belongs to
+a family, and the family decides the colour that lights the screen.
 
-| Game | Family | Devices | Status |
-|---|---|---|---|
-| Big Board | Trivia | TV only | Playable |
-| Trivia Royale | Trivia | TV + phones | Playable |
-| Bluff Trivia | Trivia | TV + phones | Playable |
-| Last One Standing | Trivia | TV + phones | Not built |
-| Impostor | Deception | TV + phones | Not built |
-| Code Grid | Deception | TV + phones | Not built |
-| Most Likely To | Social | TV + phones | Playable |
-| Who Said It | Social | TV + phones | Playable |
-| Groupthink | Social | TV + phones | Playable |
-| Face-Off | Social | TV only | Playable |
-| Categories | Word | TV only | Playable |
-| Three in Five | Word | TV only | Playable |
-| Emoji Riddles | Word | TV + phones | Playable |
-| Timeline | Word | TV + phones | Not built |
-| Dial It In | Word | TV + phones | Not built |
-| Sketch & Guess | Word | TV + phones | Not built |
+| Game | Family | Devices |
+|---|---|---|
+| Big Board | Trivia | TV only |
+| Trivia Royale | Trivia | TV + phones |
+| Bluff Trivia | Trivia | TV + phones |
+| Last One Standing | Trivia | TV + phones |
+| Impostor | Deception | TV + phones |
+| Code Grid | Deception | TV + phones |
+| Most Likely To | Social | TV + phones |
+| Who Said It | Social | TV + phones |
+| Groupthink | Social | TV + phones |
+| Face-Off | Social | TV only |
+| Categories | Word | TV only |
+| Three in Five | Word | TV only |
+| Emoji Riddles | Word | TV + phones |
+| Timeline | Word | TV + phones |
+| Dial It In | Word | TV + phones |
+| Sketch & Guess | Word | TV + phones |
 
-## How Face-Off judges an answer
+Four TV-only games run in the host's browser with no room. The rest start from
+a lobby; `+ Practice bots` fills it so one person can walk through any of them
+alone.
 
-The host types what the team shouted, and three things get a go at it, cheapest
-first:
+### Engines
 
-1. **String matching, strict** (`lib/feud/match.ts`) — the answer itself, a
-   close typo, or one of the alternates written into the pack. No network.
-2. **The model** (`/api/feud/judge`) — the only step that knows chips are
-   snacks. Roughly a second, and only reached when step 1 can't call it.
-3. **String matching, lenient** — the fallback when there's no API key or the
-   request fails. Never let a slow network cost somebody a strike.
+Twelve phone games run on four reducers, which is why the later ones were cheap:
 
-Every answer carries an `accept` list of other ways people say it, written by
-the generator with the pack and by hand in `lib/feud/samplePack.ts`. That's what
-makes the common cases free.
+- `roundEngine` — prompt, everyone writes, everyone votes, reveal.
+  *Most Likely To, Who Said It, Bluff Trivia, Groupthink.*
+- `buzzEngine` — a race, with the server deciding who was first.
+  *Trivia Royale, Emoji Riddles.*
+- `liveEngine` — everyone answers at once and the score is a calculation.
+  *Last One Standing, Timeline, Dial It In.*
+- One each for the three that don't fit: `impostor`, `codegrid`, `sketch`.
 
-The judge sees the whole board, face-up answers included, so repeating one
-that's already open says "already up" instead of taking a strike.
+### Secrets
 
-```bash
-npx tsx lib/feud/match.test.mts
-```
+Three games have something the room mustn't see: who the impostor is, which
+words are whose, and what's being drawn. Every client holds an SSE connection
+that carries the whole room, so hiding those in the UI would be no protection —
+the payload is one devtools tab away.
+
+`lib/room/redact.ts` strips them on the server, per recipient, before anything
+is written to the wire. The TV is a viewer too, and the strictest one: it's the
+screen everybody can see, so it gets less than the phones do.
 
 ## Colour
 

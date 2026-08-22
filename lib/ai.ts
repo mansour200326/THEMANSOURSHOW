@@ -6,6 +6,8 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod/v4";
 import type { Board, FinalClue } from "@/lib/board/types";
 import type { FeudQuestion } from "@/lib/feud/types";
+import type { ImpostorPlace } from "@/lib/games/impostor";
+import type { LiveItem } from "@/lib/games/liveEngine";
 import { type Difficulty, difficultyBrief } from "@/lib/difficulty";
 
 /**
@@ -425,6 +427,238 @@ export async function generateCategoryIdeas({
     .map((c) => c.trim())
     .filter(Boolean)
     .slice(0, count);
+}
+
+/* ------------------------------------------------ the room-game packs */
+
+const themeLine = (themes: string[]) =>
+  themes.length
+    ? `\n\nSpread them evenly across these themes:\n${themes
+        .map((t) => `- ${t}`)
+        .join("\n")}`
+    : "";
+
+const GeneratedStanding = z.object({
+  questions: z.array(
+    z.object({
+      prompt: z.string().describe("The question, asked the way a host says it."),
+      answer: z
+        .string()
+        .describe("The answer, in as few words as possible — one or two."),
+    }),
+  ),
+});
+
+/** Last One Standing: short questions with one unarguable answer. */
+export async function generateStandingQuestions({
+  themes = [],
+  count,
+  difficulty = "medium",
+}: {
+  themes?: string[];
+  count: number;
+  difficulty?: Difficulty;
+}): Promise<LiveItem[]> {
+  const client = new Anthropic();
+  const response = await client.messages.parse({
+    model: MODELS.packs,
+    max_tokens: 4000,
+    system:
+      "You write questions for an elimination quiz. Everyone answers at once " +
+      "and a wrong answer puts you out, so every question must have exactly " +
+      "one short answer that nobody could argue with — a name, a number, a " +
+      "place. Never a question with several valid answers, and never one that " +
+      "needs specialist knowledge. Order them easiest first; they should get " +
+      "harder as the field thins out." +
+      `\n\nDifficulty: ${difficultyBrief[difficulty]}`,
+    output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedStanding), "low"),
+    messages: [
+      { role: "user", content: `Write ${count} questions.${themeLine(themes)}` },
+    ],
+  });
+  const parsed = response.parsed_output;
+  if (!parsed?.questions?.length) throw new Error("Couldn't write those questions.");
+  return parsed.questions
+    .filter((q) => q.prompt.trim() && q.answer.trim())
+    .map((q) => ({ prompt: q.prompt.trim(), answer: q.answer.trim() }))
+    .slice(0, count);
+}
+
+const GeneratedTimeline = z.object({
+  rounds: z.array(
+    z.object({
+      prompt: z.string().describe("What the room is being asked to order."),
+      events: z
+        .array(z.string())
+        .describe("Exactly five things, ALREADY in the correct order, earliest first."),
+    }),
+  ),
+});
+
+/** Timeline: five things per round, handed over in their true order. */
+export async function generateTimelineRounds({
+  themes = [],
+  count,
+  difficulty = "medium",
+}: {
+  themes?: string[];
+  count: number;
+  difficulty?: Difficulty;
+}): Promise<LiveItem[]> {
+  const client = new Anthropic();
+  const response = await client.messages.parse({
+    model: MODELS.board,
+    max_tokens: 6000,
+    system:
+      "You write rounds for a game where the room puts five things in order. " +
+      "Give exactly five per round, listed in the correct order, earliest " +
+      "first — the game shuffles them itself. Every fact must be genuinely " +
+      "true and checkable. Space them out: five things from the same decade " +
+      "is a coin flip, not a round. Keep each entry to a few words." +
+      `\n\nDifficulty: ${difficultyBrief[difficulty]}`,
+    output_config: outputConfig(MODELS.board, zodOutputFormat(GeneratedTimeline), "medium"),
+    messages: [
+      { role: "user", content: `Write ${count} rounds.${themeLine(themes)}` },
+    ],
+  });
+  const parsed = response.parsed_output;
+  if (!parsed?.rounds?.length) throw new Error("Couldn't write those rounds.");
+  return parsed.rounds
+    .filter((r) => r.events.length >= 4)
+    .map((r) => ({
+      prompt: r.prompt.trim(),
+      events: r.events.slice(0, 5).map((e) => e.trim()),
+    }))
+    .slice(0, count);
+}
+
+const GeneratedSpectrums = z.object({
+  spectrums: z.array(
+    z.object({
+      left: z.string().describe("One end of the scale. One or two words."),
+      right: z.string().describe("The opposite end. One or two words."),
+    }),
+  ),
+});
+
+/** Dial It In: opposing pairs with plenty of room in the middle. */
+export async function generateSpectrums({
+  themes = [],
+  count,
+}: {
+  themes?: string[];
+  count: number;
+}): Promise<LiveItem[]> {
+  const client = new Anthropic();
+  const response = await client.messages.parse({
+    model: MODELS.packs,
+    max_tokens: 2000,
+    system:
+      "You write opposing pairs for a game where one player gives a one-word " +
+      "clue and the rest guess a point on the scale between them. The pair " +
+      "must be a genuine spectrum with a debatable middle — 'Cold / Hot' " +
+      "works, 'Alive / Dead' doesn't. Keep them everyday and arguable, the " +
+      "sort of thing a room will shout about.",
+    output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedSpectrums), "low"),
+    messages: [
+      { role: "user", content: `Write ${count} pairs.${themeLine(themes)}` },
+    ],
+  });
+  const parsed = response.parsed_output;
+  if (!parsed?.spectrums?.length) throw new Error("Couldn't write those spectrums.");
+  return parsed.spectrums
+    .filter((s) => s.left.trim() && s.right.trim())
+    .map((s) => ({
+      prompt: "Where does it sit?",
+      left: s.left.trim(),
+      right: s.right.trim(),
+    }))
+    .slice(0, count);
+}
+
+const GeneratedPlaces = z.object({
+  places: z.array(
+    z.object({
+      name: z.string().describe("A place everyone would recognise."),
+      roles: z
+        .array(z.string())
+        .describe("Six people you'd find there, each a couple of words."),
+    }),
+  ),
+});
+
+/** Impostor: places with roles you can bluff about but not too easily. */
+export async function generateImpostorPlaces({
+  themes = [],
+  count,
+}: {
+  themes?: string[];
+  count: number;
+}): Promise<ImpostorPlace[]> {
+  const client = new Anthropic();
+  const response = await client.messages.parse({
+    model: MODELS.packs,
+    max_tokens: 4000,
+    system:
+      "You write location packs for a hidden-role game. One player doesn't " +
+      "know where everyone is and has to bluff, so every place needs to be " +
+      "somewhere ordinary that anyone could picture, and the roles need to " +
+      "be specific enough that a faker gets caught out. Six roles per place. " +
+      "Avoid anywhere so unusual that a vague answer would pass.",
+    output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedPlaces), "low"),
+    messages: [
+      { role: "user", content: `Write ${count} places.${themeLine(themes)}` },
+    ],
+  });
+  const parsed = response.parsed_output;
+  if (!parsed?.places?.length) throw new Error("Couldn't write those places.");
+  return parsed.places
+    .filter((p) => p.name.trim() && p.roles.length >= 3)
+    .map((p) => ({
+      name: p.name.trim(),
+      roles: p.roles.map((r) => r.trim()).filter(Boolean).slice(0, 8),
+    }))
+    .slice(0, count);
+}
+
+const GeneratedWords = z.object({
+  words: z.array(z.string()).describe("Single words, no punctuation."),
+});
+
+/**
+ * Single-word packs. Code Grid wants words that mean several things at once;
+ * Sketch & Guess wants things with a shape.
+ */
+export async function generateWordPack({
+  kind,
+  themes = [],
+  count,
+}: {
+  kind: "grid" | "sketch";
+  themes?: string[];
+  count: number;
+}): Promise<string[]> {
+  const client = new Anthropic();
+  const brief =
+    kind === "grid"
+      ? "Every word must carry more than one meaning or sit in more than one " +
+        "world — 'Bank', 'Star', 'Spring'. A word with a single obvious sense " +
+        "is a wasted square. One word each, no phrases."
+      : "Every word must be a thing with a shape that somebody who cannot " +
+        "draw could still attempt in ninety seconds. Concrete objects and " +
+        "scenes, never abstract ideas. One or two words each.";
+  const response = await client.messages.parse({
+    model: MODELS.packs,
+    max_tokens: 2000,
+    system: `You write word packs for a party game.\n\n${brief}`,
+    output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedWords), "low"),
+    messages: [
+      { role: "user", content: `Write ${count} of them.${themeLine(themes)}` },
+    ],
+  });
+  const parsed = response.parsed_output;
+  if (!parsed?.words?.length) throw new Error("Couldn't write those words.");
+  return parsed.words.map((w) => w.trim()).filter(Boolean).slice(0, count);
 }
 
 /* -------------------------------------------------------- error presentation */

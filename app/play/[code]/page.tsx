@@ -2,9 +2,18 @@
 
 import { use, useEffect, useState } from "react";
 import { BuzzPlayer } from "@/components/play/BuzzPlayer";
+import { GridPlayer } from "@/components/play/GridPlayer";
+import { ImpostorPlayer } from "@/components/play/ImpostorPlayer";
+import { LivePlayer } from "@/components/play/LivePlayer";
+import { SketchPlayer } from "@/components/play/SketchPlayer";
 import { RoundPlayer } from "@/components/play/RoundPlayer";
 import type { BuzzState } from "@/lib/games/buzzEngine";
+import type { CodeGridState } from "@/lib/games/codegrid";
+import type { ImpostorState } from "@/lib/games/impostor";
+import type { LiveState } from "@/lib/games/liveEngine";
 import type { RoundState } from "@/lib/games/roundEngine";
+import type { SketchState } from "@/lib/games/sketch";
+import type { ViewerExtras } from "@/lib/room/redact";
 import { useAccentFamily } from "@/components/useAccentFamily";
 import { useRoom } from "@/lib/room/useRoom";
 
@@ -18,17 +27,19 @@ export default function PlayPage({
 }) {
   const { code } = use(params);
   const roomCode = code.toUpperCase();
-  const { room, status, send } = useRoom(roomCode);
-
-  // The screen takes its colour from whatever game is running.
-  useAccentFamily(room?.gameId);
-
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [name, setName] = useState("");
 
   useEffect(() => {
     setPlayerId(window.localStorage.getItem(idKey(roomCode)));
   }, [roomCode]);
+
+  // Saying who we are is what lets the server strip the other players'
+  // secrets before they ever reach this phone.
+  const { room, status, send } = useRoom(roomCode, playerId);
+
+  // The screen takes its colour from whatever game is running.
+  useAccentFamily(room?.gameId);
 
   // Rejoin automatically once the stream is live (covers refresh + reconnect).
   useEffect(() => {
@@ -105,7 +116,17 @@ export default function PlayPage({
     );
   }
 
-  const state = room.game as (RoundState | BuzzState) | null;
+  const state = room.game as
+    | ((
+        | RoundState
+        | BuzzState
+        | LiveState
+        | ImpostorState
+        | CodeGridState
+        | SketchState
+      ) &
+        ViewerExtras)
+    | null;
 
   if (room.gameId && state?.kind === "buzz") {
     return (
@@ -115,6 +136,57 @@ export default function PlayPage({
         me={me}
         onBuzz={() => send("buzz", undefined, me.id)}
         onPick={(c, r) => send("pick", { c, r }, me.id)}
+      />
+    );
+  }
+
+  if (room.gameId && state?.kind === "live") {
+    return (
+      <LivePlayer
+        state={state}
+        me={me}
+        onSubmit={(text) => send("submit", { text }, me.id)}
+        onClue={(text) => send("clue", { text }, me.id)}
+      />
+    );
+  }
+
+  if (room.gameId && state?.kind === "impostor") {
+    return (
+      <ImpostorPlayer
+        room={room}
+        state={state}
+        me={me}
+        onReady={() => send("ready", undefined, me.id)}
+        onAccuse={() => send("accuse", undefined, me.id)}
+        onVote={(playerId) => send("vote", { playerId }, me.id)}
+        onGuessPlace={(placeIndex) => send("guess", { placeIndex }, me.id)}
+      />
+    );
+  }
+
+  if (room.gameId && state?.kind === "grid") {
+    return (
+      <GridPlayer
+        state={state}
+        me={me}
+        onClue={(word, count) => send("clue", { word, count }, me.id)}
+        onTap={(index) => send("tap", { index }, me.id)}
+        onPass={() => send("pass", undefined, me.id)}
+      />
+    );
+  }
+
+  if (room.gameId && state?.kind === "sketch") {
+    return (
+      <SketchPlayer
+        state={state}
+        me={me}
+        onStroke={(points) => send("draw", { points }, me.id)}
+        onLift={() => send("lift", undefined, me.id)}
+        onUndo={() => send("undo", undefined, me.id)}
+        onClear={() => send("clear", undefined, me.id)}
+        onGuess={(text) => send("guess", { text }, me.id)}
       />
     );
   }

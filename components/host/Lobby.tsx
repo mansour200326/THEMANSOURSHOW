@@ -56,7 +56,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
   return (
     <main className="flex h-dvh flex-col gap-[1.4vmin] overflow-hidden p-[1.8vmin]">
       {/* One compact band: brand, join details, who's here. */}
-      <header className="flex h-[19vmin] min-h-[128px] shrink-0 items-stretch gap-[1.4vmin]">
+      <header className="flex h-[15vmin] min-h-[104px] shrink-0 items-stretch gap-[1.4vmin]">
         <div className="flex items-center gap-5 rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-[1.4vmin]">
           <ShowMark size="sm" />
           <div className="border-l border-white/10 pl-5">
@@ -132,7 +132,8 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
       </header>
 
       {/* The games get the room */}
-      <section className="grid min-h-0 flex-1 grid-cols-2 grid-rows-5 gap-[1.1vmin] sm:grid-cols-3 sm:grid-rows-4 xl:grid-cols-5 xl:grid-rows-2">
+      {/* Sixteen games have to fit on one screen without scrolling. */}
+      <section className="grid min-h-0 flex-1 grid-cols-2 grid-rows-8 gap-[0.9vmin] sm:grid-cols-3 sm:grid-rows-6 lg:grid-cols-4 lg:grid-rows-4 xl:grid-cols-6 xl:grid-rows-3">
         {TV_ONLY.map((game) => (
           <Link
             key={game.id}
@@ -190,7 +191,7 @@ function Card({
   return (
     <div
       className={[
-        "relative flex h-full flex-col overflow-hidden rounded-2xl border p-[1.6vmin] transition-all duration-200",
+        "relative flex h-full flex-col overflow-hidden rounded-2xl border p-[1.2vmin] transition-all duration-200",
         ready
           ? "border-accent/40 bg-gradient-to-b from-accent/[0.14] to-transparent group-hover:-translate-y-1 group-hover:border-accent group-hover:shadow-glow"
           : "border-white/10 bg-white/[0.02] opacity-45",
@@ -201,10 +202,10 @@ function Card({
         <span className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-accent to-transparent" />
       )}
       <div className="flex min-h-0 flex-1 flex-col justify-center">
-        <h3 className="font-display text-[clamp(0.95rem,1.5vw,1.75rem)] uppercase leading-tight tracking-wide text-moon">
+        <h3 className="font-display text-[clamp(0.8rem,1.15vw,1.4rem)] uppercase leading-tight tracking-wide text-moon">
           {name}
         </h3>
-        <p className="mt-1.5 text-balance text-[clamp(0.7rem,0.92vw,1rem)] leading-snug text-moon-dim">
+        <p className="mt-1 text-balance text-[clamp(0.62rem,0.75vw,0.9rem)] leading-snug text-moon-dim">
           {blurb}
         </p>
       </div>

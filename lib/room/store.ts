@@ -132,15 +132,30 @@ function reduceRoom(room: Room, action: Action): Room {
       const id = String(action.payload?.gameId ?? "");
       const game = games[id];
       if (!game) return room;
-      // Content generated during setup rides along on the start action.
-      const withBoard = {
+      /**
+       * Content generated during setup rides along on the start action. Each
+       * engine reads whichever slot it understands and ignores the rest; the
+       * lot is deleted straight after so it never reaches a client.
+       */
+      const PENDING = [
+        "pendingBoard",
+        "pendingItems",
+        "pendingPlaces",
+        "pendingWords",
+      ] as const;
+      const primed = {
         ...room,
         gameId: id,
         game: null,
         pendingBoard: action.payload?.board,
+        pendingItems: action.payload?.items,
+        pendingPlaces: action.payload?.places,
+        pendingWords: action.payload?.words,
       };
-      const started = game.init(withBoard as typeof room);
-      delete (started as { pendingBoard?: unknown }).pendingBoard;
+      const started = game.init(primed as typeof room);
+      PENDING.forEach((key) => {
+        delete (started as Record<string, unknown>)[key];
+      });
       return started;
     }
 

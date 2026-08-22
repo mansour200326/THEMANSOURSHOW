@@ -1,3 +1,4 @@
+import { redactFor } from "@/lib/room/redact";
 import { getRoom, subscribe } from "@/lib/room/store";
 import type { Room } from "@/lib/room/types";
 
@@ -6,14 +7,19 @@ export const dynamic = "force-dynamic";
 
 /**
  * Server-Sent Events: every client — the TV and every phone — holds one of these
- * open and receives the full room on every change. Snapshots rather than diffs;
+ * open and receives the room on every change. Snapshots rather than diffs;
  * a party room is small and it makes reconnects trivially correct.
+ *
+ * `?as=<playerId>` says who's listening, so the hidden-role games can strip
+ * what this particular screen isn't entitled to. No id means the TV, which
+ * everyone can see and so gets the least.
  */
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ code: string }> },
 ) {
   const { code } = await params;
+  const viewerId = new URL(request.url).searchParams.get("as");
   const room = getRoom(code);
   if (!room) {
     return new Response("room not found", { status: 404 });
@@ -28,7 +34,7 @@ export async function GET(
       const send = (next: Room) => {
         try {
           controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify(next)}\n\n`),
+            encoder.encode(`data: ${JSON.stringify(redactFor(next, viewerId))}\n\n`),
           );
         } catch {
           // Client vanished mid-write; the cancel handler cleans up.

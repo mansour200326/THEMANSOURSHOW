@@ -1,0 +1,324 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import {
+  type LiveState,
+  liveCurrent,
+  liveShuffledEvents,
+} from "@/lib/games/liveEngine";
+import type { Player } from "@/lib/room/types";
+
+type Props = {
+  state: LiveState;
+  me: Player;
+  onSubmit: (text: string) => void;
+  onClue: (text: string) => void;
+};
+
+export function LivePlayer({ state, me, onSubmit, onClue }: Props) {
+  const item = liveCurrent(state);
+  const benched = state.benched.includes(me.id);
+  const submitted = state.answers[me.id] !== undefined;
+  const leading = state.lead === me.id;
+
+  if (state.phase === "done") {
+    return (
+      <Centre>
+        <p className="text-6xl">{me.emoji}</p>
+        <p className="font-display text-2xl uppercase tracking-wide text-moon">
+          {me.score.toLocaleString()} points
+        </p>
+        <p className="text-moon-dim">That&apos;s the segment. Watch the TV.</p>
+      </Centre>
+    );
+  }
+
+  if (benched) {
+    return (
+      <Centre>
+        <p className="text-6xl opacity-40">{me.emoji}</p>
+        <p className="font-display text-xl uppercase tracking-wide text-moon-dim">
+          You&apos;re on the bench
+        </p>
+        <p className="text-moon-deep">Heckling is still allowed.</p>
+      </Centre>
+    );
+  }
+
+  if (state.phase === "reveal") {
+    const scored = state.lastScores[me.id] ?? 0;
+    return (
+      <Centre>
+        <p className="text-6xl">{me.emoji}</p>
+        <p
+          className={[
+            "font-display text-3xl uppercase tracking-wide",
+            scored ? "text-emerald-300" : "text-moon-dim",
+          ].join(" ")}
+        >
+          {scored ? `+${scored}` : "Nothing that time"}
+        </p>
+        <p className="text-moon-deep">Look up.</p>
+      </Centre>
+    );
+  }
+
+  /* ---- Dial It In: the clue-giver sees the target ---- */
+  if (state.variant === "dial" && leading) {
+    if (state.phase === "brief") {
+      return (
+        <ClueBox
+          left={item?.left ?? ""}
+          right={item?.right ?? ""}
+          target={item?.target ?? 50}
+          onSend={onClue}
+        />
+      );
+    }
+    return (
+      <Centre>
+        <p className="font-display text-xl uppercase tracking-wide text-accent">
+          “{state.clue}”
+        </p>
+        <p className="text-moon-dim">
+          That&apos;s all you get to say. No pointing.
+        </p>
+      </Centre>
+    );
+  }
+
+  if (submitted) {
+    return (
+      <Centre>
+        <p className="text-6xl">{me.emoji}</p>
+        <p className="font-display text-xl uppercase tracking-wide text-accent">
+          Locked in
+        </p>
+        <p className="text-moon-deep">Waiting for everyone else.</p>
+      </Centre>
+    );
+  }
+
+  if (state.variant === "standing") {
+    return <AnswerBox prompt={item?.prompt ?? ""} onSend={onSubmit} />;
+  }
+
+  if (state.variant === "timeline") {
+    return (
+      <OrderBox events={liveShuffledEvents(state)} shuffled={state.shuffled} onSend={onSubmit} />
+    );
+  }
+
+  return (
+    <DialBox
+      left={item?.left ?? ""}
+      right={item?.right ?? ""}
+      clue={state.clue}
+      onSend={onSubmit}
+    />
+  );
+}
+
+/* ------------------------------------------------------------- pieces */
+
+function Centre({ children }: { children: React.ReactNode }) {
+  return (
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-4 p-6 text-center">
+      {children}
+    </main>
+  );
+}
+
+function AnswerBox({
+  prompt,
+  onSend,
+}: {
+  prompt: string;
+  onSend: (text: string) => void;
+}) {
+  const [text, setText] = useState("");
+  return (
+    <main className="flex min-h-dvh flex-col justify-center gap-5 p-6">
+      <p className="text-center text-lg text-moon/75">{prompt}</p>
+      <input
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && text.trim() && onSend(text)}
+        placeholder="Your answer"
+        autoFocus
+        maxLength={60}
+        className="field py-5 text-center text-2xl"
+      />
+      <button
+        onClick={() => text.trim() && onSend(text)}
+        disabled={!text.trim()}
+        className="btn-accent w-full py-6 text-2xl"
+      >
+        Lock it in
+      </button>
+    </main>
+  );
+}
+
+/**
+ * Tap the events in the order you think they happened. Tapping is far kinder
+ * than dragging on a phone, and it's the same number of touches.
+ */
+function OrderBox({
+  events,
+  shuffled,
+  onSend,
+}: {
+  events: string[];
+  shuffled: number[];
+  onSend: (text: string) => void;
+}) {
+  const [order, setOrder] = useState<number[]>([]);
+
+  const toggle = (position: number) =>
+    setOrder((o) =>
+      o.includes(position) ? o.filter((p) => p !== position) : [...o, position],
+    );
+
+  const done = order.length === events.length;
+
+  return (
+    <main className="flex min-h-dvh flex-col justify-center gap-4 p-5">
+      <p className="text-center text-moon-dim">
+        Tap them in order — earliest first.
+      </p>
+      <div className="flex flex-col gap-2.5">
+        {events.map((event, position) => {
+          const place = order.indexOf(position);
+          return (
+            <button
+              key={position}
+              onClick={() => toggle(position)}
+              className={[
+                "flex items-center gap-3 rounded-xl border px-4 py-4 text-left transition-colors",
+                place >= 0
+                  ? "border-accent/70 bg-accent/15 text-moon"
+                  : "border-white/12 bg-white/[0.03] text-moon/75",
+              ].join(" ")}
+            >
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/15 font-display tabular-nums">
+                {place >= 0 ? place + 1 : ""}
+              </span>
+              <span className="text-base leading-snug">{event}</span>
+            </button>
+          );
+        })}
+      </div>
+      <button
+        onClick={() =>
+          // Send the true event indices, in the order they were tapped.
+          onSend(order.map((position) => shuffled[position]).join(","))
+        }
+        disabled={!done}
+        className="btn-accent w-full py-5 text-xl"
+      >
+        {done ? "Lock it in" : `${order.length}/${events.length} placed`}
+      </button>
+    </main>
+  );
+}
+
+function ClueBox({
+  left,
+  right,
+  target,
+  onSend,
+}: {
+  left: string;
+  right: string;
+  target: number;
+  onSend: (text: string) => void;
+}) {
+  const [clue, setClue] = useState("");
+  return (
+    <main className="flex min-h-dvh flex-col justify-center gap-5 p-6">
+      <p className="text-center font-display uppercase tracking-widest text-accent">
+        Only you can see this
+      </p>
+      <Spectrum left={left} right={right} marker={target} />
+      <input
+        value={clue}
+        onChange={(e) => setClue(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && clue.trim() && onSend(clue)}
+        placeholder="One clue…"
+        autoFocus
+        maxLength={40}
+        className="field py-5 text-center text-2xl"
+      />
+      <button
+        onClick={() => clue.trim() && onSend(clue)}
+        disabled={!clue.trim()}
+        className="btn-accent w-full py-6 text-2xl"
+      >
+        Say it
+      </button>
+    </main>
+  );
+}
+
+function DialBox({
+  left,
+  right,
+  clue,
+  onSend,
+}: {
+  left: string;
+  right: string;
+  clue: string;
+  onSend: (text: string) => void;
+}) {
+  const [value, setValue] = useState(50);
+  return (
+    <main className="flex min-h-dvh flex-col justify-center gap-6 p-6">
+      <p className="text-center font-display text-2xl uppercase tracking-wide text-accent">
+        “{clue}”
+      </p>
+      <Spectrum left={left} right={right} marker={value} />
+      <input
+        type="range"
+        min={0}
+        max={100}
+        value={value}
+        onChange={(e) => setValue(Number(e.target.value))}
+        className="h-12 w-full accent-[rgb(var(--accent-rgb))]"
+        aria-label="Where on the spectrum"
+      />
+      <button
+        onClick={() => onSend(String(value))}
+        className="btn-accent w-full py-6 text-2xl"
+      >
+        Lock it in
+      </button>
+    </main>
+  );
+}
+
+function Spectrum({
+  left,
+  right,
+  marker,
+}: {
+  left: string;
+  right: string;
+  marker: number;
+}) {
+  return (
+    <div>
+      <div className="flex justify-between font-display text-xs uppercase tracking-widest text-moon-dim">
+        <span>{left}</span>
+        <span>{right}</span>
+      </div>
+      <div className="relative mt-2 h-14 overflow-hidden rounded-full border border-white/10 bg-gradient-to-r from-dusk via-dusk-lit to-dusk">
+        <div
+          className="absolute inset-y-0 w-[4px] -translate-x-1/2 bg-accent"
+          style={{ left: `${marker}%` }}
+        />
+      </div>
+    </div>
+  );
+}

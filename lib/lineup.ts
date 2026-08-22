@@ -45,6 +45,7 @@ export const lineup: Segment[] = [
   },
   {
     slug: "impostor",
+    liveInLobby: true,
     name: "Impostor",
     tagline: "Everyone knows the location. One of you is faking it.",
     phase: 5,
@@ -84,6 +85,7 @@ export const lineup: Segment[] = [
   },
   {
     slug: "last-one-standing",
+    liveInLobby: true,
     name: "Last One Standing",
     tagline: "Get it wrong, hit the bench. One survivor.",
     phase: 8,
@@ -99,6 +101,7 @@ export const lineup: Segment[] = [
   },
   {
     slug: "timeline",
+    liveInLobby: true,
     name: "Timeline",
     tagline: "Five events. Put them in order. Sweat.",
     phase: 8,
@@ -106,6 +109,7 @@ export const lineup: Segment[] = [
   },
   {
     slug: "dial-it-in",
+    liveInLobby: true,
     name: "Dial It In",
     tagline: "Overrated ↔ underrated. One word to land the dial.",
     phase: 8,
@@ -121,6 +125,7 @@ export const lineup: Segment[] = [
   },
   {
     slug: "code-grid",
+    liveInLobby: true,
     name: "Code Grid",
     tagline: "Twenty-five words, two teams, one-word clues.",
     phase: 9,
@@ -128,6 +133,7 @@ export const lineup: Segment[] = [
   },
   {
     slug: "sketch-and-guess",
+    liveInLobby: true,
     name: "Sketch & Guess",
     tagline: "Draw on your phone, live on the TV, chaos in the room.",
     phase: 9,
