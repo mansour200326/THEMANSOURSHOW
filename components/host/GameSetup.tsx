@@ -7,6 +7,11 @@ import type { Difficulty } from "@/lib/difficulty";
 
 type Props = {
   gameName: string;
+  /**
+   * Trivia Royale needs a full board and can't start without one; every other
+   * game has a bundled pack and treats generating as optional.
+   */
+  needsBoard?: boolean;
   onCancel: () => void;
   onStart: (config: { categories: string[]; difficulty: Difficulty }) => void;
   /** Set while the board is being written. */
@@ -20,7 +25,14 @@ const SLOTS = 4;
  * The step between picking a phone game and playing it: what it's about, and
  * how hard. Same contract as the Big Board setup, condensed for the TV.
  */
-export function GameSetup({ gameName, onCancel, onStart, busy, error }: Props) {
+export function GameSetup({
+  gameName,
+  needsBoard = false,
+  onCancel,
+  onStart,
+  busy,
+  error,
+}: Props) {
   const [categories, setCategories] = useState<string[]>(Array(SLOTS).fill(""));
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [suggesting, setSuggesting] = useState(false);
@@ -58,7 +70,7 @@ export function GameSetup({ gameName, onCancel, onStart, busy, error }: Props) {
       <div>
         <div className="flex items-baseline justify-between gap-4">
           <h2 className="font-display text-lg uppercase tracking-widest text-moon/75">
-            Categories
+            {needsBoard ? "Categories" : "Themes"}
           </h2>
           <button
             onClick={suggest}
@@ -76,7 +88,7 @@ export function GameSetup({ gameName, onCancel, onStart, busy, error }: Props) {
               onChange={(e) =>
                 setCategories((c) => c.map((v, idx) => (idx === i ? e.target.value : v)))
               }
-              placeholder={`Category ${i + 1}`}
+              placeholder={needsBoard ? `Category ${i + 1}` : `Theme ${i + 1}`}
               maxLength={40}
               className="field"
             />
@@ -104,12 +116,16 @@ export function GameSetup({ gameName, onCancel, onStart, busy, error }: Props) {
       <div className="flex flex-col items-center gap-3">
         <button
           onClick={() => onStart({ categories: filled, difficulty })}
-          disabled={filled.length < 3 || busy}
+          disabled={(needsBoard && filled.length < 3) || (!needsBoard && !filled.length) || busy}
           className="btn-brand w-full py-5 text-xl"
         >
-          {busy ? "Writing the board…" : "Build the board"}
+          {busy
+            ? "Writing it…"
+            : needsBoard
+              ? "Build the board"
+              : "Write it around these"}
         </button>
-        {filled.length < 3 && (
+        {needsBoard && filled.length < 3 && (
           <p className="text-sm text-moon-deep">Add at least 3 categories.</p>
         )}
         <div className="flex gap-3">
@@ -118,7 +134,7 @@ export function GameSetup({ gameName, onCancel, onStart, busy, error }: Props) {
             disabled={busy}
             className="btn-ghost text-sm"
           >
-            Skip — use the sample board
+            {needsBoard ? "Skip — use the sample board" : "Skip — use the built-in pack"}
           </button>
           <button onClick={onCancel} disabled={busy} className="btn-ghost text-sm">
             Back

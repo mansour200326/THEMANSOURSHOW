@@ -7,6 +7,7 @@ import { z } from "zod/v4";
 import type { Board, FinalClue } from "@/lib/board/types";
 import type { FeudQuestion } from "@/lib/feud/types";
 import type { ImpostorPlace } from "@/lib/games/impostor";
+import type { BuzzItem } from "@/lib/games/buzzEngine";
 import type { LiveItem } from "@/lib/games/liveEngine";
 import { type Difficulty, difficultyBrief } from "@/lib/difficulty";
 
@@ -659,6 +660,125 @@ export async function generateWordPack({
   const parsed = response.parsed_output;
   if (!parsed?.words?.length) throw new Error("Couldn't write those words.");
   return parsed.words.map((w) => w.trim()).filter(Boolean).slice(0, count);
+}
+
+/**
+ * The label shown above the emoji. It has to be right — a room told "Food" and
+ * shown 📱🍎🎵 has been lied to — so the list is wide enough that there's
+ * always an honest one to pick.
+ */
+const RIDDLE_KINDS = [
+  "Film",
+  "TV show",
+  "Song",
+  "Book",
+  "Country",
+  "City",
+  "Food",
+  "Drink",
+  "Animal",
+  "Sport",
+  "Person",
+  "Brand",
+  "Video game",
+  "Job",
+  "Saying",
+] as const;
+
+const GeneratedRiddles = z.object({
+  riddles: z.array(
+    z.object({
+      emoji: z
+        .string()
+        .describe("Two to four emoji. No letters, no numbers, no flags."),
+      answer: z
+        .string()
+        .describe(
+          "One specific named thing — 'Iceland', 'The Lion King'. Never a generic noun like 'Movie' or 'Pizza Party'.",
+        ),
+      hint: z.enum(RIDDLE_KINDS).describe("What sort of thing the answer is."),
+    }),
+  ),
+});
+
+/**
+ * Emoji Riddles. The category matters as much as the emoji: without it a
+ * country riddle is unguessable, and with it the same three emoji are fair.
+ */
+export async function generateEmojiRiddles({
+  themes = [],
+  count,
+  difficulty = "medium",
+}: {
+  themes?: string[];
+  count: number;
+  difficulty?: Difficulty;
+}): Promise<BuzzItem[]> {
+  const client = new Anthropic();
+  const response = await client.messages.parse({
+    // The board model rather than the pack one: a bad riddle is worse than no
+    // riddle, and there are only ever a couple of dozen of them. It needs the
+    // headroom the other pack generators don't — 4k ran out mid-answer.
+    model: MODELS.board,
+    max_tokens: 16000,
+    system:
+      "You write emoji riddles for a party game. Each is a short run of emoji " +
+      "that a room has to decode into one specific well-known thing.\n\n" +
+      "Rules:\n" +
+      "- No letters, no numbers. The emoji do the work.\n" +
+      "- No flag emoji. A flag next to anything gives a country away instantly " +
+      "and there's no puzzle left. Say Iceland with ice and a volcano.\n" +
+      "- The answer is a specific named thing: Iceland, Wimbledon, The Lion " +
+      "King, Ratatouille. Never a generic noun — 'Movie', 'Pizza Party' and " +
+      "'Drinking Song' are not answers, they're categories.\n" +
+      "- The emoji must describe the thing sideways, not label it. 🎬📹🎞️ for " +
+      "'Movie' is not a riddle, it's a definition.\n" +
+      "- Spread them across the kinds available. A pack of nothing but films " +
+      "runs out fast and lets the same person win every round — countries, " +
+      "food, sayings and sport pull in whoever knows what.\n" +
+      "- Everything must be recognisable to an ordinary adult, not a deep cut.\n" +
+      "- Two to four emoji. More reads as a rebus nobody solves.\n" +
+      "- The kind you pick is shown to the room above the emoji, so it has " +
+      "to be honest. A footballer is a Person, not a Job. An app is a " +
+      "Brand, not a Song. If none of the kinds fits, write a different " +
+      "riddle instead of mislabelling this one." +
+      `\n\nDifficulty: ${difficultyBrief[difficulty]}`,
+    output_config: outputConfig(MODELS.board, zodOutputFormat(GeneratedRiddles), "low"),
+    messages: [
+      {
+        role: "user",
+        content: `Write ${count} riddles.${
+          themes.length
+            ? ` Lean them towards these, while still mixing up the sort of thing the answer is:\n${themes
+                .map((t) => `- ${t}`)
+                .join("\n")}`
+            : ""
+        }`,
+      },
+    ],
+  });
+  if (response.stop_reason === "refusal") {
+    throw new Error("The writer declined that theme. Try rewording it.");
+  }
+  const parsed = response.parsed_output;
+  if (!parsed?.riddles?.length) throw new Error("Couldn't write those riddles.");
+  return parsed.riddles
+    // A riddle with letters in it, or a flag next to a country, has given
+    // the game away before anyone looked at it.
+    .filter(
+      (r) =>
+        r.emoji.trim() &&
+        r.answer.trim() &&
+        !/[a-z0-9]/i.test(r.emoji) &&
+        !/[\u{1F1E6}-\u{1F1FF}]/u.test(r.emoji),
+    )
+    .map((r) => ({
+      prompt: r.emoji.replace(/\s+/g, ""),
+      answer: r.answer.trim(),
+      value: 500,
+      hint: r.hint.trim() || undefined,
+    }))
+    .slice(0, count);
 }
 
 /* -------------------------------------------------------- error presentation */

@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { FeudBoard } from "@/components/feud/FeudBoard";
 import { type FeudConfig, FeudSetup } from "@/components/feud/FeudSetup";
 import { GeneratingScreen } from "@/components/bigboard/GeneratingScreen";
+import { HowToPlay } from "@/components/HowToPlay";
 import { ShowMark } from "@/components/ShowMark";
 import {
   emptyFeud,
@@ -28,6 +29,8 @@ function FaceOffStage() {
   /** True while a guess is still being judged. */
   const [checking, setChecking] = useState(false);
   const judging = useRef<AbortController | null>(null);
+  /** The rules come first. Deliberately not part of game state. */
+  const [explained, setExplained] = useState(false);
 
   useEffect(() => {
     try {
@@ -99,6 +102,20 @@ function FaceOffStage() {
         onCancel={() => {
           abort.current?.abort();
           setGenerating(null);
+        }}
+      />
+    );
+  }
+
+  if (state.phase === "setup" && !explained) {
+    return (
+      <HowToPlay
+        gameId="face-off"
+        name="Face-Off"
+        startLabel="Set it up"
+        onStart={() => setExplained(true)}
+        onBack={() => {
+          window.location.href = "/games";
         }}
       />
     );

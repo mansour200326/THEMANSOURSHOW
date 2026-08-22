@@ -10,6 +10,7 @@ import { ScoreBar } from "@/components/bigboard/ScoreBar";
 import { SetupScreen, type SetupConfig } from "@/components/bigboard/SetupScreen";
 import { WagerStage } from "@/components/bigboard/WagerStage";
 import { WinnerScreen } from "@/components/bigboard/WinnerScreen";
+import { HowToPlay } from "@/components/HowToPlay";
 import { ShowMark } from "@/components/ShowMark";
 import { clueAt } from "@/lib/board/types";
 import {
@@ -31,6 +32,8 @@ function BigBoardStage() {
   const [genError, setGenError] = useState<string | null>(null);
   const hydrated = useRef(false);
   const abortRef = useRef<AbortController | null>(null);
+  /** The rules come first. Deliberately not part of game state. */
+  const [explained, setExplained] = useState(false);
 
   // Look for a game left running on this screen. Offered, never forced.
   useEffect(() => {
@@ -120,6 +123,20 @@ function BigBoardStage() {
         onCancel={() => {
           abortRef.current?.abort();
           setPending(null);
+        }}
+      />
+    );
+  }
+
+  if (state.phase === "setup" && !explained) {
+    return (
+      <HowToPlay
+        gameId="big-board"
+        name="Big Board"
+        startLabel="Set it up"
+        onStart={() => setExplained(true)}
+        onBack={() => {
+          window.location.href = "/games";
         }}
       />
     );

@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { DifficultyBar } from "@/components/DifficultyBar";
 import { GeneratingScreen } from "@/components/bigboard/GeneratingScreen";
 import { RapidStage } from "@/components/rapid/RapidStage";
+import { HowToPlay } from "@/components/HowToPlay";
 import { ShowMark } from "@/components/ShowMark";
 import { TeamsField, cleanTeamNames, startingTeams } from "@/components/setup/TeamsField";
 import { ThemeList, usableThemes } from "@/components/setup/ThemeList";
@@ -32,6 +33,8 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
   const [saved, setSaved] = useState<RapidState | null>(null);
   const hydrated = useRef(false);
   const abort = useRef<AbortController | null>(null);
+  /** The rules come first. Deliberately not part of game state. */
+  const [explained, setExplained] = useState(false);
 
   const KEY = `bignight:rapid:${mode}:v1`;
 
@@ -118,6 +121,20 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
   }
 
   /* ------------------------------------------------------------- setup */
+  if (state.phase === "setup" && !explained) {
+    return (
+      <HowToPlay
+        gameId={mode}
+        name={RAPID_TITLE[mode]}
+        startLabel="Set it up"
+        onStart={() => setExplained(true)}
+        onBack={() => {
+          window.location.href = "/games";
+        }}
+      />
+    );
+  }
+
   if (state.phase === "setup") {
     return (
       <main className="mx-auto min-h-dvh w-full max-w-3xl px-6 py-10">

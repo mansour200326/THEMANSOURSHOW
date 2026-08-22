@@ -13,6 +13,12 @@ export type BuzzItem = {
   prompt: string;
   answer: string;
   value: number;
+  /**
+   * What sort of thing the answer is. Emoji Riddles needs this the moment it
+   * stops being all films: 🧊🇮🇸 is a fair riddle if you know you're looking
+   * for a country and an impossible one if you don't.
+   */
+  hint?: string;
 };
 
 export type BuzzState = {
@@ -103,8 +109,15 @@ export function createBuzzGame(
     needsPhones: true,
 
     init(room) {
-      // A board generated at setup time overrides the bundled one.
-      const supplied = (room as unknown as { pendingBoard?: Board }).pendingBoard;
+      // Content generated at setup time overrides the bundled pack.
+      const primed = room as unknown as {
+        pendingBoard?: Board;
+        pendingItems?: BuzzItem[];
+      };
+      const supplied = primed.pendingBoard;
+      const items = primed.pendingItems?.length
+        ? primed.pendingItems
+        : (content.items ?? []);
       const fresh: BuzzState = {
         kind: "buzz",
         mode: spec.mode,
@@ -112,7 +125,7 @@ export function createBuzzGame(
         board: supplied ?? content.board ?? null,
         spent: [],
         active: null,
-        items: content.items ?? [],
+        items,
         index: 0,
         buzzedBy: null,
         lockedOut: [],

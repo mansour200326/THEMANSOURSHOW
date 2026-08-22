@@ -9,6 +9,7 @@ import { ImpostorHost } from "@/components/host/ImpostorHost";
 import { LiveHost } from "@/components/host/LiveHost";
 import { SketchHost } from "@/components/host/SketchHost";
 import { GameSetup } from "@/components/host/GameSetup";
+import { HowToPlay } from "@/components/HowToPlay";
 import { Lobby } from "@/components/host/Lobby";
 import { RoundHost } from "@/components/host/RoundHost";
 import type { BuzzState } from "@/lib/games/buzzEngine";
@@ -18,6 +19,7 @@ import type { LiveState } from "@/lib/games/liveEngine";
 import type { RoundState } from "@/lib/games/roundEngine";
 import type { SketchState } from "@/lib/games/sketch";
 import { useAccentFamily } from "@/components/useAccentFamily";
+import { games } from "@/lib/games/registry";
 import { useRoom } from "@/lib/room/useRoom";
 
 export default function HostPage({
@@ -32,7 +34,8 @@ export default function HostPage({
   // The screen takes its colour from whatever game is running.
   useAccentFamily(room?.gameId);
 
-  // Games that take categories get a setup step before they start.
+  // Every game explains itself first; some then ask what they're about.
+  const [explaining, setExplaining] = useState<string | null>(null);
   const [setupFor, setSetupFor] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [setupError, setSetupError] = useState<string | null>(null);
@@ -46,6 +49,7 @@ export default function HostPage({
     impostor: "Impostor",
     "code-grid": "Code Grid",
     "sketch-and-guess": "Sketch & Guess",
+    "emoji-riddles": "Emoji Riddles",
   };
 
   const launch = async (
@@ -120,10 +124,29 @@ export default function HostPage({
     );
   }
 
+  if (explaining) {
+    const game = games[explaining];
+    return (
+      <HowToPlay
+        gameId={explaining}
+        name={game?.name ?? "Next up"}
+        startLabel={NEEDS_SETUP[explaining] ? "Set it up" : "Start the game"}
+        onBack={() => setExplaining(null)}
+        onStart={() => {
+          const id = explaining;
+          setExplaining(null);
+          if (NEEDS_SETUP[id]) setSetupFor(id);
+          else send("game:start", { gameId: id });
+        }}
+      />
+    );
+  }
+
   if (setupFor) {
     return (
       <GameSetup
         gameName={NEEDS_SETUP[setupFor]}
+        needsBoard={setupFor === "trivia-royale"}
         busy={busy}
         error={setupError}
         onCancel={() => {
@@ -139,11 +162,7 @@ export default function HostPage({
     return (
       <Lobby
         room={room}
-        onStart={(gameId) =>
-          NEEDS_SETUP[gameId]
-            ? setSetupFor(gameId)
-            : send("game:start", { gameId })
-        }
+        onStart={(gameId) => setExplaining(gameId)}
         onAddBots={() => send("bots:add")}
         onClearBots={() => send("bots:clear")}
       />

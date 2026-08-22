@@ -57,6 +57,18 @@ export function BuzzHost({ room, state, send }: Props) {
         ) : (
           <div className="flex w-full flex-col items-center gap-[3vmin] px-[4vw] text-center">
             {/* The prompt — emoji get huge, clues stay readable */}
+            {/* What sort of thing it is — without this a country is a coin flip. */}
+            {item?.hint && (
+              <motion.p
+                key={`${item.prompt}-hint`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="font-display text-[clamp(0.8rem,1.6vw,1.8rem)] uppercase tracking-[0.35em] text-accent"
+              >
+                {item.hint}
+              </motion.p>
+            )}
+
             <motion.p
               key={item?.prompt}
               initial={{ opacity: 0, scale: 0.94 }}

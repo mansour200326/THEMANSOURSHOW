@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
   friendlyAiError,
+  generateEmojiRiddles,
   generateImpostorPlaces,
   generateSpectrums,
   generateStandingQuestions,
@@ -21,6 +22,7 @@ const RequestSchema = z.object({
     "impostor",
     "code-grid",
     "sketch-and-guess",
+    "emoji-riddles",
   ]),
   themes: z.array(z.string().max(80)).max(6).optional(),
   difficulty: z.enum(["easy", "medium", "hard"]).optional(),
@@ -76,6 +78,10 @@ export async function POST(request: Request) {
       case "sketch-and-guess":
         return NextResponse.json({
           words: await generateWordPack({ kind: "sketch", themes, count: 12 }),
+        });
+      case "emoji-riddles":
+        return NextResponse.json({
+          items: await generateEmojiRiddles({ themes, count: 18, difficulty }),
         });
     }
   } catch (error) {
