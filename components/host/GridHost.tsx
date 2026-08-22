@@ -33,7 +33,9 @@ export function GridHost({ room, state, onQuit }: Props) {
         <h2 className="brand-text t-hero font-display font-bold uppercase tracking-tight drop-shadow-[0_0_80px_rgba(255,107,87,0.45)]">
           {state.winner !== null ? state.teams[state.winner].name : "Nobody"}
         </h2>
-        <Grid state={state} reveal />
+        <div className="flex min-h-0 w-full flex-1 items-center justify-center">
+          <Grid state={state} reveal />
+        </div>
         <button onClick={onQuit} className="btn-brand px-10 py-4 text-lg">
           Back to the lobby
         </button>
@@ -98,7 +100,10 @@ function Tally({
 
 function Grid({ state, reveal }: { state: CodeGridState & ViewerExtras; reveal?: boolean }) {
   return (
-    <div className="grid w-full max-w-[92vw] grid-cols-5 gap-[0.8vmin]">
+    // Five fixed rows filling the height they're given, rather than tiles
+    // with a fixed aspect: five rows of 5:3 are 0.6x as tall as the grid is
+    // wide, which walks straight off the bottom of a 16:9 TV.
+    <div className="grid h-full w-full max-w-[92vw] grid-cols-5 grid-rows-5 gap-[0.8vmin]">
       {state.words.map((word, i) => {
         const shown = reveal || state.revealed.includes(i);
         const owner = state.key[i];
@@ -107,7 +112,7 @@ function Grid({ state, reveal }: { state: CodeGridState & ViewerExtras; reveal?:
             key={i}
             animate={{ scale: state.revealed.includes(i) ? 0.97 : 1 }}
             className={[
-              "flex aspect-[5/3] items-center justify-center rounded-xl border px-2 text-center font-display uppercase tracking-wide transition-colors",
+              "flex min-h-0 items-center justify-center rounded-xl border px-2 text-center font-display uppercase tracking-wide transition-colors",
               "text-[clamp(0.6rem,1.35vw,1.6rem)]",
               shown && owner !== "hidden"
                 ? FACE[owner]
