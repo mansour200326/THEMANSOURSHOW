@@ -8,7 +8,7 @@ export type Player = {
   id: string;
   name: string;
   emoji: string;
-  /** Score across the whole night, not just this game. */
+  /** Points in the game being played. Reset when a game starts or ends. */
   score: number;
   connected: boolean;
   joinedAt: number;

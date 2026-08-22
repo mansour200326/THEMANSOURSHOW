@@ -77,6 +77,14 @@ function publish(room: Room) {
 
 /* ----------------------------------------------------------------- actions */
 
+/**
+ * Scores are per game, not per night. Somebody who cleaned up at Big Board
+ * shouldn't walk into Sketch & Guess two thousand points ahead — every game
+ * is its own contest, and the phones show the score of the game being played.
+ */
+const clearScores = (players: Player[]): Player[] =>
+  players.map((p) => (p.score === 0 ? p : { ...p, score: 0 }));
+
 const nextAvatar = (room: Room) => {
   const taken = new Set(room.players.map((p) => p.emoji));
   return AVATARS.find((a) => !taken.has(a)) ?? AVATARS[room.players.length % AVATARS.length];
@@ -147,6 +155,8 @@ function reduceRoom(room: Room, action: Action): Room {
         ...room,
         gameId: id,
         game: null,
+        // Every game starts everyone level.
+        players: clearScores(room.players),
         pendingBoard: action.payload?.board,
         pendingItems: action.payload?.items,
         pendingPlaces: action.payload?.places,
@@ -160,7 +170,17 @@ function reduceRoom(room: Room, action: Action): Room {
     }
 
     case "game:end":
-      return { ...room, gameId: null, game: null };
+      /**
+       * Back to the lobby with a clean slate. The finished game's standings
+       * stay on screen right up until the host taps away from them, so this
+       * never wipes a result anybody is still reading.
+       */
+      return {
+        ...room,
+        gameId: null,
+        game: null,
+        players: clearScores(room.players),
+      };
 
     case "bots:add": {
       const already = room.players.filter((p) => p.bot).length;
