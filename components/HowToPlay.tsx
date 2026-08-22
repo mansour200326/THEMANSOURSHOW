@@ -9,6 +9,8 @@ type Props = {
   name: string;
   onStart: () => void;
   onBack: () => void;
+  /** Skip the bundled and AI content and write the whole thing yourself. */
+  onWriteOwn?: () => void;
   /** Label for the forward button when a setup step comes next. */
   startLabel?: string;
 };
@@ -25,6 +27,7 @@ export function HowToPlay({
   name,
   onStart,
   onBack,
+  onWriteOwn,
   startLabel = "Start the game",
 }: Props) {
   const rules = rulesFor(gameId);
@@ -105,6 +108,11 @@ export function HowToPlay({
           <button onClick={onStart} className="btn-brand px-12 py-5 text-xl">
             {startLabel}
           </button>
+          {onWriteOwn && (
+            <button onClick={onWriteOwn} className="btn-accent px-8 py-5">
+              ✎ Write my own
+            </button>
+          )}
           <button onClick={onBack} className="btn-ghost px-8 py-5">
             Pick another game
           </button>

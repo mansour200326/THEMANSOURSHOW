@@ -11,7 +11,7 @@ export type FeudConfig = {
   teamNames: string[];
   themes: string[];
   rounds: number;
-  source: "ai" | "sample";
+  source: "ai" | "sample" | "mine";
 };
 
 type Props = {
@@ -137,13 +137,22 @@ export function FeudSetup({
         >
           {generating ? "Writing the survey…" : "Build the survey"}
         </button>
-        <button
-          onClick={() => onStart(config("sample"))}
-          disabled={generating}
-          className="btn-ghost text-sm"
-        >
-          Skip it — play the sample pack
-        </button>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <button
+            onClick={() => onStart(config("mine"))}
+            disabled={generating}
+            className="btn-accent px-6 py-2.5 text-sm"
+          >
+            ✎ Write my own survey
+          </button>
+          <button
+            onClick={() => onStart(config("sample"))}
+            disabled={generating}
+            className="btn-ghost text-sm"
+          >
+            Skip it — play the sample pack
+          </button>
+        </div>
       </div>
     </main>
   );

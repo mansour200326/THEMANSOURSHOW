@@ -22,7 +22,7 @@ export type SetupConfig = {
   vibe: string;
   rules: Rules;
   difficulty: Difficulty;
-  source: "ai" | "sample";
+  source: "ai" | "sample" | "mine";
 };
 
 type Props = {
@@ -102,7 +102,7 @@ export function SetupScreen({
   const filled = usableThemes(categories);
   const canGenerate = filled.length >= MIN_CATEGORIES;
 
-  const start = (source: "ai" | "sample") =>
+  const start = (source: SetupConfig["source"]) =>
     onStart({
       teamNames: cleanTeamNames(names),
       categories: filled,
@@ -297,14 +297,25 @@ export function SetupScreen({
             Add at least {MIN_CATEGORIES} categories to build a board.
           </p>
         )}
-        <button
-          type="button"
-          onClick={() => start("sample")}
-          disabled={generating}
-          className="btn-ghost text-sm"
-        >
-          Skip it — play the sample board
-        </button>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          {/* Write the whole board yourself — categories and clues both. */}
+          <button
+            type="button"
+            onClick={() => start("mine")}
+            disabled={generating}
+            className="btn-accent px-6 py-2.5 text-sm"
+          >
+            ✎ Write my own board
+          </button>
+          <button
+            type="button"
+            onClick={() => start("sample")}
+            disabled={generating}
+            className="btn-ghost text-sm"
+          >
+            Skip it — play the sample board
+          </button>
+        </div>
       </div>
     </main>
   );

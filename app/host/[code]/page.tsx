@@ -10,6 +10,8 @@ import { LiveHost } from "@/components/host/LiveHost";
 import { SketchHost } from "@/components/host/SketchHost";
 import { GameSetup } from "@/components/host/GameSetup";
 import { HowToPlay } from "@/components/HowToPlay";
+import { PackWorkshop } from "@/components/packs/PackWorkshop";
+import { packToStartPayload } from "@/lib/packs/convert";
 import { Lobby } from "@/components/host/Lobby";
 import { RoundHost } from "@/components/host/RoundHost";
 import type { BuzzState } from "@/lib/games/buzzEngine";
@@ -37,6 +39,8 @@ export default function HostPage({
   // Every game explains itself first; some then ask what they're about.
   const [explaining, setExplaining] = useState<string | null>(null);
   const [setupFor, setSetupFor] = useState<string | null>(null);
+  /** Set while the host is writing their own content for a game. */
+  const [writingFor, setWritingFor] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [setupError, setSetupError] = useState<string | null>(null);
 
@@ -124,6 +128,24 @@ export default function HostPage({
     );
   }
 
+  if (writingFor) {
+    return (
+      <PackWorkshop
+        gameId={writingFor}
+        gameName={games[writingFor]?.name ?? "This game"}
+        onBack={() => setWritingFor(null)}
+        onPlay={(kind, data) => {
+          const gameId = writingFor;
+          setWritingFor(null);
+          send("game:start", {
+            gameId,
+            ...packToStartPayload(gameId, kind, data),
+          });
+        }}
+      />
+    );
+  }
+
   if (explaining) {
     const game = games[explaining];
     return (
@@ -132,6 +154,11 @@ export default function HostPage({
         name={game?.name ?? "Next up"}
         startLabel={NEEDS_SETUP[explaining] ? "Set it up" : "Start the game"}
         onBack={() => setExplaining(null)}
+        onWriteOwn={() => {
+          const id = explaining;
+          setExplaining(null);
+          setWritingFor(id);
+        }}
         onStart={() => {
           const id = explaining;
           setExplaining(null);
@@ -154,6 +181,11 @@ export default function HostPage({
           setSetupError(null);
         }}
         onStart={(config) => launch(setupFor, config)}
+        onWriteOwn={() => {
+          const id = setupFor;
+          setSetupFor(null);
+          setWritingFor(id);
+        }}
       />
     );
   }

@@ -6,6 +6,9 @@ import { FeudBoard } from "@/components/feud/FeudBoard";
 import { type FeudConfig, FeudSetup } from "@/components/feud/FeudSetup";
 import { GeneratingScreen } from "@/components/bigboard/GeneratingScreen";
 import { HowToPlay } from "@/components/HowToPlay";
+import { PackWorkshop } from "@/components/packs/PackWorkshop";
+import { packToSurvey } from "@/lib/packs/convert";
+import type { SurveyRound } from "@/lib/packs/types";
 import { ShowMark } from "@/components/ShowMark";
 import {
   emptyFeud,
@@ -31,6 +34,8 @@ function FaceOffStage() {
   const judging = useRef<AbortController | null>(null);
   /** The rules come first. Deliberately not part of game state. */
   const [explained, setExplained] = useState(false);
+  /** Set while the host is writing their own survey. */
+  const [writing, setWriting] = useState<FeudConfig | null>(null);
 
   useEffect(() => {
     try {
@@ -67,6 +72,10 @@ function FaceOffStage() {
 
   const start = async (config: FeudConfig) => {
     setError(null);
+    if (config.source === "mine") {
+      setWriting(config);
+      return;
+    }
     if (config.source === "sample") {
       begin(config, sampleFeudPack.slice(0, config.rounds));
       return;
@@ -102,6 +111,22 @@ function FaceOffStage() {
         onCancel={() => {
           abort.current?.abort();
           setGenerating(null);
+        }}
+      />
+    );
+  }
+
+  if (writing) {
+    return (
+      <PackWorkshop
+        gameId="face-off"
+        gameName="Face-Off"
+        onBack={() => setWriting(null)}
+        onPlay={(_kind, data) => {
+          const questions = packToSurvey(data as SurveyRound[]);
+          const config = writing;
+          setWriting(null);
+          begin(config, questions.slice(0, config.rounds));
         }}
       />
     );

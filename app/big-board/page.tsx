@@ -13,6 +13,7 @@ import { WinnerScreen } from "@/components/bigboard/WinnerScreen";
 import { HowToPlay } from "@/components/HowToPlay";
 import { useCue, useCueWhen } from "@/components/useCue";
 import { play } from "@/lib/sound";
+import { PackWorkshop } from "@/components/packs/PackWorkshop";
 import { ShowMark } from "@/components/ShowMark";
 import { clueAt } from "@/lib/board/types";
 import {
@@ -21,6 +22,8 @@ import {
   maxDailyWager,
   reducer,
 } from "@/lib/bigboard/engine";
+import { packToBoard } from "@/lib/packs/convert";
+import type { BoardCategory } from "@/lib/packs/types";
 import { sampleBoard, sampleFinalClue } from "@/lib/bigboard/sampleBoard";
 import { clearGame, loadGame, saveGame } from "@/lib/bigboard/storage";
 import type { GameState } from "@/lib/bigboard/types";
@@ -50,8 +53,20 @@ function BigBoardStage() {
   const [genError, setGenError] = useState<string | null>(null);
   const hydrated = useRef(false);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Hooks, so above every early return — the setup screen, the workshop and
+  // the board are all this one component.
+  useCue(
+    state.active ? `${state.active.c}:${state.active.r}` : null,
+    state.active ? "pop" : null,
+  );
+  useJudgementCue(state.spent.length, state.teams);
+  useCueWhen(state.phase === "winner", "fanfare");
+
   /** The rules come first. Deliberately not part of game state. */
   const [explained, setExplained] = useState(false);
+  /** Set while the host is writing their own board. */
+  const [writing, setWriting] = useState<SetupConfig | null>(null);
 
   // Look for a game left running on this screen. Offered, never forced.
   useEffect(() => {
@@ -102,6 +117,11 @@ function BigBoardStage() {
 
     if (config.source === "sample") {
       begin(config, sampleBoard, sampleFinalClue);
+      return;
+    }
+
+    if (config.source === "mine") {
+      setWriting(config);
       return;
     }
 
@@ -160,6 +180,23 @@ function BigBoardStage() {
     );
   }
 
+  if (writing) {
+    return (
+      <PackWorkshop
+        gameId="big-board"
+        gameName="Big Board"
+        onBack={() => setWriting(null)}
+        onPlay={(_kind, data) => {
+          const board = packToBoard(data as BoardCategory[]);
+          setWriting(null);
+          // A hand-written board has no final round unless one is written for
+          // it, so the bundled one stands in rather than the game ending early.
+          begin(writing, board, sampleFinalClue);
+        }}
+      />
+    );
+  }
+
   if (state.phase === "setup") {
     return (
       <SetupScreen
@@ -170,13 +207,6 @@ function BigBoardStage() {
       />
     );
   }
-
-  useCue(
-    state.active ? `${state.active.c}:${state.active.r}` : null,
-    state.active ? "pop" : null,
-  );
-  useJudgementCue(state.spent.length, state.teams);
-  useCueWhen(state.phase === "winner", "fanfare");
 
   const active = state.active ? clueAt(state.board, state.active) : null;
   const activeCategory = state.active

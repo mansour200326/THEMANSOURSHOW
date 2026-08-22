@@ -13,6 +13,8 @@ type Props = {
    */
   needsBoard?: boolean;
   onCancel: () => void;
+  /** Write the content by hand instead of generating it. */
+  onWriteOwn?: () => void;
   onStart: (config: { categories: string[]; difficulty: Difficulty }) => void;
   /** Set while the board is being written. */
   busy?: boolean;
@@ -29,6 +31,7 @@ export function GameSetup({
   gameName,
   needsBoard = false,
   onCancel,
+  onWriteOwn,
   onStart,
   busy,
   error,
@@ -136,6 +139,15 @@ export function GameSetup({
           >
             {needsBoard ? "Skip — use the sample board" : "Skip — use the built-in pack"}
           </button>
+          {onWriteOwn && (
+            <button
+              onClick={onWriteOwn}
+              disabled={busy}
+              className="btn-ghost text-sm"
+            >
+              ✎ Write my own
+            </button>
+          )}
           <button onClick={onCancel} disabled={busy} className="btn-ghost text-sm">
             Back
           </button>

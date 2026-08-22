@@ -92,6 +92,38 @@ the payload is one devtools tab away.
 is written to the wire. The TV is a viewer too, and the strictest one: it's the
 screen everybody can see, so it gets less than the phones do.
 
+## Writing your own content
+
+Every game can be played three ways: the bundled pack, something the AI writes,
+or your own questions. The third one is `✎ Write my own`, on the rules screen
+and again on the setup screen.
+
+Packs are saved in the host's browser under a name and offered back next time,
+which is the point — a set written for someone's birthday should still be there
+next month. There are no accounts and rooms are already ephemeral, so
+localStorage is the honest place for them. Export and import move them between
+devices, and are how two people write a quiz between them.
+
+Sixteen games take nine content shapes, and those need three editors: a board
+(categories × five clues, edited a column at a time), a survey (answers with
+points that should total 100), and one generic row editor for the other seven.
+
+Half-finished rows are dropped rather than refused. Someone writing a quiz with
+the room already arriving will leave a box empty, and losing the pack over it
+would be the wrong trade — a five-clue category with four clues is a four-clue
+category.
+
+```bash
+npx tsx lib/packs/convert.test.mts
+```
+
+## Sound
+
+Ten cues, synthesised with the Web Audio API rather than loaded from files:
+nothing to download so a buzzer never arrives late, nothing to license, nothing
+to keep in sync. Meaning lives in the pitch direction — up is good, down is bad,
+flat and harsh is the buzzer. Mute is in the lobby and on the landing page.
+
 ## Colour
 
 "Midnight & Coral", defined once in `tailwind.config.ts` and `app/globals.css`.

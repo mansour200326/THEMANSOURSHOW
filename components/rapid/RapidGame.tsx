@@ -7,6 +7,8 @@ import { DifficultyBar } from "@/components/DifficultyBar";
 import { GeneratingScreen } from "@/components/bigboard/GeneratingScreen";
 import { RapidStage } from "@/components/rapid/RapidStage";
 import { HowToPlay } from "@/components/HowToPlay";
+import { PackWorkshop } from "@/components/packs/PackWorkshop";
+import { packToPrompts } from "@/lib/packs/convert";
 import { Tally } from "@/components/Tally";
 import { ShowMark } from "@/components/ShowMark";
 import { TeamsField, cleanTeamNames, startingTeams } from "@/components/setup/TeamsField";
@@ -36,6 +38,8 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
   const abort = useRef<AbortController | null>(null);
   /** The rules come first. Deliberately not part of game state. */
   const [explained, setExplained] = useState(false);
+  /** Set while the host is writing their own prompts. */
+  const [writing, setWriting] = useState(false);
 
   const KEY = `bignight:rapid:${mode}:v1`;
 
@@ -122,6 +126,20 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
   }
 
   /* ------------------------------------------------------------- setup */
+  if (writing) {
+    return (
+      <PackWorkshop
+        gameId={mode}
+        gameName={RAPID_TITLE[mode]}
+        onBack={() => setWriting(false)}
+        onPlay={(_kind, data) => {
+          setWriting(false);
+          begin(packToPrompts(data as string[]));
+        }}
+      />
+    );
+  }
+
   if (state.phase === "setup" && !explained) {
     return (
       <HowToPlay
@@ -241,9 +259,17 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
           <button onClick={() => start(true)} className="btn-brand px-16 py-5 text-2xl">
             Write the prompts
           </button>
-          <button onClick={() => start(false)} className="btn-ghost text-sm">
-            Skip — use the built-in prompts
-          </button>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <button
+              onClick={() => setWriting(true)}
+              className="btn-accent px-6 py-2.5 text-sm"
+            >
+              ✎ Write my own prompts
+            </button>
+            <button onClick={() => start(false)} className="btn-ghost text-sm">
+              Skip — use the built-in prompts
+            </button>
+          </div>
         </div>
       </main>
     );

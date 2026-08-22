@@ -128,7 +128,11 @@ export function createRoundGame(
     needsPhones: true,
 
     init(room) {
-      const prompts = shuffle(pack).slice(0, spec.rounds);
+      // A pack the host wrote overrides the bundled one.
+      const supplied = (room as unknown as { pendingPrompts?: Prompt[] })
+        .pendingPrompts;
+      const source = supplied?.length ? supplied : pack;
+      const prompts = shuffle(source).slice(0, spec.rounds);
       const fresh: RoundState = {
         kind: "round",
         phase: startPhase,

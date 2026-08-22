@@ -150,6 +150,7 @@ function reduceRoom(room: Room, action: Action): Room {
         "pendingItems",
         "pendingPlaces",
         "pendingWords",
+        "pendingPrompts",
       ] as const;
       const primed = {
         ...room,
@@ -161,6 +162,7 @@ function reduceRoom(room: Room, action: Action): Room {
         pendingItems: action.payload?.items,
         pendingPlaces: action.payload?.places,
         pendingWords: action.payload?.words,
+        pendingPrompts: action.payload?.prompts,
       };
       const started = game.init(primed as typeof room);
       PENDING.forEach((key) => {

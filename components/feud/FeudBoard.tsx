@@ -38,15 +38,6 @@ export function FeudBoard({
     box.current?.focus();
   }, [state.lastGuess?.at, state.round, state.phase]);
 
-  if (!question) return null;
-
-  const submit = () => {
-    const text = draft.trim();
-    if (text && !checking) onGuess(text);
-  };
-
-  const feedback = state.lastGuess;
-
   // A tile turning over, a strike, and the moment the board changes hands.
   useCue(
     state.lastGuess?.at,
@@ -60,6 +51,16 @@ export function FeudBoard({
   );
   useCue(state.handoverAt, state.handoverAt ? "whoosh" : null);
   useCueWhen(state.phase === "round-end", "correct");
+
+  if (!question) return null;
+
+  const submit = () => {
+    const text = draft.trim();
+    if (text && !checking) onGuess(text);
+  };
+
+  const feedback = state.lastGuess;
+
   const over = state.phase === "round-end";
   const lastRound = state.round + 1 >= state.questions.length;
 
