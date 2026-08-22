@@ -21,28 +21,21 @@ const TV_ONLY = [
     id: "big-board",
     name: "Big Board",
     href: "/big-board",
-    blurb:
-      "The classic board. Teams pick a tile, answer out loud, and you keep score.",
   },
   {
     id: "face-off",
     name: "Face-Off",
     href: "/face-off",
-    blurb:
-      "We surveyed 100 people. Guess the top answers before three strikes.",
   },
   {
     id: "categories",
     name: "Categories",
     href: "/categories",
-    blurb:
-      "Thirty seconds to name as many as you can. Two teams, one clock.",
   },
   {
     id: "three-in-five",
     name: "Three in Five",
     href: "/three-in-five",
-    blurb: "Name three things in five seconds. Much harder than it sounds.",
   },
 ];
 
@@ -144,7 +137,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
         * Two across on a phone with a height that fits the text, so you scroll
         * through them. From lg the rows are fixed and the whole lineup fits.
         */}
-      <section className="grid grid-cols-2 gap-2.5 auto-rows-[minmax(9.5rem,auto)] sm:grid-cols-3 lg:min-h-0 lg:flex-1 lg:auto-rows-auto lg:grid-cols-4 lg:grid-rows-4 lg:gap-[0.9vmin] xl:grid-cols-6 xl:grid-rows-3">
+      <section className="grid grid-cols-2 gap-2.5 auto-rows-[minmax(6.5rem,auto)] sm:grid-cols-3 lg:min-h-0 lg:flex-1 lg:auto-rows-auto lg:grid-cols-4 lg:grid-rows-4 lg:gap-[0.9vmin] xl:grid-cols-6 xl:grid-rows-3">
         {TV_ONLY.map((game) => (
           <Link
             key={game.id}
@@ -152,7 +145,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
             /* Each card is lit by its own game's colour, so the grid reads as a lineup. */
             className={`group block min-h-0 ${familyClass(game.id)}`}
           >
-            <Card name={game.name} blurb={game.blurb} status="No phones needed" ready />
+            <Card name={game.name} status="No phones needed" ready />
           </Link>
         ))}
 
@@ -170,7 +163,6 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
             >
               <Card
                 name={game.name}
-                blurb={game.blurb}
                 ready={ready}
                 status={
                   ready
@@ -190,19 +182,17 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
 
 function Card({
   name,
-  blurb,
   status,
   ready,
 }: {
   name: string;
-  blurb: string;
   status: string;
   ready: boolean;
 }) {
   return (
     <div
       className={[
-        "relative flex h-full flex-col overflow-hidden rounded-2xl border p-3 transition-all duration-200 lg:p-[1.2vmin]",
+        "relative flex h-full flex-col overflow-hidden rounded-2xl border p-3 text-center transition-all duration-200 lg:p-[1.2vmin]",
         ready
           ? "border-accent/40 bg-gradient-to-b from-accent/[0.14] to-transparent group-hover:-translate-y-1 group-hover:border-accent group-hover:shadow-glow"
           : "border-white/10 bg-white/[0.02] opacity-45",
@@ -212,18 +202,27 @@ function Card({
       {ready && (
         <span className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-accent to-transparent" />
       )}
-      <div className="flex min-h-0 flex-1 flex-col justify-center">
-        <h3 className="font-display text-sm uppercase leading-tight tracking-wide text-moon lg:text-[clamp(0.8rem,1.15vw,1.4rem)]">
+
+      {/*
+       * Just the name, sitting in the middle in the same colour as the border
+       * around it. The blurb that used to live under here said the same thing
+       * as the rules screen you get on the way in, only shorter and worse.
+       */}
+      <div className="flex min-h-0 flex-1 items-center justify-center px-1">
+        <h3
+          className={[
+            "text-balance font-display text-base uppercase leading-tight tracking-wide lg:text-[clamp(0.9rem,1.45vw,1.8rem)]",
+            ready ? "text-accent" : "text-moon-dim",
+          ].join(" ")}
+        >
           {name}
         </h3>
-        <p className="mt-1.5 text-balance text-xs leading-snug text-moon-dim lg:mt-1 lg:text-[clamp(0.62rem,0.75vw,0.9rem)]">
-          {blurb}
-        </p>
       </div>
+
       <span
         className={[
           "mt-2 block font-display text-[0.62rem] uppercase tracking-[0.18em]",
-          ready ? "text-accent" : "text-moon-deep",
+          ready ? "text-accent/60" : "text-moon-deep",
         ].join(" ")}
       >
         {status}

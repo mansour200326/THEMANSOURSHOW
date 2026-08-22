@@ -107,8 +107,6 @@ export function createSketchGame(pool: string[]): GameModule {
   return {
     id: "sketch-and-guess",
     name: "Sketch & Guess",
-    blurb:
-      "Draw it on your phone while it appears on the TV. Everyone else races to type what it is.",
     minPlayers: 2,
     needsPhones: true,
 

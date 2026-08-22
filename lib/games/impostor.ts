@@ -147,8 +147,6 @@ export function createImpostorGame(pack: ImpostorPlace[]): GameModule {
   return {
     id: "impostor",
     name: "Impostor",
-    blurb:
-      "Everyone knows where they are except one of you. Ask questions, spot the faker, don't get caught.",
     minPlayers: 3,
     needsPhones: true,
 

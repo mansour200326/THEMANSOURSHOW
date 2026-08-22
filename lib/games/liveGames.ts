@@ -66,8 +66,6 @@ export const lastOneStanding = createLiveGame(
   {
     id: "last-one-standing",
     name: "Last One Standing",
-    blurb:
-      "Everyone answers at once. Get it wrong and you're on the bench until one player is left.",
     minPlayers: 2,
     variant: "standing",
     rounds: 12,
@@ -79,8 +77,6 @@ export const timeline = createLiveGame(
   {
     id: "timeline",
     name: "Timeline",
-    blurb:
-      "Five things, one right order. Put them in sequence on your phone before the reveal.",
     minPlayers: 1,
     variant: "timeline",
     rounds: 6,
@@ -92,8 +88,6 @@ export const dialItIn = createLiveGame(
   {
     id: "dial-it-in",
     name: "Dial It In",
-    blurb:
-      "One player sees a hidden point on a spectrum and gives one word. Everyone else dials it in.",
     minPlayers: 2,
     variant: "dial",
     rounds: 8,

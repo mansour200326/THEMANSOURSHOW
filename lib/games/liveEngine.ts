@@ -110,7 +110,6 @@ export function dialScore(guess: number, target: number): number {
 export type LiveSpec = {
   id: string;
   name: string;
-  blurb: string;
   minPlayers: number;
   variant: LiveVariant;
   /** How many items to play. Trimmed to the size of the pack. */
@@ -215,7 +214,6 @@ export function createLiveGame(spec: LiveSpec, pack: LiveItem[]): GameModule {
   return {
     id: spec.id,
     name: spec.name,
-    blurb: spec.blurb,
     minPlayers: spec.minPlayers,
     needsPhones: true,
 

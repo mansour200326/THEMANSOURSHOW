@@ -113,8 +113,6 @@ export function createCodeGrid(wordPool: string[]): GameModule {
   return {
     id: "code-grid",
     name: "Code Grid",
-    blurb:
-      "Twenty-five words, two teams. One player per side sees which are theirs and gets one word to say.",
     minPlayers: 4,
     needsPhones: true,
 
