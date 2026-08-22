@@ -23,10 +23,12 @@ const LABELS = ["100", "200", "300", "400", "500", "?", "✗", "✓", "200", "40
 /** Deterministic layout — random here would desync server and client render. */
 const TILES: Tile[] = LABELS.map((label, i) => {
   const angle = (i / LABELS.length) * Math.PI * 2;
-  const radius = 30 + (i % 3) * 9;
+  const radius = 34 + (i % 3) * 11;
   return {
-    x: Math.cos(angle) * radius,
-    y: Math.sin(angle) * (radius * 0.42) - 4,
+    // Spread wider than tall, and kept clear of the middle, because the middle
+    // is where the wordmark and the two buttons live.
+    x: Math.cos(angle) * radius * 1.3,
+    y: Math.sin(angle) * (radius * 0.52) - 4,
     z: -180 + (i % 4) * 110,
     label,
     delay: i * 0.09,
@@ -34,7 +36,14 @@ const TILES: Tile[] = LABELS.map((label, i) => {
   };
 });
 
-export function HeroStage({ children }: { children: React.ReactNode }) {
+export function HeroStage({
+  children,
+  footnote,
+}: {
+  children: React.ReactNode;
+  /** The small print, pinned to the bottom and out of the tiles' way. */
+  footnote?: string;
+}) {
   const [ready, setReady] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
 
@@ -132,6 +141,20 @@ export function HeroStage({ children }: { children: React.ReactNode }) {
         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
       />
 
+      {/*
+        * The tiles drift right across the middle of the stage, which is also
+        * where the wordmark is. This pool of dark sits between the two so the
+        * logo always reads, however the tiles happen to be floating.
+        */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-[5]"
+        style={{
+          background:
+            "radial-gradient(46vmax 32vmax at 50% 46%, rgba(11,19,48,0.86) 0%, rgba(11,19,48,0.62) 45%, transparent 78%)",
+        }}
+      />
+
       {/* Content rides slightly in front of the tiles */}
       <motion.div
         className="relative z-10 flex w-full flex-col items-center px-6"
@@ -141,6 +164,17 @@ export function HeroStage({ children }: { children: React.ReactNode }) {
       >
         {children}
       </motion.div>
+
+      {footnote && (
+        <motion.p
+          className="absolute inset-x-0 bottom-0 z-10 px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-center font-display text-[0.6rem] uppercase leading-relaxed tracking-[0.18em] text-moon-deep sm:text-xs sm:tracking-[0.2em]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.9, delay: 1.35 }}
+        >
+          {footnote}
+        </motion.p>
+      )}
     </div>
   );
 }

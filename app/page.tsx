@@ -23,15 +23,16 @@ export default function Home() {
 
   return (
     <main>
-      <HeroStage>
+      {/*
+       * The middle of the stage is the wordmark and two buttons, nothing else.
+       * The explanation used to sit between them, where the floating tiles ran
+       * straight through it — it's a footnote now, out of the way at the
+       * bottom, which is where anyone who wants it will look.
+       */}
+      <HeroStage footnote="Sixteen games · the TV is the stage, your phone is the controller · no downloads, no accounts">
         <ShowMark />
 
-        <p className="mt-8 max-w-2xl text-balance text-center text-lg text-moon-dim sm:text-xl">
-          Ten party games on one screen. The TV is the stage, your phone is the
-          controller — no downloads, no accounts.
-        </p>
-
-        <div className="mt-12 flex w-full flex-col items-stretch gap-4 sm:w-auto sm:flex-row">
+        <div className="mt-10 flex w-full flex-col items-stretch gap-4 sm:mt-12 sm:w-auto sm:flex-row">
           <button
             type="button"
             onClick={hostGame}
@@ -45,9 +46,6 @@ export default function Home() {
           </Link>
         </div>
 
-        <p className="mt-8 text-center font-display text-xs uppercase tracking-[0.2em] text-moon-deep/70">
-          Every game lives inside Host — phones optional
-        </p>
       </HeroStage>
     </main>
   );

@@ -108,6 +108,21 @@
     color: transparent;
   }
 
+  /* A band of light for the wordmark to pass under, once, on arrival. */
+  .brand-shine {
+    background: linear-gradient(
+      100deg,
+      transparent 38%,
+      rgba(255, 255, 255, 0.9) 50%,
+      transparent 62%
+    );
+    background-size: 250% 100%;
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
   /* Brand only — the logo and the moment somebody wins. */
   .brand-text {
     background: linear-gradient(180deg, #ff8d7c 0%, #ff6b57 50%, #de4b37 100%);
