@@ -73,12 +73,28 @@ export function HowToPlay({
           </ol>
         )}
 
+        {rules?.example && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.42 }}
+            className="mt-[3vh] rounded-2xl border border-accent/30 bg-accent/[0.07] p-5"
+          >
+            <p className="t-label font-display uppercase text-accent">
+              For example
+            </p>
+            <p className="mt-1.5 text-[clamp(0.9rem,1.5vw,1.35rem)] leading-snug text-moon/90">
+              {rules.example}
+            </p>
+          </motion.div>
+        )}
+
         {rules && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.45 }}
-            className="mt-[4vh] grid gap-3 sm:grid-cols-2"
+            className="mt-[3vh] grid gap-3 sm:grid-cols-2"
           >
             <Note label="Scoring" text={rules.scoring} />
             <Note label="You need" text={rules.needs} />

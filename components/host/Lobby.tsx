@@ -54,30 +54,39 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
   const bots = live.filter((p) => p.bot);
 
   return (
-    <main className="flex h-dvh flex-col gap-[1.4vmin] overflow-hidden p-[1.8vmin]">
+    /*
+     * Two shapes, one screen. On a TV everything has to fit at once, because
+     * nobody scrolls a television from the sofa. On a phone that same layout
+     * crushes sixteen cards into a fixed height, so below lg it becomes an
+     * ordinary scrolling page with cards big enough to read.
+     */
+    <main className="flex min-h-dvh flex-col gap-3 p-3 lg:h-dvh lg:gap-[1.4vmin] lg:overflow-hidden lg:p-[1.8vmin]">
       {/* One compact band: brand, join details, who's here. */}
-      <header className="flex h-[15vmin] min-h-[104px] shrink-0 items-stretch gap-[1.4vmin]">
-        <div className="flex items-center gap-5 rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-[1.4vmin]">
+      <header className="flex shrink-0 flex-col items-stretch gap-3 lg:h-[15vmin] lg:min-h-[104px] lg:flex-row lg:gap-[1.4vmin]">
+        <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-3 lg:gap-5 lg:px-6 lg:py-[1.4vmin]">
           <ShowMark size="sm" />
           <div className="border-l border-white/10 pl-5">
             <p className="t-label font-display uppercase text-moon-deep">
               Room code
             </p>
-            <p className="accent-text font-display text-[clamp(2rem,4.2vw,4.5rem)] font-bold leading-none tracking-[0.1em]">
+            <p className="accent-text font-display text-[clamp(1.75rem,4.2vw,4.5rem)] font-bold leading-none tracking-[0.1em]">
               {room.code}
             </p>
+            <p className="mt-1 break-all text-[0.65rem] leading-tight text-moon-deep sm:hidden">
+              {joinUrl || "…"}
+            </p>
           </div>
-          <div className="max-w-[22ch] border-l border-white/10 pl-5">
+          <div className="hidden max-w-[22ch] border-l border-white/10 pl-5 sm:block">
             <p className="t-label font-display uppercase text-moon-deep">
               Phones join at
             </p>
-            <p className="break-all text-[clamp(0.7rem,0.95vw,1rem)] leading-tight text-moon/75">
+            <p className="break-all text-[clamp(0.65rem,0.95vw,1rem)] leading-tight text-moon/75">
               {joinUrl || "…"}
             </p>
           </div>
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-col rounded-2xl border border-white/10 bg-white/[0.02] px-5 py-[1vmin]">
+        <div className="flex min-w-0 flex-1 flex-col rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-2.5 lg:px-5 lg:py-[1vmin]">
           <div className="flex shrink-0 items-center justify-between gap-4">
             <span className="t-label font-display uppercase text-moon-deep">
               In the room · {live.length}
@@ -131,9 +140,11 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
         </div>
       </header>
 
-      {/* The games get the room */}
-      {/* Sixteen games have to fit on one screen without scrolling. */}
-      <section className="grid min-h-0 flex-1 grid-cols-2 grid-rows-8 gap-[0.9vmin] sm:grid-cols-3 sm:grid-rows-6 lg:grid-cols-4 lg:grid-rows-4 xl:grid-cols-6 xl:grid-rows-3">
+      {/*
+        * Two across on a phone with a height that fits the text, so you scroll
+        * through them. From lg the rows are fixed and the whole lineup fits.
+        */}
+      <section className="grid grid-cols-2 gap-2.5 auto-rows-[minmax(9.5rem,auto)] sm:grid-cols-3 lg:min-h-0 lg:flex-1 lg:auto-rows-auto lg:grid-cols-4 lg:grid-rows-4 lg:gap-[0.9vmin] xl:grid-cols-6 xl:grid-rows-3">
         {TV_ONLY.map((game) => (
           <Link
             key={game.id}
@@ -191,7 +202,7 @@ function Card({
   return (
     <div
       className={[
-        "relative flex h-full flex-col overflow-hidden rounded-2xl border p-[1.2vmin] transition-all duration-200",
+        "relative flex h-full flex-col overflow-hidden rounded-2xl border p-3 transition-all duration-200 lg:p-[1.2vmin]",
         ready
           ? "border-accent/40 bg-gradient-to-b from-accent/[0.14] to-transparent group-hover:-translate-y-1 group-hover:border-accent group-hover:shadow-glow"
           : "border-white/10 bg-white/[0.02] opacity-45",
@@ -202,10 +213,10 @@ function Card({
         <span className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-accent to-transparent" />
       )}
       <div className="flex min-h-0 flex-1 flex-col justify-center">
-        <h3 className="font-display text-[clamp(0.8rem,1.15vw,1.4rem)] uppercase leading-tight tracking-wide text-moon">
+        <h3 className="font-display text-sm uppercase leading-tight tracking-wide text-moon lg:text-[clamp(0.8rem,1.15vw,1.4rem)]">
           {name}
         </h3>
-        <p className="mt-1 text-balance text-[clamp(0.62rem,0.75vw,0.9rem)] leading-snug text-moon-dim">
+        <p className="mt-1.5 text-balance text-xs leading-snug text-moon-dim lg:mt-1 lg:text-[clamp(0.62rem,0.75vw,0.9rem)]">
           {blurb}
         </p>
       </div>

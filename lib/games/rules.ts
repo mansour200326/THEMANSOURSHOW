@@ -16,6 +16,12 @@ export type GameRules = {
   scoring: string;
   /** What the room needs before it starts. */
   needs: string;
+  /**
+   * A worked example. Only for the games where the rules alone don't land —
+   * Code Grid is three sentences that mean nothing until you see one clue
+   * play out.
+   */
+  example?: string;
 };
 
 export const RULES: Record<string, GameRules> = {
@@ -156,6 +162,8 @@ export const RULES: Record<string, GameRules> = {
     scoring:
       "The closer you land the more you get, and the clue-giver scores the room's average — so a bad clue costs them too.",
     needs: "Two phones or more.",
+    example:
+      "The scale is “Overrated → Underrated” and the hidden point is near the underrated end. You say “Pineapple on pizza”. Everyone slides their dial to where they think you meant.",
   },
   impostor: {
     summary: "Everyone knows where they are except one of you.",
@@ -167,17 +175,23 @@ export const RULES: Record<string, GameRules> = {
     scoring:
       "Everyone who pointed at the right person scores. The impostor scores double for surviving, or for naming the place before you catch them.",
     needs: "Three phones or more.",
+    example:
+      "The place is a wedding. Ask “how did you get here?” — everyone can answer that, so it tells you nothing. Ask “what are you wearing?” and the impostor has to guess.",
   },
   "code-grid": {
-    summary: "Twenty-five words. One person per team knows which are yours.",
+    summary:
+      "Twenty-five words on the TV. Nine belong to your team — only one of you knows which.",
     how: [
-      "Two teams. Each side's clue-giver sees a key card on their phone.",
-      "They say one word and a number, and nothing else.",
-      "Their team taps the words they think are theirs.",
+      "Split into two teams. One person per team is the clue-giver, and their phone shows which words are whose.",
+      "The clue-giver says ONE word and a number. Nothing else — no gestures, no hints.",
+      "The number is how many of your words that one clue covers. Their team taps the words they think it means.",
+      "Tap one of yours and you carry on. Tap anything else and your turn ends.",
     ],
     scoring:
-      "First team to find all their words wins. Touch the assassin and you lose on the spot.",
-    needs: "Four phones or more.",
+      "First team to find all nine of theirs wins. One word on the board is the assassin — tap it and you lose instantly.",
+    needs: "Four phones or more, so each team has a clue-giver and at least one guesser.",
+    example:
+      "Your words include APPLE and TREE, so you say “Orchard, 2”. Your team taps APPLE — right, keep going — then taps TREE. Both yours, turn continues. Say “Orchard, 2” badly and they might tap PALM instead, which is the other team's, and you've just helped them.",
   },
   "sketch-and-guess": {
     summary: "Draw on your phone, live on the TV.",

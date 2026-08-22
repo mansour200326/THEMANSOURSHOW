@@ -1,7 +1,7 @@
 export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
   if (size === "sm") {
     return (
-      <span className="brand-text font-display text-lg uppercase tracking-[0.24em]">
+      <span className="brand-text whitespace-nowrap font-display text-base uppercase tracking-[0.2em] sm:text-lg sm:tracking-[0.24em]">
         Big Night
       </span>
     );
