@@ -239,11 +239,12 @@ Rules:
 - Keep it clean enough for a living room with everyone's friends in it.`;
 
 export async function generateFeudPack({
-  theme,
+  themes,
   rounds,
   difficulty = "medium",
 }: {
-  theme: string;
+  /** Spread the rounds across these. Empty means anything goes. */
+  themes: string[];
   rounds: number;
   difficulty?: Difficulty;
 }): Promise<FeudQuestion[]> {
@@ -262,7 +263,11 @@ export async function generateFeudPack({
       {
         role: "user",
         content: `Write ${rounds} survey rounds${
-          theme.trim() ? ` about: ${theme.trim()}` : ""
+          themes.length
+            ? `, spread across these themes so each one gets a turn:\n${themes
+                .map((t) => `- ${t}`)
+                .join("\n")}`
+            : ""
         }.`,
       },
     ],
@@ -467,12 +472,13 @@ const GeneratedPrompts = z.object({
 export async function generateRapidPrompts({
   mode,
   count,
-  theme = "",
+  themes = [],
   difficulty = "medium",
 }: {
   mode: "categories" | "three-in-five";
   count: number;
-  theme?: string;
+  /** Spread the prompts across these. Empty means anything goes. */
+  themes?: string[];
   difficulty?: Difficulty;
 }): Promise<string[]> {
   const client = new Anthropic();
@@ -503,7 +509,11 @@ export async function generateRapidPrompts({
       {
         role: "user",
         content: `Write exactly ${count} prompts${
-          theme.trim() ? ` themed around: ${theme.trim()}` : ""
+          themes.length
+            ? `, spread evenly across these themes:\n${themes
+                .map((t) => `- ${t}`)
+                .join("\n")}`
+            : ""
         }.`,
       },
     ],

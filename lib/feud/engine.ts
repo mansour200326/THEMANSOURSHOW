@@ -5,6 +5,7 @@ import {
   STRIKES_ALLOWED,
   allRevealed,
   currentQuestion,
+  nextInLine,
   otherTeam,
 } from "@/lib/feud/types";
 
@@ -22,7 +23,7 @@ export const emptyFeud = (): FeudState => ({
   revealed: [],
   outcome: null,
   contributions: [],
-  strikeouts: 0,
+  struckOut: [],
   handoverAt: null,
   lastGuess: null,
   past: [],
@@ -150,20 +151,16 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
       };
       if (strikes < STRIKES_ALLOWED) return next;
 
-      // First strikeout hands the board to the other team, who carry on with
-      // the pot already on it and a clean set of strikes.
-      if (next.strikeouts === 0) {
-        return {
-          ...next,
-          control: otherTeam(next),
-          strikes: 0,
-          strikeouts: 1,
-          handoverAt: Date.now(),
-        };
+      // A strikeout passes the board round the table. Whoever picks it up
+      // carries on against the same answers with a clean set of strikes.
+      const out = { ...next, struckOut: [...next.struckOut, next.control] };
+      const heir = nextInLine(out);
+      if (heir !== undefined) {
+        return { ...out, control: heir, strikes: 0, handoverAt: Date.now() };
       }
 
-      // Both teams out. Everyone keeps what they opened; show the rest.
-      return endRound(next, "both-out");
+      // Nobody left to try. Everyone keeps what they opened; show the rest.
+      return endRound(out, "all-out");
     }
 
     case "NEXT_ROUND": {
@@ -183,7 +180,7 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
         outcome: null,
         lastGuess: null,
         contributions: state.teams.map(() => 0),
-        strikeouts: 0,
+        struckOut: [],
         handoverAt: null,
         // Loser of the last round starts the next one.
         control: otherTeam(state),

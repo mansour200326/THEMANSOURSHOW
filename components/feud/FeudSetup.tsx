@@ -4,10 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ShowMark } from "@/components/ShowMark";
+import { TeamsField, cleanTeamNames, startingTeams } from "@/components/setup/TeamsField";
+import { ThemeList, usableThemes } from "@/components/setup/ThemeList";
 
 export type FeudConfig = {
   teamNames: string[];
-  theme: string;
+  themes: string[];
   rounds: number;
   source: "ai" | "sample";
 };
@@ -29,9 +31,16 @@ export function FeudSetup({
   canResume,
   onResume,
 }: Props) {
-  const [names, setNames] = useState(["Team 1", "Team 2"]);
-  const [theme, setTheme] = useState("");
+  const [names, setNames] = useState(startingTeams);
+  const [themes, setThemes] = useState<string[]>([""]);
   const [rounds, setRounds] = useState(5);
+
+  const config = (source: FeudConfig["source"]): FeudConfig => ({
+    teamNames: cleanTeamNames(names),
+    themes: usableThemes(themes),
+    rounds,
+    source,
+  });
 
   return (
     <main className="mx-auto min-h-dvh w-full max-w-3xl px-6 py-10">
@@ -55,8 +64,8 @@ export function FeudSetup({
           Face-Off
         </h1>
         <p className="mt-3 text-moon-dim">
-          Two teams, one survey board, three strikes. No phones — you run it from
-          here and everyone shouts.
+          Two to six teams, one survey board, three strikes each. No phones —
+          you run it from here and everyone shouts.
         </p>
       </div>
 
@@ -74,47 +83,14 @@ export function FeudSetup({
       )}
 
       <section className="mt-10 space-y-8">
-        <div>
-          <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
-            Teams
-          </h2>
-          <div className="mt-4 space-y-3">
-            {names.map((name, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <span className="w-6 shrink-0 text-center font-display text-lg tabular-nums text-moon-deep/70">
-                  {i + 1}
-                </span>
-                <input
-                  value={name}
-                  onChange={(e) =>
-                    setNames((n) =>
-                      n.map((v, idx) => (idx === i ? e.target.value : v)),
-                    )
-                  }
-                  maxLength={22}
-                  className="field"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
+        <TeamsField names={names} onChange={setNames} />
 
-        <div>
-          <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
-            Survey theme
-          </h2>
-          <p className="mt-1 text-sm text-moon-deep">
-            What the questions should be about. We write the survey and rank the
-            answers.
-          </p>
-          <input
-            value={theme}
-            onChange={(e) => setTheme(e.target.value)}
-            placeholder="everyday life · your friends · football · weddings · road trips"
-            maxLength={200}
-            className="field mt-4"
-          />
-        </div>
+        <ThemeList
+          title="Survey themes"
+          hint="What the questions should be about. Add a few and the rounds spread across them — we write the survey and rank the answers."
+          themes={themes}
+          onChange={setThemes}
+        />
 
         <div>
           <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
@@ -155,16 +131,14 @@ export function FeudSetup({
 
       <div className="mt-10 flex flex-col items-center gap-3 pb-6">
         <button
-          onClick={() => onStart({ teamNames: names, theme, rounds, source: "ai" })}
+          onClick={() => onStart(config("ai"))}
           disabled={generating}
           className="btn-brand px-16 py-5 text-2xl"
         >
           {generating ? "Writing the survey…" : "Build the survey"}
         </button>
         <button
-          onClick={() =>
-            onStart({ teamNames: names, theme, rounds, source: "sample" })
-          }
+          onClick={() => onStart(config("sample"))}
           disabled={generating}
           className="btn-ghost text-sm"
         >

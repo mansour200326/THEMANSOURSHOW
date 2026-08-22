@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export const maxDuration = 300;
 
 const RequestSchema = z.object({
-  theme: z.string().max(200).optional(),
+  themes: z.array(z.string().max(80)).max(6).optional(),
   rounds: z.number().int().min(1).max(8).optional(),
 });
 
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
   try {
     const questions = await generateFeudPack({
-      theme: parsed.data.theme ?? "",
+      themes: parsed.data.themes ?? [],
       rounds: parsed.data.rounds ?? 5,
     });
     return NextResponse.json({ questions });

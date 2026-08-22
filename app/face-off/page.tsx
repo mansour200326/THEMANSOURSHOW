@@ -57,7 +57,7 @@ function FaceOffStage() {
     dispatch({
       type: "START",
       teamNames: config.teamNames,
-      theme: config.theme,
+      theme: config.themes.join(" · "),
       questions,
     });
   };
@@ -76,7 +76,7 @@ function FaceOffStage() {
       const res = await fetch("/api/feud", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ theme: config.theme, rounds: config.rounds }),
+        body: JSON.stringify({ themes: config.themes, rounds: config.rounds }),
         signal: controller.signal,
       });
       const data = await res.json();
@@ -95,7 +95,7 @@ function FaceOffStage() {
   if (generating) {
     return (
       <GeneratingScreen
-        categories={[generating.theme.trim() || "Face-Off"]}
+        categories={generating.themes.length ? generating.themes : ["Face-Off"]}
         onCancel={() => {
           abort.current?.abort();
           setGenerating(null);

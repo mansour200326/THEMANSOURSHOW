@@ -45,11 +45,11 @@ export type FeudState = {
   /** Which answers are face-up, by index. */
   revealed: number[];
   /** How the round finished, for the round-end card. */
-  outcome: "cleared" | "both-out" | null;
+  outcome: "cleared" | "all-out" | null;
   /** Answers each team has opened this round, by team index. */
   contributions: number[];
-  /** How many teams have already struck out this round. */
-  strikeouts: number;
+  /** Teams that have already struck out this round, by index. */
+  struckOut: number[];
   /** Stamped when the board changes hands, so the TV can announce it. */
   handoverAt: number | null;
   /** What the host last typed, and whether it landed. */
@@ -70,6 +70,19 @@ export const currentQuestion = (state: FeudState): FeudQuestion | undefined =>
 
 export const otherTeam = (state: FeudState) =>
   (state.control + 1) % Math.max(state.teams.length, 1);
+
+/**
+ * Who picks up the board after a strikeout. Goes round the table in order and
+ * skips anyone already out; undefined once nobody is left to try.
+ */
+export const nextInLine = (state: FeudState): number | undefined => {
+  const count = state.teams.length;
+  for (let step = 1; step <= count; step++) {
+    const team = (state.control + step) % count;
+    if (!state.struckOut.includes(team)) return team;
+  }
+  return undefined;
+};
 
 export const allRevealed = (state: FeudState): boolean => {
   const q = currentQuestion(state);

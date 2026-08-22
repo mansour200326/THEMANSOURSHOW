@@ -8,7 +8,7 @@ export const maxDuration = 180;
 const RequestSchema = z.object({
   mode: z.enum(["categories", "three-in-five"]),
   count: z.number().int().min(1).max(20),
-  theme: z.string().max(200).optional(),
+  themes: z.array(z.string().max(80)).max(6).optional(),
   difficulty: z.enum(["easy", "medium", "hard"]).optional(),
 });
 

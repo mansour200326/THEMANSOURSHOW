@@ -5,34 +5,16 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { DifficultyBar } from "@/components/DifficultyBar";
 import { ShowMark } from "@/components/ShowMark";
+import { TeamsField, cleanTeamNames, startingTeams } from "@/components/setup/TeamsField";
+import { ThemeList, usableThemes } from "@/components/setup/ThemeList";
 import type { Difficulty } from "@/lib/difficulty";
 import { type Rules, defaultRules } from "@/lib/bigboard/types";
 
-const MIN_TEAMS = 2;
-const MAX_TEAMS = 4;
 const MIN_CATEGORIES = 3;
 const MAX_CATEGORIES = 6;
 
-const DEFAULT_NAMES = ["Team 1", "Team 2", "Team 3", "Team 4"];
-
 /** Clue countdown lengths the host can pick from. */
 const TIMER_CHOICES = [10, 15, 20, 30, 45, 60];
-
-/** One tap fills the next empty category slot. */
-const SUGGESTIONS = [
-  "Game of Thrones",
-  "Football",
-  "2000s Movies",
-  "Roast the group",
-  "Anime",
-  "Cars",
-  "Rap Lyrics",
-  "Geography",
-  "Food",
-  "Video Games",
-  "History",
-  "Science",
-];
 
 export type SetupConfig = {
   teamNames: string[];
@@ -109,66 +91,26 @@ export function SetupScreen({
   generating,
   error,
 }: Props) {
-  const [names, setNames] = useState<string[]>(DEFAULT_NAMES.slice(0, 2));
+  const [names, setNames] = useState<string[]>(startingTeams);
   const [categories, setCategories] = useState<string[]>(["", "", ""]);
   const [vibe, setVibe] = useState("");
   const [rules, setRules] = useState<Rules>(defaultRules);
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
-  const [suggesting, setSuggesting] = useState(false);
-
-  /** Fill every slot with AI-invented topics, for hosts who'd rather not think. */
-  const suggestCategories = async () => {
-    setSuggesting(true);
-    try {
-      const res = await fetch("/api/categories", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ count: categories.length, hint: vibe, difficulty }),
-      });
-      const data = await res.json();
-      if (res.ok && Array.isArray(data.categories)) {
-        setCategories((c) => c.map((v, i) => data.categories[i] ?? v));
-      }
-    } catch {
-      /* leave what's typed — the host can still write their own */
-    } finally {
-      setSuggesting(false);
-    }
-  };
-
   const setRule = <K extends keyof Rules>(key: K, value: Rules[K]) =>
     setRules((r) => ({ ...r, [key]: value }));
 
-  const setName = (i: number, value: string) =>
-    setNames((n) => n.map((v, idx) => (idx === i ? value : v)));
-
-  const setCategory = (i: number, value: string) =>
-    setCategories((c) => c.map((v, idx) => (idx === i ? value : v)));
-
-  const addCategory = () =>
-    setCategories((c) => (c.length < MAX_CATEGORIES ? [...c, ""] : c));
-
-  const removeCategory = (i: number) =>
-    setCategories((c) =>
-      c.length > MIN_CATEGORIES ? c.filter((_, idx) => idx !== i) : c,
-    );
-
-  /** Drop a suggestion into the first empty slot, or add a new one. */
-  const useSuggestion = (topic: string) => {
-    setCategories((c) => {
-      if (c.some((v) => v.trim().toLowerCase() === topic.toLowerCase())) return c;
-      const empty = c.findIndex((v) => !v.trim());
-      if (empty !== -1) return c.map((v, i) => (i === empty ? topic : v));
-      if (c.length < MAX_CATEGORIES) return [...c, topic];
-      return c;
-    });
-  };
-
-  const filled = categories.map((c) => c.trim()).filter(Boolean);
+  const filled = usableThemes(categories);
   const canGenerate = filled.length >= MIN_CATEGORIES;
 
   const start = (source: "ai" | "sample") =>
-    onStart({ teamNames: names, categories: filled, vibe, rules, difficulty, source });
+    onStart({
+      teamNames: cleanTeamNames(names),
+      categories: filled,
+      vibe,
+      rules,
+      difficulty,
+      source,
+    });
 
   return (
     <main className="mx-auto min-h-dvh w-full max-w-6xl px-6 py-10">
@@ -211,160 +153,32 @@ export function SetupScreen({
       <div className="mt-10 grid gap-8 lg:grid-cols-[1.05fr_1fr]">
         {/* Categories + teams */}
         <section className="space-y-8">
-          <div>
-            <div className="flex items-baseline justify-between gap-4">
-              <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
-                Categories
-              </h2>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={suggestCategories}
-                  disabled={suggesting}
-                  className="btn-ghost px-3 py-1.5 text-xs"
-                >
-                  {suggesting ? "Thinking…" : "✦ Suggest for me"}
-                </button>
-                <span className="font-display text-xs uppercase tracking-widest text-moon-deep/70">
-                  {filled.length}/{MAX_CATEGORIES}
-                </span>
-              </div>
-            </div>
-            <p className="mt-1 text-sm text-moon-deep">
-              You pick the topics — anything from Game of Thrones to roasting your
-              friends. We write five clues for each.
-            </p>
-
-            <div className="mt-4 space-y-3">
-              {categories.map((value, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <span className="w-6 shrink-0 text-center font-display text-lg tabular-nums text-moon-deep/70">
-                    {i + 1}
-                  </span>
-                  <input
-                    value={value}
-                    onChange={(e) => setCategory(i, e.target.value)}
-                    placeholder={
-                      SUGGESTIONS[i % SUGGESTIONS.length] + "…"
-                    }
-                    maxLength={40}
-                    className="field"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeCategory(i)}
-                    disabled={categories.length <= MIN_CATEGORIES}
-                    className="btn-ghost h-10 w-10 shrink-0 px-0 py-0 text-lg"
-                    aria-label={`Remove category ${i + 1}`}
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            {categories.length < MAX_CATEGORIES && (
-              <button
-                type="button"
-                onClick={addCategory}
-                className="btn-ghost mt-3 w-full py-2.5 text-sm"
-              >
-                + Add category
-              </button>
-            )}
-
-            <div className="mt-5">
-              <p className="t-label font-display uppercase text-moon-deep/70">
-                Or tap one
-              </p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {SUGGESTIONS.map((topic) => {
-                  const used = filled.some(
-                    (c) => c.toLowerCase() === topic.toLowerCase(),
-                  );
-                  return (
-                    <button
-                      key={topic}
-                      type="button"
-                      onClick={() => useSuggestion(topic)}
-                      disabled={used}
-                      className={[
-                        "rounded-full border px-3.5 py-1.5 text-sm transition-colors",
-                        used
-                          ? "cursor-default border-accent/40 bg-accent/10 text-accent-bright"
-                          : "border-white/10 bg-white/[0.03] text-moon/75 hover:border-accent/50 hover:text-accent-bright",
-                      ].join(" ")}
-                    >
-                      {topic}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <label className="t-label block font-display uppercase text-moon-deep/70">
-                Extra instructions (optional)
-              </label>
-              <input
-                value={vibe}
-                onChange={(e) => setVibe(e.target.value)}
-                placeholder="make it hard · keep it light · no spoilers past season 4"
-                maxLength={200}
-                className="field mt-2"
-              />
-            </div>
-          </div>
+          <ThemeList
+            title="Categories"
+            hint="You pick the topics — anything from Game of Thrones to roasting your friends. We write five clues for each."
+            themes={categories}
+            onChange={setCategories}
+            difficulty={difficulty}
+            vibe={vibe}
+            min={MIN_CATEGORIES}
+            max={MAX_CATEGORIES}
+            noun="category"
+          />
 
           <div>
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
-                Teams
-              </h2>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setNames((n) => n.slice(0, -1))}
-                  disabled={names.length <= MIN_TEAMS}
-                  className="btn-ghost h-9 w-9 px-0 py-0 text-lg"
-                  aria-label="Remove team"
-                >
-                  −
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setNames((n) => [
-                      ...n,
-                      DEFAULT_NAMES[n.length] ?? `Team ${n.length + 1}`,
-                    ])
-                  }
-                  disabled={names.length >= MAX_TEAMS}
-                  className="btn-ghost h-9 w-9 px-0 py-0 text-lg"
-                  aria-label="Add team"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            <div className="mt-4 space-y-3">
-              {names.map((name, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <span className="w-6 shrink-0 text-center font-display text-lg tabular-nums text-moon-deep/70">
-                    {i + 1}
-                  </span>
-                  <input
-                    value={name}
-                    onChange={(e) => setName(i, e.target.value)}
-                    placeholder={`Team ${i + 1}`}
-                    maxLength={22}
-                    className="field"
-                  />
-                </div>
-              ))}
-            </div>
+            <label className="t-label block font-display uppercase text-moon-deep/70">
+              Extra instructions (optional)
+            </label>
+            <input
+              value={vibe}
+              onChange={(e) => setVibe(e.target.value)}
+              placeholder="make it hard · keep it light · no spoilers past season 4"
+              maxLength={200}
+              className="field mt-2"
+            />
           </div>
+
+          <TeamsField names={names} onChange={setNames} />
         </section>
 
         {/* Rules */}

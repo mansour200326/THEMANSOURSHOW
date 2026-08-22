@@ -7,6 +7,8 @@ import { DifficultyBar } from "@/components/DifficultyBar";
 import { GeneratingScreen } from "@/components/bigboard/GeneratingScreen";
 import { RapidStage } from "@/components/rapid/RapidStage";
 import { ShowMark } from "@/components/ShowMark";
+import { TeamsField, cleanTeamNames, startingTeams } from "@/components/setup/TeamsField";
+import { ThemeList, usableThemes } from "@/components/setup/ThemeList";
 import type { Difficulty } from "@/lib/difficulty";
 import { emptyRapid, rapidReducer, rapidStandings, rapidWinners } from "@/lib/rapid/engine";
 import { drawPrompts } from "@/lib/rapid/packs";
@@ -21,8 +23,8 @@ const ROUND_CHOICES = [3, 5, 8];
 
 export function RapidGame({ mode }: { mode: RapidMode }) {
   const [state, dispatch] = useReducer(rapidReducer, mode, emptyRapid);
-  const [names, setNames] = useState(["Team 1", "Team 2"]);
-  const [theme, setTheme] = useState("");
+  const [names, setNames] = useState(startingTeams);
+  const [themes, setThemes] = useState<string[]>([""]);
   const [rounds, setRounds] = useState(5);
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [generating, setGenerating] = useState(false);
@@ -56,7 +58,12 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
   }, [state, KEY]);
 
   const begin = (prompts: string[]) =>
-    dispatch({ type: "START", teamNames: names, theme, prompts });
+    dispatch({
+      type: "START",
+      teamNames: cleanTeamNames(names),
+      theme: usableThemes(themes).join(" · "),
+      prompts,
+    });
 
   const start = async (useAi: boolean) => {
     setError(null);
@@ -71,7 +78,12 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
       const res = await fetch("/api/rapid", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode, count: rounds, theme, difficulty }),
+        body: JSON.stringify({
+          mode,
+          count: rounds,
+          themes: usableThemes(themes),
+          difficulty,
+        }),
         signal: controller.signal,
       });
       const data = await res.json();
@@ -96,7 +108,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
   if (generating) {
     return (
       <GeneratingScreen
-        categories={[theme.trim() || RAPID_TITLE[mode]]}
+        categories={usableThemes(themes).length ? usableThemes(themes) : [RAPID_TITLE[mode]]}
         onCancel={() => {
           abort.current?.abort();
           setGenerating(false);
@@ -129,7 +141,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
             {RAPID_TITLE[mode]}
           </h1>
           <p className="mt-3 text-moon-dim">
-            {RAPID_RULE[mode]} Two teams take turns — no phones, you run the
+            {RAPID_RULE[mode]} Teams take turns — no phones, you run the
             clock from here.
           </p>
         </div>
@@ -151,45 +163,15 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
         )}
 
         <section className="mt-10 space-y-8">
-          <div>
-            <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
-              Teams
-            </h2>
-            <div className="mt-4 space-y-3">
-              {names.map((name, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <span className="w-6 shrink-0 text-center font-display text-lg tabular-nums text-moon-deep/70">
-                    {i + 1}
-                  </span>
-                  <input
-                    value={name}
-                    onChange={(e) =>
-                      setNames((n) => n.map((v, idx) => (idx === i ? e.target.value : v)))
-                    }
-                    maxLength={22}
-                    className="field"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+          <TeamsField names={names} onChange={setNames} />
 
-          <div>
-            <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
-              Theme
-            </h2>
-            <p className="mt-1 text-sm text-moon-deep">
-              What the prompts should lean towards. Leave it blank for a bit of
-              everything.
-            </p>
-            <input
-              value={theme}
-              onChange={(e) => setTheme(e.target.value)}
-              placeholder="food · sport · films · the 90s"
-              maxLength={200}
-              className="field mt-3"
-            />
-          </div>
+          <ThemeList
+            title="Themes"
+            hint="What the prompts should lean towards. Add a few and they'll be spread across them."
+            themes={themes}
+            onChange={setThemes}
+            difficulty={difficulty}
+          />
 
           <div>
             <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">

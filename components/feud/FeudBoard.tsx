@@ -63,7 +63,7 @@ export function FeudBoard({
           {over
             ? state.outcome === "cleared"
               ? "Board cleared"
-              : "Both teams struck out"
+              : "Every team struck out"
             : controlTeam?.name}
         </span>
         <span className="flex gap-2">
