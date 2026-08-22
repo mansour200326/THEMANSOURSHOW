@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useCue, useCueWhen } from "@/components/useCue";
+import { Tally } from "@/components/Tally";
 import {
   type ImpostorState,
   impostorPlace,
@@ -52,6 +54,19 @@ export function ImpostorHost({
   }, [left, state.phase, onTimeUp]);
 
   const clock = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}`;
+
+  // The last ten seconds tick; the vote and the verdict get their own cues.
+  useCue(state.phase === "talk" && left <= 10 ? left : null, "tick");
+  useCue(state.phase, state.phase === "vote" ? "whoosh" : null);
+  useCue(
+    state.outcome,
+    state.outcome === "impostor-caught"
+      ? "correct"
+      : state.outcome
+        ? "wrong"
+        : null,
+  );
+  useCueWhen(state.phase === "done", "fanfare");
 
   if (state.phase === "done") {
     const standings = [...players].sort((a, b) => b.score - a.score);
@@ -216,7 +231,7 @@ export function ImpostorHost({
             key={p.id}
             className="rounded-full border border-white/10 bg-white/[0.02] px-3 py-1 font-display text-xs uppercase tracking-wide text-moon-dim"
           >
-            {p.emoji} {p.name} · {p.score.toLocaleString()}
+            {p.emoji} {p.name} · <Tally value={p.score} />
           </span>
         ))}
       </div>

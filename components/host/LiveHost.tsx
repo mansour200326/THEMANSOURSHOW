@@ -1,6 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { useCue, useCueWhen } from "@/components/useCue";
+import { Tally } from "@/components/Tally";
 import {
   type LiveState,
   liveCurrent,
@@ -28,6 +30,17 @@ export function LiveHost({ room, state, onForce, onNext, onQuit }: Props) {
   const byId = (id: string) => players.find((p) => p.id === id);
   const lead = state.lead ? byId(state.lead) : undefined;
 
+  // The answer going up, and whether anybody got it.
+  useCue(
+    `${state.round}:${state.phase}`,
+    state.phase === "reveal"
+      ? state.correct.length
+        ? "correct"
+        : "wrong"
+      : null,
+  );
+  useCueWhen(state.phase === "done", "fanfare");
+
   if (state.phase === "done") {
     const standings = [...players].sort((a, b) => b.score - a.score);
     const survivors = players.filter((p) => !state.benched.includes(p.id));
@@ -47,7 +60,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit }: Props) {
               key={p.id}
               className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 font-display uppercase tracking-wide text-moon/75"
             >
-              {p.emoji} {p.name} · {p.score.toLocaleString()}
+              {p.emoji} {p.name} · <Tally value={p.score} />
             </span>
           ))}
         </div>
@@ -238,7 +251,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit }: Props) {
             key={p.id}
             className="rounded-full border border-white/10 bg-white/[0.02] px-3 py-1 font-display text-xs uppercase tracking-wide text-moon-dim"
           >
-            {p.emoji} {p.name} · {p.score.toLocaleString()}
+            {p.emoji} {p.name} · <Tally value={p.score} />
             {state.lastScores[p.id] ? (
               <span className="ml-1 text-emerald-300">
                 +{state.lastScores[p.id]}

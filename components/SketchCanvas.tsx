@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { Stroke } from "@/lib/games/sketch";
+import { type Stroke, strokeColour } from "@/lib/games/sketch";
 
 /**
  * Draws the strokes on a square canvas, in the 0-1000 grid space they're
@@ -11,14 +11,17 @@ export function SketchCanvas({
   strokes,
   live,
   className,
+  colour = 0,
   onStroke,
   onLift,
 }: {
   strokes: Stroke[];
   live: Stroke;
   className?: string;
+  /** Index into SKETCH_COLOURS — only used by the canvas being drawn on. */
+  colour?: number;
   /** Present when this canvas is the one being drawn on. */
-  onStroke?: (points: number[]) => void;
+  onStroke?: (points: number[], colour: number) => void;
   onLift?: () => void;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -46,14 +49,14 @@ export function SketchCanvas({
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.lineWidth = Math.max(2, size / 140);
-    ctx.strokeStyle = getComputedStyle(el).getPropertyValue("color") || "#fff";
 
     const paint = (stroke: Stroke) => {
-      if (stroke.length < 4) return;
+      if (stroke.p.length < 4) return;
+      ctx.strokeStyle = strokeColour(stroke);
       ctx.beginPath();
-      for (let i = 0; i < stroke.length; i += 2) {
-        const x = (stroke[i] / 1000) * size;
-        const y = (stroke[i + 1] / 1000) * size;
+      for (let i = 0; i < stroke.p.length; i += 2) {
+        const x = (stroke.p[i] / 1000) * size;
+        const y = (stroke.p[i + 1] / 1000) * size;
         i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
       }
       ctx.stroke();
@@ -81,7 +84,7 @@ export function SketchCanvas({
    */
   const flush = () => {
     if (!pending.current.length || !onStroke) return;
-    onStroke(pending.current);
+    onStroke(pending.current, colour);
     pending.current = [];
   };
 
@@ -127,7 +130,7 @@ export function SketchCanvas({
       onPointerCancel={end}
       onPointerLeave={end}
       className={[
-        "aspect-square touch-none rounded-2xl border border-white/10 bg-dusk/60 text-accent",
+        "aspect-square touch-none rounded-2xl border border-white/10 bg-dusk/60",
         className ?? "",
       ].join(" ")}
     />

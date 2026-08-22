@@ -11,6 +11,8 @@ import { SetupScreen, type SetupConfig } from "@/components/bigboard/SetupScreen
 import { WagerStage } from "@/components/bigboard/WagerStage";
 import { WinnerScreen } from "@/components/bigboard/WinnerScreen";
 import { HowToPlay } from "@/components/HowToPlay";
+import { useCue, useCueWhen } from "@/components/useCue";
+import { play } from "@/lib/sound";
 import { ShowMark } from "@/components/ShowMark";
 import { clueAt } from "@/lib/board/types";
 import {
@@ -23,6 +25,22 @@ import { sampleBoard, sampleFinalClue } from "@/lib/bigboard/sampleBoard";
 import { clearGame, loadGame, saveGame } from "@/lib/bigboard/storage";
 import type { GameState } from "@/lib/bigboard/types";
 import type { Board, FinalClue } from "@/lib/board/types";
+
+/**
+ * Big Board keeps no record of how the host called an answer, so the cue is
+ * worked out from the scoreboard: a tile closing with the total up is a
+ * correct answer, down or flat is a wrong one.
+ */
+function useJudgementCue(spent: number, teams: { score: number }[]) {
+  const total = teams.reduce((sum, t) => sum + t.score, 0);
+  const last = useRef({ spent, total });
+  useEffect(() => {
+    if (spent !== last.current.spent) {
+      play(total > last.current.total ? "correct" : "wrong");
+    }
+    last.current = { spent, total };
+  }, [spent, total]);
+}
 
 function BigBoardStage() {
   const [state, dispatch] = useReducer(reducer, sampleBoard, emptyState);
@@ -152,6 +170,13 @@ function BigBoardStage() {
       />
     );
   }
+
+  useCue(
+    state.active ? `${state.active.c}:${state.active.r}` : null,
+    state.active ? "pop" : null,
+  );
+  useJudgementCue(state.spent.length, state.teams);
+  useCueWhen(state.phase === "winner", "fanfare");
 
   const active = state.active ? clueAt(state.board, state.active) : null;
   const activeCategory = state.active

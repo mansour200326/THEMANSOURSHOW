@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useCue, useCueWhen } from "@/components/useCue";
 import type { CodeGridState } from "@/lib/games/codegrid";
 import type { ViewerExtras } from "@/lib/room/redact";
 import { type Room, connectedPlayers } from "@/lib/room/types";
@@ -23,6 +24,12 @@ export function GridHost({ room, state, onQuit }: Props) {
   const players = connectedPlayers(room);
   const name = (id: string | null) =>
     players.find((p) => p.id === id)?.name ?? "—";
+
+  // A word turning over, a clue being given, and the assassin.
+  useCue(state.revealed.length, state.revealed.length ? "reveal" : null);
+  useCue(state.clue?.word ?? null, state.clue ? "pop" : null);
+  useCueWhen(state.struckAssassin, "wrong");
+  useCueWhen(state.phase === "done" && !state.struckAssassin, "fanfare");
 
   if (state.phase === "done") {
     return (

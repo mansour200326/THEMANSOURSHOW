@@ -182,7 +182,7 @@ export default function PlayPage({
       <SketchPlayer
         state={state}
         me={me}
-        onStroke={(points) => send("draw", { points }, me.id)}
+        onStroke={(points, colour) => send("draw", { points, colour }, me.id)}
         onLift={() => send("lift", undefined, me.id)}
         onUndo={() => send("undo", undefined, me.id)}
         onClear={() => send("clear", undefined, me.id)}

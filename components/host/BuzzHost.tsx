@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { BoardGrid } from "@/components/board/BoardGrid";
+import { useCue, useCueWhen } from "@/components/useCue";
+import { Tally } from "@/components/Tally";
 import { type BuzzState, buzzCurrent } from "@/lib/games/buzzEngine";
 import { type Room, connectedPlayers, playerById } from "@/lib/room/types";
 
@@ -15,6 +17,19 @@ type Props = {
 export function BuzzHost({ room, state, send }: Props) {
   const item = buzzCurrent(state);
   const buzzer = playerById(room, state.buzzedBy ?? undefined);
+
+  // The buzzer landing, then whichever way the host called it.
+  useCue(state.buzzedBy, state.buzzedBy ? "buzz" : null);
+  useCue(
+    `${state.index}:${JSON.stringify(state.lastScores)}`,
+    Object.values(state.lastScores).some((n) => n > 0)
+      ? "correct"
+      : Object.keys(state.lastScores).length
+        ? "wrong"
+        : null,
+  );
+  useCueWhen(state.revealed, "reveal");
+  useCueWhen(state.phase === "done", "fanfare");
 
   // The host has to know the answer to judge a buzz, but putting it on the TV
   // spoils it for everyone still playing. This shows it small, host-side only,
@@ -211,7 +226,7 @@ export function BuzzHost({ room, state, send }: Props) {
                 p.score < 0 ? "text-rose-400" : "text-accent",
               ].join(" ")}
             >
-              {p.score.toLocaleString()}
+              <Tally value={p.score} />
             </span>
           </div>
         ))}
@@ -241,7 +256,7 @@ function Standings({ room }: { room: Room }) {
             {p.name}
           </span>
           <span className="font-display text-xl font-bold tabular-nums text-accent">
-            {p.score.toLocaleString()}
+            <Tally value={p.score} />
           </span>
         </div>
       ))}

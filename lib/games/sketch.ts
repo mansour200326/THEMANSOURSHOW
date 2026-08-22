@@ -16,8 +16,32 @@ import { type Action, type Room, award, connectedPlayers } from "@/lib/room/type
  * on the phone and coordinates are stored as small integers.
  */
 
-/** A single line, as a flat [x, y, x, y, …] list in 0-1000 grid space. */
-export type Stroke = number[];
+/**
+ * The colours a drawer can pick from. Stored as an index rather than a hex
+ * string — this array streams to every phone many times a second, and an
+ * index is one byte where "#37D3C8" is nine.
+ */
+export const SKETCH_COLOURS = [
+  "#F4F2EC", // moonlight
+  "#FF6B57", // coral
+  "#37D3C8", // aqua
+  "#A8E05F", // lime
+  "#E8508D", // magenta
+  "#8E7CFF", // violet
+  "#FFC857", // amber
+  "#5BA8FF", // sky
+] as const;
+
+/**
+ * One line. `p` is a flat [x, y, x, y, …] list in 0-1000 grid space and `c` is
+ * an index into SKETCH_COLOURS. The keys are one letter for the same reason
+ * the colour is an index: this is the only state in the product that streams
+ * continuously, and every byte is sent again on each update.
+ */
+export type Stroke = { c: number; p: number[] };
+
+export const strokeColour = (stroke: Stroke) =>
+  SKETCH_COLOURS[stroke.c] ?? SKETCH_COLOURS[0];
 
 export type SketchState = {
   kind: "sketch";
@@ -72,7 +96,7 @@ export function createSketchGame(pool: string[]): GameModule {
         // The pen goes round the room in order.
         drawerId: players[s.round % players.length].id,
         strokes: [],
-        live: [],
+        live: { c: 0, p: [] },
         guesses: {},
         solved: [],
         startedAt: Date.now(),
@@ -123,7 +147,7 @@ export function createSketchGame(pool: string[]): GameModule {
         round: 0,
         drawerId: null,
         strokes: [],
-        live: [],
+        live: { c: 0, p: [] },
         guesses: {},
         solved: [],
         startedAt: null,
@@ -148,32 +172,54 @@ export function createSketchGame(pool: string[]): GameModule {
                 .map(Math.round)
             : [];
           if (!points.length) return room;
-          const live = [...s.live, ...points].slice(-MAX_POINTS_PER_STROKE);
+          // The colour is taken from whatever the pen was set to when the
+          // stroke began, so switching mid-line can't recolour it halfway.
+          const colour = s.live.p.length
+            ? s.live.c
+            : Math.max(
+                0,
+                Math.min(
+                  SKETCH_COLOURS.length - 1,
+                  Math.round(Number(action.payload?.colour) || 0),
+                ),
+              );
+          const live: Stroke = {
+            c: colour,
+            p: [...s.live.p, ...points].slice(-MAX_POINTS_PER_STROKE),
+          };
           return { ...room, game: { ...s, live } };
         }
 
         /** Pen lifted — bank the line. */
         case "lift": {
           if (s.phase !== "drawing" || action.playerId !== s.drawerId) return room;
-          if (s.live.length < 2) return { ...room, game: { ...s, live: [] } };
+          if (s.live.p.length < 4) {
+            return { ...room, game: { ...s, live: { c: s.live.c, p: [] } } };
+          }
           return {
             ...room,
             game: {
               ...s,
               strokes: [...s.strokes, s.live].slice(-MAX_STROKES),
-              live: [],
+              live: { c: s.live.c, p: [] },
             },
           };
         }
 
         case "undo": {
           if (s.phase !== "drawing" || action.playerId !== s.drawerId) return room;
-          return { ...room, game: { ...s, strokes: s.strokes.slice(0, -1), live: [] } };
+          return {
+            ...room,
+            game: { ...s, strokes: s.strokes.slice(0, -1), live: { c: s.live.c, p: [] } },
+          };
         }
 
         case "clear": {
           if (s.phase !== "drawing" || action.playerId !== s.drawerId) return room;
-          return { ...room, game: { ...s, strokes: [], live: [] } };
+          return {
+            ...room,
+            game: { ...s, strokes: [], live: { c: s.live.c, p: [] } },
+          };
         }
 
         case "guess": {

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { SoundToggle } from "@/components/SoundToggle";
 import { HeroStage } from "@/components/HeroStage";
 import { IMPACT, ShowMark } from "@/components/ShowMark";
 
@@ -23,13 +24,16 @@ export default function Home() {
   };
 
   return (
-    <main>
+    <main className="relative">
       {/*
        * The middle of the stage is the wordmark and two buttons, nothing else.
        * The explanation used to sit between them, where the floating tiles ran
        * straight through it — it's a footnote now, out of the way at the
        * bottom, which is where anyone who wants it will look.
        */}
+      <div className="absolute right-4 top-4 z-20">
+        <SoundToggle />
+      </div>
       <HeroStage footnote="Sixteen games · the TV is the stage, your phone is the controller · no downloads, no accounts">
         <ShowMark />
 

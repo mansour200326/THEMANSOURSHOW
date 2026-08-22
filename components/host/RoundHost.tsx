@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { BLUFF_REAL_ID } from "@/lib/games/roundGames";
+import { Tally } from "@/components/Tally";
 import type { RoundState } from "@/lib/games/roundEngine";
 import { type Room, connectedPlayers, playerById } from "@/lib/room/types";
 
@@ -246,7 +247,7 @@ function Standings({ room }: { room: Room }) {
             {p.name}
           </span>
           <span className="font-display text-xl font-bold tabular-nums text-accent">
-            {p.score.toLocaleString()}
+            <Tally value={p.score} />
           </span>
         </motion.div>
       ))}
@@ -269,7 +270,7 @@ function ScoreStrip({ room, state }: { room: Room; state: RoundState }) {
               {p.name}
             </span>
             <span className="font-display text-sm font-bold tabular-nums text-accent">
-              {p.score.toLocaleString()}
+              <Tally value={p.score} />
             </span>
             <AnimatePresence>
               {gained ? (

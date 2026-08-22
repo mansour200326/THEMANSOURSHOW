@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useCue, useCueWhen } from "@/components/useCue";
 import { SketchCanvas } from "@/components/SketchCanvas";
 import type { SketchState } from "@/lib/games/sketch";
 import type { ViewerExtras } from "@/lib/room/redact";
@@ -19,6 +20,10 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
   const players = connectedPlayers(room);
   const drawer = players.find((p) => p.id === state.drawerId);
   const [left, setLeft] = useState(state.seconds);
+
+  // Somebody getting it, the clock running out, and the end of the night.
+  useCue(state.solved.length, state.solved.length ? "correct" : null);
+  useCueWhen(state.phase === "done", "fanfare");
 
   // Same as Impostor: the clock runs on the TV and the server is only told
   // when it hits zero, so a ticking number never touches the room state.
@@ -39,6 +44,8 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
   useEffect(() => {
     if (state.phase === "drawing" && left === 0) onTimeUp();
   }, [left, state.phase, onTimeUp]);
+
+  useCue(state.phase === "drawing" && left <= 10 ? left : null, "tick");
 
   if (state.phase === "done") {
     const standings = [...players].sort((a, b) => b.score - a.score);

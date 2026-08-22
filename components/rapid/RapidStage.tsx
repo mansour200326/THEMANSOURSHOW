@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useCue, useCueWhen } from "@/components/useCue";
 import {
   type RapidState,
   RAPID_RULE,
@@ -46,6 +47,11 @@ export function RapidStage({ state, onGo, onTimeUp, onScore }: Props) {
   useEffect(() => setCount(0), [state.round, state.turn, state.phase]);
 
   const urgent = left <= (state.mode === "three-in-five" ? 2 : 6);
+
+  // A tick a second while the clock runs down, and a klaxon when it stops.
+  useCue(state.phase === "running" && urgent ? Math.ceil(left) : null, "tick");
+  useCue(state.phase, state.phase === "running" ? "whoosh" : null);
+  useCueWhen(state.phase === "judge", "timeup");
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-[3vmin] text-center">

@@ -7,6 +7,7 @@ import { DifficultyBar } from "@/components/DifficultyBar";
 import { GeneratingScreen } from "@/components/bigboard/GeneratingScreen";
 import { RapidStage } from "@/components/rapid/RapidStage";
 import { HowToPlay } from "@/components/HowToPlay";
+import { Tally } from "@/components/Tally";
 import { ShowMark } from "@/components/ShowMark";
 import { TeamsField, cleanTeamNames, startingTeams } from "@/components/setup/TeamsField";
 import { ThemeList, usableThemes } from "@/components/setup/ThemeList";
@@ -294,7 +295,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
                     {team.name}
                   </span>
                   <span className="font-display text-xl font-bold tabular-nums text-accent">
-                    {team.score}
+                    <Tally value={team.score} />
                   </span>
                 </div>
               ))}
@@ -337,7 +338,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
                 {team.name}
               </span>
               <span className="font-display text-[clamp(1.4rem,2.2vw,3rem)] font-bold tabular-nums text-moon">
-                {team.score}
+                <Tally value={team.score} />
               </span>
             </div>
           ))}

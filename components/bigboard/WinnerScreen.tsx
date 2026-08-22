@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { standings, winners } from "@/lib/bigboard/engine";
+import { Tally } from "@/components/Tally";
 import type { Team } from "@/lib/bigboard/types";
 
 const COLORS = ["#FF6B57", "#FF8D7C", "#DE4B37", "#F4F2EC", "#C6CADA"];
@@ -86,7 +87,7 @@ export function WinnerScreen({ teams, onRematch, onNewGame }: Props) {
           {champs.map((t) => t.name).join(" & ")}
         </h2>
         <p className="mt-2 font-display text-[clamp(1.5rem,3vw,3.5rem)] font-bold tabular-nums text-moon">
-          {champs[0]?.score.toLocaleString()}
+          <Tally value={champs[0]?.score ?? 0} duration={900} />
         </p>
       </motion.div>
 
@@ -118,7 +119,7 @@ export function WinnerScreen({ teams, onRematch, onNewGame }: Props) {
                 team.score < 0 ? "text-rose-400" : "text-moon",
               ].join(" ")}
             >
-              {team.score.toLocaleString()}
+              <Tally value={team.score} />
             </span>
           </motion.div>
         ))}

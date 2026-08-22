@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useCue, useCueWhen } from "@/components/useCue";
 import {
   type FeudState,
   STRIKES_ALLOWED,
@@ -45,6 +46,20 @@ export function FeudBoard({
   };
 
   const feedback = state.lastGuess;
+
+  // A tile turning over, a strike, and the moment the board changes hands.
+  useCue(
+    state.lastGuess?.at,
+    state.lastGuess
+      ? state.lastGuess.matched !== null
+        ? "reveal"
+        : state.lastGuess.repeat
+          ? "pop"
+          : "strike"
+      : null,
+  );
+  useCue(state.handoverAt, state.handoverAt ? "whoosh" : null);
+  useCueWhen(state.phase === "round-end", "correct");
   const over = state.phase === "round-end";
   const lastRound = state.round + 1 >= state.questions.length;
 

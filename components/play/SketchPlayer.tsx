@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { SketchCanvas } from "@/components/SketchCanvas";
-import type { SketchState } from "@/lib/games/sketch";
+import { SKETCH_COLOURS, type SketchState } from "@/lib/games/sketch";
 import type { ViewerExtras } from "@/lib/room/redact";
 import type { Player } from "@/lib/room/types";
 
 type Props = {
   state: SketchState & ViewerExtras;
   me: Player;
-  onStroke: (points: number[]) => void;
+  onStroke: (points: number[], colour: number) => void;
   onLift: () => void;
   onUndo: () => void;
   onClear: () => void;
@@ -26,6 +26,7 @@ export function SketchPlayer({
   onGuess,
 }: Props) {
   const [text, setText] = useState("");
+  const [colour, setColour] = useState(0);
   const drawing = state.drawerId === me.id;
 
   if (state.phase === "done") {
@@ -75,10 +76,32 @@ export function SketchPlayer({
         <SketchCanvas
           strokes={state.strokes}
           live={state.live}
+          colour={colour}
           onStroke={onStroke}
           onLift={onLift}
           className="w-full"
         />
+
+        {/* Big enough to hit with a thumb while the clock is running. */}
+        <div className="flex justify-between gap-1.5">
+          {SKETCH_COLOURS.map((hex, i) => (
+            <button
+              key={hex}
+              type="button"
+              onClick={() => setColour(i)}
+              aria-label={`Colour ${i + 1}`}
+              aria-pressed={colour === i}
+              className={[
+                "h-11 flex-1 rounded-full border-2 transition-transform",
+                colour === i
+                  ? "scale-110 border-moon"
+                  : "border-white/15 active:scale-95",
+              ].join(" ")}
+              style={{ backgroundColor: hex }}
+            />
+          ))}
+        </div>
+
         <div className="mt-auto flex gap-2">
           <button onClick={onUndo} className="btn-ghost flex-1 py-4">
             Undo

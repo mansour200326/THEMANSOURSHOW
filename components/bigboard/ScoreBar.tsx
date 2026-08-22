@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Tally } from "@/components/Tally";
 import type { Team } from "@/lib/bigboard/types";
 
 type Props = {
@@ -53,7 +54,7 @@ export function ScoreBar({ teams, activeIndex = null, compact }: Props) {
               ].join(" ")}
             >
               {team.score < 0 ? "−" : ""}
-              {Math.abs(team.score).toLocaleString()}
+              <Tally value={Math.abs(team.score)} />
             </span>
           </motion.div>
         );
