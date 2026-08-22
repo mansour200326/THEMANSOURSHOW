@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { IMPACT } from "@/components/ShowMark";
 
 /**
  * The cold open. A field of game-board tiles floating in real 3D space behind
@@ -94,15 +95,41 @@ export function HeroStage({
               ready
                 ? {
                     opacity: 1,
-                    x: [`${tile.x}vmin`, `${tile.x + 1.5 * tile.spin}vmin`, `${tile.x}vmin`],
-                    y: [`${tile.y}vmin`, `${tile.y - 2.5}vmin`, `${tile.y}vmin`],
+                    /*
+                     * Shoved outward by the blast, then easing back into the
+                     * slow drift they keep for the rest of the night. The
+                     * first keyframe of each is the kick.
+                     */
+                    x: [
+                      `${tile.x * 1.16}vmin`,
+                      `${tile.x}vmin`,
+                      `${tile.x + 1.5 * tile.spin}vmin`,
+                      `${tile.x}vmin`,
+                    ],
+                    y: [
+                      `${tile.y * 1.16}vmin`,
+                      `${tile.y}vmin`,
+                      `${tile.y - 2.5}vmin`,
+                      `${tile.y}vmin`,
+                    ],
                   }
                 : {}
             }
             transition={{
-              opacity: { duration: 1.1, delay: tile.delay },
-              x: { duration: 11 + i, repeat: Infinity, ease: "easeInOut" },
-              y: { duration: 8 + i * 0.7, repeat: Infinity, ease: "easeInOut" },
+              opacity: { duration: 0.5, delay: IMPACT },
+              x: {
+                duration: 11 + i,
+                times: [0, 0.06, 0.5, 1],
+                repeat: Infinity,
+                repeatDelay: 0,
+                ease: "easeInOut",
+              },
+              y: {
+                duration: 8 + i * 0.7,
+                times: [0, 0.08, 0.5, 1],
+                repeat: Infinity,
+                ease: "easeInOut",
+              },
             }}
           >
             <motion.div
@@ -128,6 +155,19 @@ export function HeroStage({
           </motion.div>
         ))}
       </motion.div>
+
+      {/* The room lights up for a moment when the title lands */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-[6]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0, 0.5, 0] }}
+        transition={{ duration: 0.6, delay: IMPACT, ease: "easeOut" }}
+        style={{
+          background:
+            "radial-gradient(70vmax 50vmax at 50% 46%, rgba(255,107,87,0.32), transparent 70%)",
+        }}
+      />
 
       {/* Spotlight sweep across the stage */}
       <motion.div
@@ -158,9 +198,8 @@ export function HeroStage({
       {/* Content rides slightly in front of the tiles */}
       <motion.div
         className="relative z-10 flex w-full flex-col items-center px-6"
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 1 }}
       >
         {children}
       </motion.div>

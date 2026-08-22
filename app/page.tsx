@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { HeroStage } from "@/components/HeroStage";
-import { ShowMark } from "@/components/ShowMark";
+import { IMPACT, ShowMark } from "@/components/ShowMark";
 
 export default function Home() {
   const router = useRouter();
@@ -32,7 +33,18 @@ export default function Home() {
       <HeroStage footnote="Sixteen games · the TV is the stage, your phone is the controller · no downloads, no accounts">
         <ShowMark />
 
-        <div className="mt-10 flex w-full flex-col items-stretch gap-4 sm:mt-12 sm:w-auto sm:flex-row">
+        {/* Straight in behind the blast, not a polite fade afterwards. */}
+        <motion.div
+          className="mt-10 flex w-full flex-col items-stretch gap-4 sm:mt-12 sm:w-auto sm:flex-row"
+          initial={{ opacity: 0, y: 18, scale: 0.94 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{
+            type: "spring",
+            stiffness: 520,
+            damping: 22,
+            delay: IMPACT + 0.12,
+          }}
+        >
           <button
             type="button"
             onClick={hostGame}
@@ -44,8 +56,7 @@ export default function Home() {
           <Link href="/play" className="btn-ghost px-12 py-5 text-xl sm:text-2xl">
             Join a game
           </Link>
-        </div>
-
+        </motion.div>
       </HeroStage>
     </main>
   );

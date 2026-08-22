@@ -3,15 +3,44 @@
 import { motion, useReducedMotion } from "framer-motion";
 
 const WORDS = ["Big", "Night"];
+const LETTERS = WORDS.join("").length;
+
+/**
+ * The moment the letters hit, in seconds. Everything loud is pinned to it —
+ * flash, shockwave, sparks, the kick — so it all lands as one bang instead of
+ * a sequence of separate effects.
+ */
+export const IMPACT = 0.34;
+
+const SPARKS = 16;
+
+/**
+ * Deterministic scatter. Random here would desync the server and client render,
+ * and the golden angle spreads them without any two lining up.
+ */
+const spark = (i: number) => {
+  const angle = (i * 137.508 * Math.PI) / 180;
+  const reach = 26 + (i % 4) * 7;
+  return { x: Math.cos(angle) * reach, y: Math.sin(angle) * reach * 0.62 };
+};
+
+/** Which way each letter comes in from, so they don't arrive as a neat row. */
+const entry = (i: number) => ({
+  x: (i % 2 === 0 ? -1 : 1) * (8 + (i % 3) * 5),
+  y: i % 3 === 0 ? -22 : 18,
+  rotate: (i % 2 === 0 ? -1 : 1) * (14 + (i % 4) * 6),
+});
 
 /**
  * The wordmark.
  *
  * `sm` is the quiet one that sits in a corner all night. `lg` is the cold open,
- * and it earns its animation: the letters drop in and settle, a light runs
- * across them once, and the rules draw outward underneath. It plays exactly
- * once, on the landing page, and never loops — anything that repeats on a
- * screen left on all evening turns into wallpaper.
+ * and it detonates: the letters are thrown in from different directions and
+ * slam into place hard enough to overshoot, the impact throws a flash, a
+ * shockwave and sparks, and the whole mark takes the recoil.
+ *
+ * It's over in under a second and never loops. This is a party starting, not a
+ * screensaver.
  */
 export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
   const still = useReducedMotion();
@@ -24,100 +53,163 @@ export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
     );
   }
 
+  if (still) {
+    return (
+      <div className="flex flex-col items-center font-display uppercase">
+        <h1 className="brand-text t-hero tracking-[0.08em] drop-shadow-[0_0_50px_rgba(255,107,87,0.35)]">
+          Big Night
+        </h1>
+        <Rule />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col items-center font-display uppercase">
-      <div className="relative">
-        <motion.h1
-          className="t-hero flex flex-wrap justify-center gap-x-[0.3em] tracking-[0.08em]"
-          initial="hidden"
-          animate="shown"
-          variants={{
-            hidden: {},
-            shown: { transition: { staggerChildren: still ? 0 : 0.055 } },
-          }}
-        >
-          {WORDS.map((word) => (
-            <span key={word} className="flex">
-              {[...word].map((letter, i) => (
+    <motion.div
+      className="relative flex flex-col items-center font-display uppercase"
+      /* The recoil. The mark itself takes the hit, not the page. */
+      animate={{
+        x: [0, -10, 8, -5, 3, -1, 0],
+        y: [0, 6, -5, 3, -2, 1, 0],
+        rotate: [0, -0.8, 0.6, -0.35, 0.15, 0],
+      }}
+      transition={{ duration: 0.5, delay: IMPACT, ease: "easeOut" }}
+    >
+      {/* Blast light, one frame of overexposure */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[40vmin] w-[40vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
+        initial={{ opacity: 0, scale: 0.3 }}
+        animate={{ opacity: [0, 0.85, 0], scale: [0.3, 1.6, 2.2] }}
+        transition={{ duration: 0.55, delay: IMPACT, ease: "easeOut" }}
+        style={{
+          background:
+            "radial-gradient(circle, rgba(255,220,210,0.9) 0%, rgba(255,107,87,0.5) 35%, transparent 70%)",
+          filter: "blur(14px)",
+        }}
+      />
+
+      {/* Shockwave */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[26vmin] w-[26vmin] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-coral"
+        initial={{ opacity: 0, scale: 0.15 }}
+        animate={{ opacity: [0, 0.9, 0], scale: [0.15, 1.5, 2.9] }}
+        transition={{ duration: 0.75, delay: IMPACT, ease: [0.1, 0.8, 0.3, 1] }}
+      />
+
+      {/* Sparks thrown out of the middle */}
+      {Array.from({ length: SPARKS }).map((_, i) => {
+        const { x, y } = spark(i);
+        return (
+          <motion.span
+            aria-hidden
+            key={i}
+            className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[0.5vmin] w-[0.5vmin] rounded-full bg-coral-bright"
+            initial={{ opacity: 0, x: 0, y: 0, scale: 1 }}
+            animate={{
+              opacity: [0, 1, 0],
+              x: `${x}vmin`,
+              y: `${y}vmin`,
+              scale: [1, 0.9, 0.2],
+            }}
+            transition={{
+              duration: 0.7 + (i % 3) * 0.12,
+              delay: IMPACT,
+              ease: [0.05, 0.8, 0.2, 1],
+            }}
+          />
+        );
+      })}
+
+      <h1 className="t-hero flex flex-wrap justify-center gap-x-[0.3em] tracking-[0.08em]">
+        {WORDS.map((word, w) => (
+          <span key={word} className="flex">
+            {[...word].map((letter, i) => {
+              // Index across the whole wordmark, so the stagger runs B→T.
+              const n = w === 0 ? i : WORDS[0].length + i;
+              const from = entry(n);
+              return (
                 <motion.span
                   key={i}
                   className="brand-text inline-block"
-                  style={{ transformOrigin: "50% 100%" }}
-                  variants={{
-                    hidden: {
-                      opacity: 0,
-                      y: "0.45em",
-                      rotateX: -70,
-                      filter: "blur(12px)",
-                    },
-                    shown: {
-                      opacity: 1,
-                      y: 0,
-                      rotateX: 0,
-                      filter: "blur(0px)",
-                      transition: { duration: 0.75, ease: [0.16, 1, 0.3, 1] },
-                    },
+                  initial={{
+                    opacity: 0,
+                    scale: 3.2,
+                    x: `${from.x}vmin`,
+                    y: `${from.y}vmin`,
+                    rotate: from.rotate,
+                    filter: "blur(14px)",
+                  }}
+                  animate={{
+                    opacity: 1,
+                    scale: 1,
+                    x: 0,
+                    y: 0,
+                    rotate: 0,
+                    filter: "blur(0px)",
+                  }}
+                  transition={{
+                    // Stiff and underdamped: they arrive too fast and bounce
+                    // back off the stop. That overshoot is the whole effect.
+                    type: "spring",
+                    stiffness: 850,
+                    damping: 17,
+                    mass: 0.9,
+                    delay: (n / LETTERS) * IMPACT,
+                    opacity: { duration: 0.12, delay: (n / LETTERS) * IMPACT },
+                    filter: { duration: 0.22, delay: (n / LETTERS) * IMPACT },
                   }}
                 >
                   {letter}
                 </motion.span>
-              ))}
-            </span>
-          ))}
-        </motion.h1>
+              );
+            })}
+          </span>
+        ))}
+      </h1>
 
-        {/* The glow blooms as the last letter lands, not before. */}
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 -z-10"
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ opacity: still ? 0.55 : [0, 1, 0.6], scale: 1 }}
-          transition={{ duration: 1.6, delay: 0.5, ease: "easeOut" }}
-          style={{
-            background:
-              "radial-gradient(60% 130% at 50% 50%, rgba(255,107,87,0.4), transparent 70%)",
-            filter: "blur(26px)",
-          }}
-        />
+      <Rule animated />
+    </motion.div>
+  );
+}
 
-        {/* One pass of light across the letters, once they've settled. */}
-        {!still && (
-          <motion.span
-            aria-hidden
-            className="brand-shine t-hero pointer-events-none absolute inset-0 flex flex-wrap justify-center gap-x-[0.3em] tracking-[0.08em]"
-            initial={{ backgroundPosition: "180% 0" }}
-            animate={{ backgroundPosition: "-80% 0" }}
-            transition={{ duration: 1.2, delay: 0.9, ease: "easeInOut" }}
-          >
-            {WORDS.map((word) => (
-              <span key={word}>{word}</span>
-            ))}
-          </motion.span>
-        )}
-      </div>
-
+/** The strapline and its two rules, snapping outward on the recoil. */
+function Rule({ animated }: { animated?: boolean }) {
+  const line = "h-px flex-1 bg-gradient-to-r from-transparent to-accent/50";
+  if (!animated) {
+    return (
       <div className="mt-2 flex w-full items-center gap-4">
-        <motion.span
-          className="h-px flex-1 origin-right bg-gradient-to-r from-transparent to-accent/50"
-          initial={{ scaleX: still ? 1 : 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 0.8, delay: 1, ease: [0.16, 1, 0.3, 1] }}
-        />
-        <motion.span
-          className="t-label whitespace-nowrap text-moon-dim"
-          initial={{ opacity: still ? 1 : 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 1.05 }}
-        >
+        <span className={line} />
+        <span className="t-label whitespace-nowrap text-moon-dim">
           Games for the room
-        </motion.span>
-        <motion.span
-          className="h-px flex-1 origin-left bg-gradient-to-l from-transparent to-accent/50"
-          initial={{ scaleX: still ? 1 : 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 0.8, delay: 1, ease: [0.16, 1, 0.3, 1] }}
-        />
+        </span>
+        <span className={`${line} rotate-180`} />
       </div>
+    );
+  }
+  return (
+    <div className="mt-2 flex w-full items-center gap-4">
+      <motion.span
+        className={`${line} origin-right`}
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: 0.35, delay: IMPACT + 0.05, ease: [0.2, 1, 0.3, 1] }}
+      />
+      <motion.span
+        className="t-label whitespace-nowrap text-moon-dim"
+        initial={{ opacity: 0, letterSpacing: "0.8em" }}
+        animate={{ opacity: 1, letterSpacing: "0.22em" }}
+        transition={{ duration: 0.45, delay: IMPACT + 0.05, ease: [0.2, 1, 0.3, 1] }}
+      >
+        Games for the room
+      </motion.span>
+      <motion.span
+        className={`${line} origin-left rotate-180`}
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: 0.35, delay: IMPACT + 0.05, ease: [0.2, 1, 0.3, 1] }}
+      />
     </div>
   );
 }
