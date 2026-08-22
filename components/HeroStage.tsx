@@ -85,6 +85,24 @@ export function HeroStage({
         className="pointer-events-none absolute inset-0"
         style={{ transformStyle: "preserve-3d", rotateX: rotX, rotateY: rotY }}
       >
+        {/*
+          * The blast pushes the whole field outward once and lets it settle.
+          * It's a wrapper rather than extra keyframes on each tile, because
+          * folding a one-shot kick into an infinite loop makes the loop
+          * re-fire it every time round.
+          */}
+        <motion.div
+          className="absolute inset-0"
+          style={{ transformStyle: "preserve-3d" }}
+          initial={{ scale: 1 }}
+          animate={ready ? { scale: [1, 1.14, 1] } : {}}
+          transition={{
+            duration: 1.5,
+            delay: IMPACT,
+            times: [0, 0.18, 1],
+            ease: "easeOut",
+          }}
+        >
         {TILES.map((tile, i) => (
           <motion.div
             key={i}
@@ -95,41 +113,16 @@ export function HeroStage({
               ready
                 ? {
                     opacity: 1,
-                    /*
-                     * Shoved outward by the blast, then easing back into the
-                     * slow drift they keep for the rest of the night. The
-                     * first keyframe of each is the kick.
-                     */
-                    x: [
-                      `${tile.x * 1.16}vmin`,
-                      `${tile.x}vmin`,
-                      `${tile.x + 1.5 * tile.spin}vmin`,
-                      `${tile.x}vmin`,
-                    ],
-                    y: [
-                      `${tile.y * 1.16}vmin`,
-                      `${tile.y}vmin`,
-                      `${tile.y - 2.5}vmin`,
-                      `${tile.y}vmin`,
-                    ],
+                    x: [`${tile.x}vmin`, `${tile.x + 1.5 * tile.spin}vmin`, `${tile.x}vmin`],
+                    y: [`${tile.y}vmin`, `${tile.y - 2.5}vmin`, `${tile.y}vmin`],
                   }
                 : {}
             }
             transition={{
-              opacity: { duration: 0.5, delay: IMPACT },
-              x: {
-                duration: 11 + i,
-                times: [0, 0.06, 0.5, 1],
-                repeat: Infinity,
-                repeatDelay: 0,
-                ease: "easeInOut",
-              },
-              y: {
-                duration: 8 + i * 0.7,
-                times: [0, 0.08, 0.5, 1],
-                repeat: Infinity,
-                ease: "easeInOut",
-              },
+              opacity: { duration: 0.5, delay: IMPACT * 0.5 },
+              // First and last keyframes match, so the loop joins up silently.
+              x: { duration: 11 + i, repeat: Infinity, ease: "easeInOut" },
+              y: { duration: 8 + i * 0.7, repeat: Infinity, ease: "easeInOut" },
             }}
           >
             <motion.div
@@ -154,6 +147,7 @@ export function HeroStage({
             </motion.div>
           </motion.div>
         ))}
+        </motion.div>
       </motion.div>
 
       {/* The room lights up for a moment when the title lands */}
@@ -162,7 +156,7 @@ export function HeroStage({
         className="pointer-events-none absolute inset-0 z-[6]"
         initial={{ opacity: 0 }}
         animate={{ opacity: [0, 0.5, 0] }}
-        transition={{ duration: 0.6, delay: IMPACT, ease: "easeOut" }}
+        transition={{ duration: 0.9, delay: IMPACT, ease: "easeOut" }}
         style={{
           background:
             "radial-gradient(70vmax 50vmax at 50% 46%, rgba(255,107,87,0.32), transparent 70%)",
@@ -209,7 +203,7 @@ export function HeroStage({
           className="absolute inset-x-0 bottom-0 z-10 px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-center font-display text-[0.6rem] uppercase leading-relaxed tracking-[0.18em] text-moon-deep sm:text-xs sm:tracking-[0.2em]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.9, delay: 1.35 }}
+          transition={{ duration: 0.7, delay: IMPACT + 0.3 }}
         >
           {footnote}
         </motion.p>

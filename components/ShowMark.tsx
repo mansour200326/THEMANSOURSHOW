@@ -9,8 +9,13 @@ const LETTERS = WORDS.join("").length;
  * The moment the letters hit, in seconds. Everything loud is pinned to it —
  * flash, shockwave, sparks, the kick — so it all lands as one bang instead of
  * a sequence of separate effects.
+ *
+ * Everything downstream is expressed as IMPACT plus an offset, and nothing is
+ * allowed to start after the blast has finished. A gap between the last effect
+ * ending and the next thing starting reads as the page having hung, which is
+ * worse than the animation being too long.
  */
-export const IMPACT = 0.34;
+export const IMPACT = 0.6;
 
 const SPARKS = 16;
 
@@ -39,8 +44,8 @@ const entry = (i: number) => ({
  * slam into place hard enough to overshoot, the impact throws a flash, a
  * shockwave and sparks, and the whole mark takes the recoil.
  *
- * It's over in under a second and never loops. This is a party starting, not a
- * screensaver.
+ * The whole thing runs about a second and a half and never loops. This is a
+ * party starting, not a screensaver.
  */
 export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
   const still = useReducedMotion();
@@ -73,7 +78,7 @@ export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
         y: [0, 6, -5, 3, -2, 1, 0],
         rotate: [0, -0.8, 0.6, -0.35, 0.15, 0],
       }}
-      transition={{ duration: 0.5, delay: IMPACT, ease: "easeOut" }}
+      transition={{ duration: 0.7, delay: IMPACT, ease: "easeOut" }}
     >
       {/* Blast light, one frame of overexposure */}
       <motion.div
@@ -81,11 +86,14 @@ export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
         className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[40vmin] w-[40vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
         initial={{ opacity: 0, scale: 0.3 }}
         animate={{ opacity: [0, 0.85, 0], scale: [0.3, 1.6, 2.2] }}
-        transition={{ duration: 0.55, delay: IMPACT, ease: "easeOut" }}
+        transition={{ duration: 0.8, delay: IMPACT, ease: "easeOut" }}
         style={{
+          // Soft gradient stops rather than a CSS blur filter. Animating scale
+          // and opacity on a blurred layer is the one thing here that can drop
+          // frames, and the gradient looks the same without it.
           background:
-            "radial-gradient(circle, rgba(255,220,210,0.9) 0%, rgba(255,107,87,0.5) 35%, transparent 70%)",
-          filter: "blur(14px)",
+            "radial-gradient(circle, rgba(255,220,210,0.85) 0%, rgba(255,107,87,0.45) 30%, rgba(255,107,87,0.12) 52%, transparent 72%)",
+          willChange: "transform, opacity",
         }}
       />
 
@@ -95,7 +103,7 @@ export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
         className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[26vmin] w-[26vmin] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-coral"
         initial={{ opacity: 0, scale: 0.15 }}
         animate={{ opacity: [0, 0.9, 0], scale: [0.15, 1.5, 2.9] }}
-        transition={{ duration: 0.75, delay: IMPACT, ease: [0.1, 0.8, 0.3, 1] }}
+        transition={{ duration: 1, delay: IMPACT, ease: [0.1, 0.8, 0.3, 1] }}
       />
 
       {/* Sparks thrown out of the middle */}
@@ -114,7 +122,7 @@ export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
               scale: [1, 0.9, 0.2],
             }}
             transition={{
-              duration: 0.7 + (i % 3) * 0.12,
+              duration: 0.8 + (i % 3) * 0.1,
               delay: IMPACT,
               ease: [0.05, 0.8, 0.2, 1],
             }}
@@ -139,7 +147,7 @@ export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
                     x: `${from.x}vmin`,
                     y: `${from.y}vmin`,
                     rotate: from.rotate,
-                    filter: "blur(14px)",
+                    filter: "blur(10px)",
                   }}
                   animate={{
                     opacity: 1,
@@ -153,12 +161,12 @@ export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
                     // Stiff and underdamped: they arrive too fast and bounce
                     // back off the stop. That overshoot is the whole effect.
                     type: "spring",
-                    stiffness: 850,
-                    damping: 17,
-                    mass: 0.9,
+                    stiffness: 320,
+                    damping: 16,
+                    mass: 1.2,
                     delay: (n / LETTERS) * IMPACT,
-                    opacity: { duration: 0.12, delay: (n / LETTERS) * IMPACT },
-                    filter: { duration: 0.22, delay: (n / LETTERS) * IMPACT },
+                    opacity: { duration: 0.2, delay: (n / LETTERS) * IMPACT },
+                    filter: { duration: 0.34, delay: (n / LETTERS) * IMPACT },
                   }}
                 >
                   {letter}
@@ -194,13 +202,13 @@ function Rule({ animated }: { animated?: boolean }) {
         className={`${line} origin-right`}
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
-        transition={{ duration: 0.35, delay: IMPACT + 0.05, ease: [0.2, 1, 0.3, 1] }}
+        transition={{ duration: 0.5, delay: IMPACT + 0.08, ease: [0.2, 1, 0.3, 1] }}
       />
       <motion.span
         className="t-label whitespace-nowrap text-moon-dim"
         initial={{ opacity: 0, letterSpacing: "0.8em" }}
         animate={{ opacity: 1, letterSpacing: "0.22em" }}
-        transition={{ duration: 0.45, delay: IMPACT + 0.05, ease: [0.2, 1, 0.3, 1] }}
+        transition={{ duration: 0.6, delay: IMPACT + 0.08, ease: [0.2, 1, 0.3, 1] }}
       >
         Games for the room
       </motion.span>
@@ -208,7 +216,7 @@ function Rule({ animated }: { animated?: boolean }) {
         className={`${line} origin-left rotate-180`}
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
-        transition={{ duration: 0.35, delay: IMPACT + 0.05, ease: [0.2, 1, 0.3, 1] }}
+        transition={{ duration: 0.5, delay: IMPACT + 0.08, ease: [0.2, 1, 0.3, 1] }}
       />
     </div>
   );
