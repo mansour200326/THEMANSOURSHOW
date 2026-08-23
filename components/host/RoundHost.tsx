@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { BLUFF_REAL_ID } from "@/lib/games/roundGames";
 import { Tally } from "@/components/Tally";
+import { useCue, useCueWhen } from "@/components/useCue";
 import type { RoundState } from "@/lib/games/roundEngine";
 import { type Room, connectedPlayers, playerById } from "@/lib/room/types";
 
@@ -28,6 +29,22 @@ export function RoundHost({ room, state, onForce, onNext, onQuit }: Props) {
   const live = connectedPlayers(room);
   const isBluff = room.gameId === "bluff-trivia";
   const isHerd = room.gameId === "groupthink";
+
+  /*
+   * Most Likely To, Who Said It, Bluff Trivia and Groupthink all run through
+   * this screen, and it was the one host view with no sound in it at all.
+   */
+  useCue(
+    `${state.round}:${state.phase}`,
+    state.phase === "vote"
+      ? "whoosh"
+      : state.phase === "reveal"
+        ? Object.keys(state.lastScores).length
+          ? "correct"
+          : "wrong"
+        : null,
+  );
+  useCueWhen(state.phase === "done", "fanfare");
 
   const waitingOn = live.filter((p) =>
     state.phase === "collect"

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { SoundToggle } from "@/components/SoundToggle";
 import { ShowMark } from "@/components/ShowMark";
 import { familyClass } from "@/lib/games/families";
 import { gameList } from "@/lib/games/registry";
@@ -91,7 +90,6 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
                   Clear bots
                 </button>
               )}
-              <SoundToggle />
               <button
                 onClick={onAddBots}
                 disabled={bots.length >= 3}

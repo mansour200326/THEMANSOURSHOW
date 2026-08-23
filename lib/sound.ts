@@ -32,6 +32,7 @@ let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
 let muted = false;
 let noise: AudioBuffer | null = null;
+let unlocked = false;
 
 /** Read the host's choice once, on the client. */
 if (typeof window !== "undefined") {
@@ -52,8 +53,20 @@ function audio(): AudioContext | null {
     if (!Ctor) return null;
     ctx = new Ctor();
     master = ctx.createGain();
-    master.gain.value = 0.5;
-    master.connect(ctx.destination);
+    master.gain.value = 0.9;
+    /*
+     * A compressor between the cues and the speakers. It means the gains below
+     * can be loud enough to cut through a room without two cues landing
+     * together and clipping — which is the usual reason game audio ends up
+     * timid.
+     */
+    const limiter = ctx.createDynamicsCompressor();
+    limiter.threshold.setValueAtTime(-8, ctx.currentTime);
+    limiter.knee.setValueAtTime(6, ctx.currentTime);
+    limiter.ratio.setValueAtTime(12, ctx.currentTime);
+    limiter.attack.setValueAtTime(0.003, ctx.currentTime);
+    limiter.release.setValueAtTime(0.2, ctx.currentTime);
+    master.connect(limiter).connect(ctx.destination);
   }
   // Safari and Chrome both park the context until a gesture has happened.
   if (ctx.state === "suspended") void ctx.resume();
@@ -96,10 +109,18 @@ function tone(c: AudioContext, o: ToneOptions) {
       start + o.duration,
     );
   }
-  const peak = o.gain ?? 0.3;
+  const peak = o.gain ?? 0.5;
   const attack = o.attack ?? 0.006;
+  /*
+   * Attack, hold, then decay. The first version rang down from the instant it
+   * peaked, so the note spent nearly all its length almost silent and measured
+   * about -32dBFS — inaudible across a room. Holding the peak for the first
+   * half is most of the difference.
+   */
+  const hold = start + attack + (o.duration - attack) * 0.45;
   amp.gain.setValueAtTime(0.0001, start);
   amp.gain.exponentialRampToValueAtTime(peak, start + attack);
+  amp.gain.setValueAtTime(peak, hold);
   amp.gain.exponentialRampToValueAtTime(0.0001, start + o.duration);
   osc.connect(amp).connect(master!);
   osc.start(start);
@@ -108,7 +129,7 @@ function tone(c: AudioContext, o: ToneOptions) {
 
 function hit(
   c: AudioContext,
-  { at = 0, duration = 0.18, gain = 0.25, cutoff = 1800 } = {},
+  { at = 0, duration = 0.18, gain = 0.5, cutoff = 1800 } = {},
 ) {
   const start = c.currentTime + at;
   const src = c.createBufferSource();
@@ -132,39 +153,39 @@ function hit(
 const CUES: Record<Cue, (c: AudioContext) => void> = {
   /** The one that has to cut through everything. */
   buzz(c) {
-    tone(c, { type: "square", from: 200, to: 150, duration: 0.42, gain: 0.3 });
-    tone(c, { type: "square", from: 100, to: 74, duration: 0.42, gain: 0.22 });
+    tone(c, { type: "square", from: 200, to: 150, duration: 0.45, gain: 0.75 });
+    tone(c, { type: "square", from: 100, to: 74, duration: 0.45, gain: 0.5 });
   },
 
   correct(c) {
-    tone(c, { type: "triangle", from: 523, duration: 0.1, gain: 0.28 });
-    tone(c, { type: "triangle", from: 784, at: 0.09, duration: 0.22, gain: 0.28 });
+    tone(c, { type: "triangle", from: 523, duration: 0.13, gain: 0.6 });
+    tone(c, { type: "triangle", from: 784, at: 0.1, duration: 0.3, gain: 0.65 });
   },
 
   wrong(c) {
-    tone(c, { type: "sawtooth", from: 240, to: 90, duration: 0.4, gain: 0.22 });
-    hit(c, { duration: 0.22, gain: 0.16, cutoff: 700 });
+    tone(c, { type: "sawtooth", from: 240, to: 90, duration: 0.42, gain: 0.5 });
+    hit(c, { duration: 0.24, gain: 0.4, cutoff: 700 });
   },
 
   /** Face-Off's X. Percussive, and it should make people wince. */
   strike(c) {
-    hit(c, { duration: 0.3, gain: 0.34, cutoff: 1100 });
-    tone(c, { type: "square", from: 160, to: 60, duration: 0.34, gain: 0.26 });
+    hit(c, { duration: 0.32, gain: 0.7, cutoff: 1100 });
+    tone(c, { type: "square", from: 160, to: 60, duration: 0.36, gain: 0.6 });
   },
 
   /** A tile turning over. */
   reveal(c) {
-    tone(c, { type: "triangle", from: 700, to: 1400, duration: 0.16, gain: 0.24 });
-    tone(c, { type: "sine", from: 1400, at: 0.1, duration: 0.22, gain: 0.14 });
+    tone(c, { type: "triangle", from: 700, to: 1400, duration: 0.18, gain: 0.55 });
+    tone(c, { type: "sine", from: 1400, at: 0.12, duration: 0.26, gain: 0.35 });
   },
 
   pop(c) {
-    tone(c, { type: "sine", from: 420, to: 880, duration: 0.09, gain: 0.2 });
+    tone(c, { type: "sine", from: 420, to: 880, duration: 0.11, gain: 0.45 });
   },
 
   /** Quiet on purpose — it plays once a second and mustn't become annoying. */
   tick(c) {
-    tone(c, { type: "square", from: 1200, duration: 0.03, gain: 0.07 });
+    tone(c, { type: "square", from: 1200, duration: 0.04, gain: 0.22 });
   },
 
   timeup(c) {
@@ -173,15 +194,15 @@ const CUES: Record<Cue, (c: AudioContext) => void> = {
         type: "square",
         from: 880,
         at: i * 0.16,
-        duration: 0.12,
-        gain: 0.26,
+        duration: 0.14,
+        gain: 0.6,
       });
     }
   },
 
   whoosh(c) {
-    hit(c, { duration: 0.36, gain: 0.16, cutoff: 900 });
-    tone(c, { type: "sine", from: 180, to: 640, duration: 0.34, gain: 0.12 });
+    hit(c, { duration: 0.36, gain: 0.35, cutoff: 900 });
+    tone(c, { type: "sine", from: 180, to: 640, duration: 0.34, gain: 0.3 });
   },
 
   /** Somebody won. Worth four notes. */
@@ -191,11 +212,11 @@ const CUES: Record<Cue, (c: AudioContext) => void> = {
         type: "triangle",
         from: hz,
         at: i * 0.11,
-        duration: i === 3 ? 0.7 : 0.2,
-        gain: 0.26,
+        duration: i === 3 ? 0.8 : 0.22,
+        gain: 0.62,
       });
     });
-    tone(c, { type: "sine", from: 1568, at: 0.33, duration: 0.8, gain: 0.1 });
+    tone(c, { type: "sine", from: 1568, at: 0.35, duration: 0.9, gain: 0.28 });
   },
 };
 
@@ -229,10 +250,26 @@ export function setMuted(next: boolean) {
  * other route in as well.
  */
 export function unlockAudio() {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || unlocked) return;
+  unlocked = true;
+
+  /*
+   * Not `{ once: true }`. Browsers park the context again when a tab is
+   * backgrounded, and a TV left on all evening will be backgrounded plenty, so
+   * every interaction gets a chance to wake it rather than just the first.
+   */
   const wake = () => {
-    if (!muted) audio();
+    if (muted) return;
+    const c = audio();
+    if (c && c.state === "suspended") void c.resume();
   };
-  window.addEventListener("pointerdown", wake, { once: true });
-  window.addEventListener("keydown", wake, { once: true });
+
+  window.addEventListener("pointerdown", wake);
+  window.addEventListener("keydown", wake);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) wake();
+  });
 }
+
+/** Whether the browser is actually letting us make a noise. For diagnostics. */
+export const audioState = () => ctx?.state ?? "none";
