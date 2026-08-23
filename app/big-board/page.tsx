@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { BoardGrid } from "@/components/board/BoardGrid";
 import { ClueStage } from "@/components/bigboard/ClueStage";
 import { FinalStage } from "@/components/bigboard/FinalStage";
-import { GeneratingScreen } from "@/components/bigboard/GeneratingScreen";
+import { Generating } from "@/components/Generating";
 import { ScoreBar } from "@/components/bigboard/ScoreBar";
 import { SetupScreen, type SetupConfig } from "@/components/bigboard/SetupScreen";
 import { WagerStage } from "@/components/bigboard/WagerStage";
@@ -156,8 +156,10 @@ function BigBoardStage() {
 
   if (pending) {
     return (
-      <GeneratingScreen
-        categories={pending.categories}
+      <Generating
+        title="Writing the board"
+        items={pending.categories}
+        note="Five clues for every category, plus one Final Round."
         onCancel={() => {
           abortRef.current?.abort();
           setPending(null);

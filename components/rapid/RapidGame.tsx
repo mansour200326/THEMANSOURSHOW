@@ -4,7 +4,7 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { DifficultyBar } from "@/components/DifficultyBar";
-import { GeneratingScreen } from "@/components/bigboard/GeneratingScreen";
+import { Generating } from "@/components/Generating";
 import { RapidStage } from "@/components/rapid/RapidStage";
 import { HowToPlay } from "@/components/HowToPlay";
 import { PackWorkshop } from "@/components/packs/PackWorkshop";
@@ -115,8 +115,9 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
 
   if (generating) {
     return (
-      <GeneratingScreen
-        categories={usableThemes(themes).length ? usableThemes(themes) : [RAPID_TITLE[mode]]}
+      <Generating
+        title="Writing the prompts"
+        items={usableThemes(themes).length ? usableThemes(themes) : [RAPID_TITLE[mode]]}
         onCancel={() => {
           abort.current?.abort();
           setGenerating(false);

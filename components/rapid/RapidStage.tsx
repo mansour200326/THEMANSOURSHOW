@@ -173,7 +173,7 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="flex flex-col items-center"
+            className="flex flex-col items-center gap-[1.5vmin]"
           >
             <motion.span
               animate={urgent ? { scale: [1, 1.08, 1] } : { scale: 1 }}
@@ -186,6 +186,15 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
             >
               {left < 10 ? left.toFixed(1) : Math.ceil(left)}
             </motion.span>
+
+            {/*
+              * Nobody wants to watch eleven seconds run down after a team has
+              * already dried up, or already got there. Stopping the clock is
+              * the same as the clock stopping itself.
+              */}
+            <button onClick={onTimeUp} className="btn-ghost px-10 py-3 text-lg">
+              Finish now
+            </button>
           </motion.div>
         )}
 

@@ -4,7 +4,7 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FeudBoard } from "@/components/feud/FeudBoard";
 import { type FeudConfig, FeudSetup } from "@/components/feud/FeudSetup";
-import { GeneratingScreen } from "@/components/bigboard/GeneratingScreen";
+import { Generating } from "@/components/Generating";
 import { HowToPlay } from "@/components/HowToPlay";
 import { PackWorkshop } from "@/components/packs/PackWorkshop";
 import { packToSurvey } from "@/lib/packs/convert";
@@ -106,8 +106,10 @@ function FaceOffStage() {
 
   if (generating) {
     return (
-      <GeneratingScreen
-        categories={generating.themes.length ? generating.themes : ["Face-Off"]}
+      <Generating
+        title="Writing the survey"
+        items={generating.themes.length ? generating.themes : ["Face-Off"]}
+        note="A question and its top answers for every round, ranked the way a hundred people would have."
         onCancel={() => {
           abort.current?.abort();
           setGenerating(null);

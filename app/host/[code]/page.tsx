@@ -2,13 +2,14 @@
 
 import { use } from "react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { BuzzHost } from "@/components/host/BuzzHost";
 import { GridHost } from "@/components/host/GridHost";
 import { ImpostorHost } from "@/components/host/ImpostorHost";
 import { LiveHost } from "@/components/host/LiveHost";
 import { SketchHost } from "@/components/host/SketchHost";
 import { GameSetup } from "@/components/host/GameSetup";
+import { Generating } from "@/components/Generating";
 import { HowToPlay } from "@/components/HowToPlay";
 import { PackWorkshop } from "@/components/packs/PackWorkshop";
 import { packToStartPayload } from "@/lib/packs/convert";
@@ -42,6 +43,9 @@ export default function HostPage({
   /** Set while the host is writing their own content for a game. */
   const [writingFor, setWritingFor] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  /** The themes being written from, for the loading screen. */
+  const [writingThemes, setWritingThemes] = useState<string[]>([]);
+  const writingAbort = useRef<AbortController | null>(null);
   const [setupError, setSetupError] = useState<string | null>(null);
 
   /** Games that ask what they should be about before they start. */
@@ -70,9 +74,13 @@ export default function HostPage({
       return;
     }
     setBusy(true);
+    setWritingThemes(config.categories);
+    const controller = new AbortController();
+    writingAbort.current = controller;
     try {
       const res = await fetch(board ? "/api/board" : "/api/content", {
         method: "POST",
+        signal: controller.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
           board
@@ -95,9 +103,14 @@ export default function HostPage({
         words: data.words,
       });
     } catch (e) {
-      setSetupError(e instanceof Error ? e.message : "Couldn't write that one.");
+      // A cancel isn't an error worth putting on the TV.
+      if (!controller.signal.aborted) {
+        setSetupError(e instanceof Error ? e.message : "Couldn't write that one.");
+      }
     } finally {
+      writingAbort.current = null;
       setBusy(false);
+      setWritingThemes([]);
     }
   };
 
@@ -125,6 +138,21 @@ export default function HostPage({
           Opening room {roomCode}…
         </p>
       </main>
+    );
+  }
+
+  if (busy) {
+    return (
+      <Generating
+        title={`Writing ${setupFor ? NEEDS_SETUP[setupFor] : "it"}`}
+        items={writingThemes}
+        onCancel={() => {
+          // Actually stop the request, rather than just hiding the screen and
+          // letting the game start anyway when it lands.
+          writingAbort.current?.abort();
+          setBusy(false);
+        }}
+      />
     );
   }
 

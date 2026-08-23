@@ -69,6 +69,26 @@ let undone = rapidReducer(made, { type: "UNDO" });
 check("undo returns to judging", undone.phase, "judge");
 check("undo returns the points", scores(undone), [0, 0]);
 
+/* ------------------------------------- finishing the clock early */
+
+// The host's "Finish now" button and the clock running out are the same
+// action. The reducer has no idea how much time was left, which is precisely
+// why stopping early can't behave differently from stopping late.
+for (const mode of ["categories", "three-in-five"] as const) {
+  let early = start(mode);
+  if (mode === "categories") early = rapidReducer(early, { type: "SET_BID", team: 0, count: 3 });
+  early = rapidReducer(early, { type: "GO" });
+  check(`${mode}: running`, early.phase, "running");
+  early = rapidReducer(early, { type: "TIME_UP" });
+  check(`${mode}: finishing early goes straight to judging`, early.phase, "judge");
+  const scored = rapidReducer(early, { type: "SCORE", points: 4 });
+  check(`${mode}: and the turn scores normally`, scored.phase !== "judge", true);
+}
+
+// TIME_UP is ignored from anywhere else, so a stray press can't skip a turn.
+check("time up does nothing while bidding", rapidReducer(start("categories"), { type: "TIME_UP" }).phase, "bidding");
+check("time up does nothing while ready", rapidReducer(start("three-in-five"), { type: "TIME_UP" }).phase, "ready");
+
 /* ------------------------------------------- Three in Five is unchanged */
 
 let t = start("three-in-five");
