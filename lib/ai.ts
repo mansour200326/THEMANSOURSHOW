@@ -9,7 +9,7 @@ import type { FeudQuestion } from "@/lib/feud/types";
 import type { ImpostorPlace } from "@/lib/games/impostor";
 import type { BuzzItem } from "@/lib/games/buzzEngine";
 import type { LiveItem } from "@/lib/games/liveEngine";
-import { type Difficulty, difficultyBrief } from "@/lib/difficulty";
+import { type Difficulty, difficultyBrief, varietyBrief } from "@/lib/difficulty";
 
 /**
  * Server-side AI content generation. Every generator here returns the same
@@ -80,7 +80,9 @@ const GeneratedCategory = z.object({
   title: z.string().describe("The category title, in CAPS, as it appears on the board."),
   clues: z
     .array(GeneratedClue)
-    .describe("Exactly five clues, easiest first, hardest last."),
+    .describe(
+      "Exactly five clues, easiest first, hardest last, all inside the difficulty band you were given.",
+    ),
 });
 
 const GeneratedBoard = z.object({
@@ -97,8 +99,10 @@ const SYSTEM = `You write clues for a party game played by a group of friends ar
 Rules:
 - Produce exactly one category per requested title, in the order given. Keep the
   host's topic; you may tidy the wording into a punchy CAPS board title.
-- Exactly five clues per category, ordered easiest to hardest. The fifth should
-  be genuinely hard — something only a real fan of the topic would get.
+- Exactly five clues per category, ordered easiest to hardest WITHIN the
+  difficulty band you are given below. The band is absolute: a 100 on a hard
+  board is harder than a 500 on a medium one. Do not write a general spread and
+  then re-sort it — write to the band.
 - A clue is a statement, never a question. The answer is short: a name, a title,
   a year, a place. No full sentences in the answer.
 - Every clue must be factually correct and have exactly one defensible answer.
@@ -120,7 +124,9 @@ function buildPrompt(categories: string[], vibe: string): string {
   const extra = vibe.trim()
     ? `\n\nThe host also asked for: ${vibe.trim()}`
     : "";
-  return `Write the board for these ${categories.length} categories:\n\n${list}${extra}`;
+  // The variety brief goes in the user turn rather than the system prompt, so
+  // it changes on every call instead of being cached along with the rules.
+  return `Write the board for these ${categories.length} categories:\n\n${list}${extra}\n\n${varietyBrief()}`;
 }
 
 /* --------------------------------------------------------------- generation */

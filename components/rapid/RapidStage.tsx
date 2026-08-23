@@ -11,16 +11,21 @@ import {
 
 type Props = {
   state: RapidState;
+  /** Categories: the bidding is settled. */
+  onBid: (team: number, count: number) => void;
   onGo: () => void;
   onTimeUp: () => void;
   onScore: (points: number) => void;
 };
 
-export function RapidStage({ state, onGo, onTimeUp, onScore }: Props) {
+export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
   const prompt = rapidPrompt(state);
   const team = state.teams[state.turn];
   const [left, setLeft] = useState(state.seconds);
   const [count, setCount] = useState(0);
+  // Who's winning the bidding, and at what. Both reset with the category.
+  const [bidTeam, setBidTeam] = useState(0);
+  const [bid, setBid] = useState(5);
   const startedAt = useRef<number>(0);
 
   // Clock runs locally — the reducer only cares that it finished.
@@ -46,6 +51,12 @@ export function RapidStage({ state, onGo, onTimeUp, onScore }: Props) {
   // Fresh tally for each turn.
   useEffect(() => setCount(0), [state.round, state.turn, state.phase]);
 
+  // A new category means new bidding.
+  useEffect(() => {
+    setBid(5);
+    setBidTeam(0);
+  }, [state.round]);
+
   const urgent = left <= (state.mode === "three-in-five" ? 2 : 6);
 
   // A tick a second while the clock runs down, and a klaxon when it stops.
@@ -57,7 +68,11 @@ export function RapidStage({ state, onGo, onTimeUp, onScore }: Props) {
     <div className="flex h-full flex-col items-center justify-center gap-[3vmin] text-center">
       <div>
         <p className="t-label font-display uppercase text-moon-deep">
-          Round {state.round + 1} of {state.prompts.length} · {team?.name}
+          Round {state.round + 1} of {state.prompts.length}
+          {state.phase === "bidding" ? " · up for bids" : ` · ${team?.name}`}
+          {state.mode === "categories" && state.phase !== "bidding" && state.bid
+            ? ` · called ${state.bid}`
+            : ""}
         </p>
         <motion.p
           key={prompt}
@@ -70,6 +85,69 @@ export function RapidStage({ state, onGo, onTimeUp, onScore }: Props) {
       </div>
 
       <AnimatePresence mode="wait">
+        {state.phase === "bidding" && (
+          <motion.div
+            key="bidding"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex flex-col items-center gap-[2vmin]"
+          >
+            <p className="font-display text-[clamp(0.9rem,1.5vw,1.6rem)] uppercase tracking-[0.25em] text-moon-deep">
+              Bid against each other — how many can you name?
+            </p>
+
+            <div className="flex flex-wrap justify-center gap-3">
+              {state.teams.map((t, i) => (
+                <button
+                  key={t.id}
+                  onClick={() => setBidTeam(i)}
+                  className={[
+                    "rounded-full border px-8 py-3 font-display text-[clamp(1rem,2vw,1.8rem)] uppercase tracking-wide transition-colors",
+                    i === bidTeam
+                      ? "border-accent bg-accent/20 text-accent-bright"
+                      : "border-white/15 text-moon/70",
+                  ].join(" ")}
+                >
+                  {t.name}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-5">
+              <button
+                onClick={() => setBid((b) => Math.max(1, b - 1))}
+                aria-label="Lower the bid"
+                className="btn-ghost h-16 w-16 px-0 text-3xl"
+              >
+                −
+              </button>
+              <span className="accent-text w-32 font-display text-[clamp(3rem,8vw,7rem)] font-bold tabular-nums">
+                {bid}
+              </span>
+              <button
+                onClick={() => setBid((b) => b + 1)}
+                aria-label="Raise the bid"
+                className="btn-ghost h-16 w-16 px-0 text-3xl"
+              >
+                +
+              </button>
+            </div>
+
+            <button
+              onClick={() => onBid(bidTeam, bid)}
+              className="btn-accent px-14 py-4 text-xl"
+            >
+              {state.teams[bidTeam]?.name} takes it at {bid}
+            </button>
+            <p className="max-w-[60ch] text-[clamp(0.75rem,1.1vw,1rem)] text-moon-deep">
+              Whoever bids highest plays the category alone. Reach the number and
+              you score everything you named; fall short and the other side takes
+              the bid.
+            </p>
+          </motion.div>
+        )}
+
         {state.phase === "ready" && (
           <motion.div
             key="ready"
@@ -79,7 +157,9 @@ export function RapidStage({ state, onGo, onTimeUp, onScore }: Props) {
             className="flex flex-col items-center gap-[2vmin]"
           >
             <p className="font-display text-[clamp(0.9rem,1.5vw,1.6rem)] uppercase tracking-[0.25em] text-moon-deep">
-              {RAPID_RULE[state.mode]}
+              {state.mode === "categories"
+                ? `${team?.name} — name ${state.bid} or more`
+                : RAPID_RULE[state.mode]}
             </p>
             <button onClick={onGo} className="btn-accent px-16 py-5 text-2xl">
               Start the clock
@@ -123,7 +203,7 @@ export function RapidStage({ state, onGo, onTimeUp, onScore }: Props) {
             {state.mode === "categories" ? (
               <>
                 <p className="t-label font-display uppercase text-moon-deep">
-                  How many did {team?.name} get?
+                  How many did {team?.name} get? They called {state.bid}.
                 </p>
                 <div className="flex items-center gap-5">
                   <button
@@ -144,9 +224,14 @@ export function RapidStage({ state, onGo, onTimeUp, onScore }: Props) {
                 </div>
                 <button
                   onClick={() => onScore(count)}
-                  className="btn-accent px-14 py-4 text-xl"
+                  className={[
+                    "px-14 py-4 text-xl",
+                    count >= state.bid ? "btn-good" : "btn-bad",
+                  ].join(" ")}
                 >
-                  Bank {count} {count === 1 ? "point" : "points"}
+                  {count >= state.bid
+                    ? `Made it — ${count} to ${team?.name}`
+                    : `Short — ${state.bid} to ${state.teams[(state.turn + 1) % state.teams.length]?.name}`}
                 </button>
               </>
             ) : (

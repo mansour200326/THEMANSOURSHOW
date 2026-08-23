@@ -111,14 +111,18 @@ export const RULES: Record<string, GameRules> = {
     needs: "This screen only.",
   },
   categories: {
-    summary: "Thirty seconds to name as many as you can.",
+    summary: "Bid for the category, then prove you can do it.",
     how: [
-      "A category goes up — 'things in a kitchen'.",
-      "One team shouts as many as they can before the clock runs out.",
-      "You count them and tap the number in.",
+      "A category goes up — 'things you'd find in a kitchen'.",
+      "The teams bid against each other out loud: “I can name six.” “I can name nine.”",
+      "Whoever bids highest takes the category and plays it alone, on the clock.",
+      "You count what they managed and tap it in.",
     ],
-    scoring: "A point for each one. Then it's the next team's turn.",
+    scoring:
+      "Reach your bid and you score everything you named. Fall short and the other team takes the number you bid — which is what stops anyone bidding twenty.",
     needs: "This screen only.",
+    example:
+      "The category is “Countries in Africa”. One team says seven, the other says nine, the first says eleven and the second gives up. The first team now has thirty seconds to name eleven. Ten and they get nothing and hand over eleven points.",
   },
   "three-in-five": {
     summary: "Name three things. Five seconds. Go.",

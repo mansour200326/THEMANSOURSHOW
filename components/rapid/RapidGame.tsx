@@ -333,6 +333,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
         ) : (
           <RapidStage
             state={state}
+            onBid={(team, count) => dispatch({ type: "SET_BID", team, count })}
             onGo={() => dispatch({ type: "GO" })}
             onTimeUp={() => dispatch({ type: "TIME_UP" })}
             onScore={(points) => dispatch({ type: "SCORE", points })}

@@ -1,4 +1,5 @@
 import {
+  RAPID_BIDS,
   type RapidMode,
   type RapidState,
   type RapidTeam,
@@ -15,6 +16,9 @@ export const emptyRapid = (mode: RapidMode): RapidState => ({
   prompts: [],
   round: 0,
   turn: 0,
+  bid: 0,
+  lastCount: 0,
+  lastMade: false,
   seconds: RAPID_SECONDS[mode],
   lastAward: 0,
   past: [],
@@ -22,6 +26,8 @@ export const emptyRapid = (mode: RapidMode): RapidState => ({
 
 export type RapidAction =
   | { type: "START"; teamNames: string[]; theme: string; prompts: string[] }
+  /** Categories: the bidding is over — this team claimed this many. */
+  | { type: "SET_BID"; team: number; count: number }
   | { type: "GO" }
   | { type: "TIME_UP" }
   | { type: "SCORE"; points: number }
@@ -43,11 +49,19 @@ export function rapidReducer(state: RapidState, action: RapidAction): RapidState
     case "START":
       return {
         ...emptyRapid(state.mode),
-        phase: "ready",
+        // Categories starts with the room bidding, not with a clock.
+        phase: RAPID_BIDS(state.mode) ? "bidding" : "ready",
         theme: action.theme,
         teams: action.teamNames.map(makeTeam),
         prompts: action.prompts,
       };
+
+    case "SET_BID": {
+      if (state.phase !== "bidding") return state;
+      const team = Math.max(0, Math.min(state.teams.length - 1, action.team));
+      const count = Math.max(1, Math.round(action.count));
+      return { ...state, phase: "ready", turn: team, bid: count };
+    }
 
     case "GO":
       return state.phase === "ready"
@@ -60,11 +74,40 @@ export function rapidReducer(state: RapidState, action: RapidAction): RapidState
     /** Host banks the turn: a count for Categories, 1 or 0 for Three in Five. */
     case "SCORE": {
       if (state.phase !== "judge") return state;
-      const points = Math.max(0, Math.round(action.points));
-      const teams = state.teams.map((t, i) =>
-        i === state.turn ? { ...t, score: t.score + points } : t,
-      );
+      const count = Math.max(0, Math.round(action.points));
 
+      if (RAPID_BIDS(state.mode)) {
+        /*
+         * They either reach what they claimed or they don't. Making it pays
+         * everything they named; falling short hands the bid to the other
+         * side, which is what stops the bidding running away.
+         */
+        const made = count >= state.bid;
+        const other = (state.turn + 1) % state.teams.length;
+        const winner = made ? state.turn : other;
+        const points = made ? count : state.bid;
+        const teams = state.teams.map((t, i) =>
+          i === winner ? { ...t, score: t.score + points } : t,
+        );
+        // One category, one team — so a category is a whole round.
+        const round = state.round + 1;
+        const finished = round >= state.prompts.length;
+        return {
+          ...state,
+          past: snapshot(state),
+          teams,
+          round,
+          bid: 0,
+          lastAward: points,
+          lastCount: count,
+          lastMade: made,
+          phase: finished ? "winner" : "bidding",
+        };
+      }
+
+      const teams = state.teams.map((t, i) =>
+        i === state.turn ? { ...t, score: t.score + count } : t,
+      );
       const nextTurn = (state.turn + 1) % state.teams.length;
       // A round is done once it's been all the way around the teams.
       const wrapped = nextTurn === 0;
@@ -77,7 +120,9 @@ export function rapidReducer(state: RapidState, action: RapidAction): RapidState
         teams,
         turn: nextTurn,
         round,
-        lastAward: points,
+        lastAward: count,
+        lastCount: count,
+        lastMade: true,
         phase: finished ? "winner" : "ready",
       };
     }
