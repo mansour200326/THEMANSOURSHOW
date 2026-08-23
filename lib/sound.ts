@@ -24,7 +24,9 @@ export type Cue =
   | "tick"
   | "timeup"
   | "whoosh"
-  | "fanfare";
+  | "fanfare"
+  /** The title card: a rise into the moment the letters hit. */
+  | "title";
 
 const STORAGE_KEY = "bignight:muted";
 
@@ -146,6 +148,32 @@ function hit(
 }
 
 /**
+ * Filtered noise with the filter climbing — the sound of something arriving.
+ * Separate from `hit` because that one is a thud and this one is a lift.
+ */
+function rise(
+  c: AudioContext,
+  { at = 0, duration = 0.6, gain = 0.4, from = 200, to = 3000 } = {},
+) {
+  const start = c.currentTime + at;
+  const src = c.createBufferSource();
+  src.buffer = noiseBuffer(c);
+  src.loop = true;
+  const filter = c.createBiquadFilter();
+  filter.type = "bandpass";
+  filter.Q.setValueAtTime(1.2, start);
+  filter.frequency.setValueAtTime(from, start);
+  filter.frequency.exponentialRampToValueAtTime(to, start + duration);
+  const amp = c.createGain();
+  amp.gain.setValueAtTime(0.0001, start);
+  amp.gain.exponentialRampToValueAtTime(gain, start + duration * 0.92);
+  amp.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+  src.connect(filter).connect(amp).connect(master!);
+  src.start(start);
+  src.stop(start + duration + 0.02);
+}
+
+/**
  * Each cue is written to be recognisable from across a room with people
  * talking over it — short, with its meaning in the pitch direction. Up is
  * good, down is bad, flat and harsh is the buzzer.
@@ -205,6 +233,26 @@ const CUES: Record<Cue, (c: AudioContext) => void> = {
     tone(c, { type: "sine", from: 180, to: 640, duration: 0.34, gain: 0.3 });
   },
 
+  /**
+   * The cold open. The timings here are the animation's, not this file's —
+   * IMPACT in components/ShowMark.tsx is 0.6s, so the rise runs for exactly
+   * that long and everything loud lands on the frame the letters do.
+   */
+  title(c) {
+    // The letters flying in.
+    rise(c, { duration: 0.6, gain: 0.32, from: 180, to: 2600 });
+    tone(c, { type: "sine", from: 70, to: 300, duration: 0.6, gain: 0.3, attack: 0.2 });
+
+    // The hit.
+    tone(c, { type: "sine", from: 150, to: 42, at: 0.6, duration: 0.9, gain: 0.95 });
+    hit(c, { at: 0.6, duration: 0.4, gain: 0.7, cutoff: 600 });
+    tone(c, { type: "triangle", from: 784, at: 0.6, duration: 0.35, gain: 0.4 });
+    tone(c, { type: "triangle", from: 1175, at: 0.62, duration: 0.4, gain: 0.3 });
+
+    // The sparks, ringing out after it.
+    tone(c, { type: "sine", from: 2093, at: 0.72, duration: 0.9, gain: 0.16 });
+  },
+
   /** Somebody won. Worth four notes. */
   fanfare(c) {
     [523, 659, 784, 1047].forEach((hz, i) => {
@@ -220,16 +268,45 @@ const CUES: Record<Cue, (c: AudioContext) => void> = {
   },
 };
 
-/** Make the noise. Safe to call from anywhere, including the server. */
-export function play(cue: Cue) {
-  if (muted) return;
+/**
+ * Make the noise. Safe to call from anywhere, including the server.
+ *
+ * Returns false when nothing was heard — muted, no audio at all, or the
+ * browser still holding the context shut because nobody has touched the page
+ * yet. Most callers ignore it; the title card uses it to try again.
+ */
+export function play(cue: Cue): boolean {
+  if (muted) return false;
   const c = audio();
-  if (!c || !master) return;
+  if (!c || !master) return false;
+  // A suspended context accepts the notes and plays none of them.
+  if (c.state !== "running") return false;
   try {
     CUES[cue](c);
+    return true;
   } catch {
     // A cue is never important enough to break a game over.
+    return false;
   }
+}
+
+/**
+ * The title card couldn't play because the page hadn't been touched. Fire it
+ * on the first thing the host does instead, so the sound isn't simply lost.
+ */
+export function primeTitleSound() {
+  if (typeof window === "undefined" || muted) return;
+  const go = () => {
+    window.removeEventListener("pointerdown", go);
+    window.removeEventListener("keydown", go);
+    const c = audio();
+    if (!c) return;
+    // resume() is asynchronous, so wait for it rather than firing into a
+    // context that is still shut.
+    void Promise.resolve(c.resume()).then(() => play("title"));
+  };
+  window.addEventListener("pointerdown", go, { once: true });
+  window.addEventListener("keydown", go, { once: true });
 }
 
 export const isMuted = () => muted;

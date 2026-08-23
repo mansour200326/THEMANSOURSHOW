@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { IMPACT } from "@/components/ShowMark";
+import { play, primeTitleSound } from "@/lib/sound";
 
 /**
  * The cold open. A field of game-board tiles floating in real 3D space behind
@@ -61,6 +62,20 @@ export function HeroStage({
   });
 
   useEffect(() => setReady(true), []);
+
+  /*
+   * The title card's own sound, scheduled from the same instant the letters
+   * start flying so the bang lands on the frame they do.
+   *
+   * A browser won't make a noise before the page has been touched, so on a
+   * genuinely cold open this is silent and there is nothing to be done about
+   * it. primeTitleSound arranges for it to play on the first interaction
+   * instead — a tap on "Host a game" gets the bang, which is better than the
+   * room never hearing the thing exists.
+   */
+  useEffect(() => {
+    if (!play("title")) primeTitleSound();
+  }, []);
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
