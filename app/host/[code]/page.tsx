@@ -130,8 +130,9 @@ export default function HostPage({
           Room {roomCode} is gone
         </h1>
         <p className="max-w-md text-moon-dim">
-          Rooms live in the server&apos;s memory, so restarting it clears them.
-          Start a fresh one and the phones can rejoin.
+          Rooms are kept for twelve hours, and a deploy without a mounted
+          volume clears them sooner. Start a fresh one and the phones can
+          rejoin with the new code.
         </p>
         <Link href="/" className="btn-brand px-8 py-4 text-lg">
           Host a new room
