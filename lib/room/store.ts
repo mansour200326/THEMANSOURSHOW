@@ -2,6 +2,7 @@ import "server-only";
 
 import { games } from "@/lib/games/registry";
 import { BOT_ROSTER, settleBots } from "@/lib/room/bots";
+import { loadRooms, saveRooms } from "@/lib/room/persist";
 import {
   type Action,
   type Player,
@@ -12,9 +13,12 @@ import {
 
 /**
  * Rooms live in this process's memory. That's deliberate: one laptop serving one
- * living room needs no Redis, no accounts, no network hop. It also means a
- * server restart clears the room — fine for a party, and the thing to replace
- * when this gets deployed somewhere with more than one instance.
+ * living room needs no Redis, no accounts, no network hop.
+ *
+ * Memory is still the source of truth, but every change is now mirrored to disk
+ * (see persist.ts) and read back at boot, so restarting the server — or
+ * deploying a fix while people are playing — no longer ends the game and
+ * invalidates the code on the TV.
  *
  * Stashed on globalThis so Next's dev hot-reload doesn't wipe a live game.
  */
@@ -25,7 +29,9 @@ const g = globalThis as unknown as {
   __showListeners?: Map<string, Set<Listener>>;
 };
 
-const rooms = (g.__showRooms ??= new Map<string, Room>());
+const rooms = (g.__showRooms ??= new Map<string, Room>(
+  loadRooms().map((room) => [room.code, room]),
+));
 const listeners = (g.__showListeners ??= new Map<string, Set<Listener>>());
 
 /* ------------------------------------------------------------------ access */
@@ -48,6 +54,7 @@ export function createRoom(): Room {
     version: 0,
   };
   rooms.set(code, room);
+  saveRooms(rooms.values());
   return room;
 }
 
@@ -66,6 +73,7 @@ export function subscribe(code: string, fn: Listener): () => void {
 
 function publish(room: Room) {
   rooms.set(room.code, room);
+  saveRooms(rooms.values());
   listeners.get(room.code)?.forEach((fn) => {
     try {
       fn(room);

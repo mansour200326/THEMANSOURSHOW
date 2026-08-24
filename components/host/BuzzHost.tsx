@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { BoardGrid } from "@/components/board/BoardGrid";
 import { useCue, useCueWhen } from "@/components/useCue";
 import { Tally } from "@/components/Tally";
-import { type BuzzState, buzzCurrent } from "@/lib/games/buzzEngine";
+import { type BuzzState, buzzArmed, buzzCurrent } from "@/lib/games/buzzEngine";
 import { type Room, connectedPlayers, playerById } from "@/lib/room/types";
 
 type Props = {
@@ -17,6 +17,23 @@ type Props = {
 export function BuzzHost({ room, state, send }: Props) {
   const item = buzzCurrent(state);
   const buzzer = playerById(room, state.buzzedBy ?? undefined);
+
+  /*
+   * The buzzers arm a beat after the clue appears, so the round is won by
+   * whoever reads fastest rather than whoever was already holding the button.
+   * Recomputed on a timer because it's a wall-clock question, not a state one.
+   */
+  const [armed, setArmed] = useState(false);
+  useEffect(() => {
+    if (state.phase !== "open" || !state.openedAt) {
+      setArmed(false);
+      return;
+    }
+    const check = () => setArmed(buzzArmed(state));
+    check();
+    const id = window.setInterval(check, 100);
+    return () => window.clearInterval(id);
+  }, [state.phase, state.openedAt, state]);
 
   // The buzzer landing, then whichever way the host called it.
   useCue(state.buzzedBy, state.buzzedBy ? "buzz" : null);
@@ -115,14 +132,25 @@ export function BuzzHost({ room, state, send }: Props) {
                   </span>
                 </motion.div>
               ) : state.phase === "open" ? (
-                <motion.p
-                  key="open"
-                  animate={{ opacity: [0.45, 1, 0.45] }}
-                  transition={{ duration: 1.6, repeat: Infinity }}
-                  className="font-display text-[clamp(1.1rem,2.4vw,2.6rem)] uppercase tracking-[0.3em] text-accent"
-                >
-                  Buzz in
-                </motion.p>
+                armed ? (
+                  <motion.p
+                    key="open"
+                    animate={{ opacity: [0.45, 1, 0.45] }}
+                    transition={{ duration: 1.6, repeat: Infinity }}
+                    className="font-display text-[clamp(1.1rem,2.4vw,2.6rem)] uppercase tracking-[0.3em] text-accent"
+                  >
+                    Buzz in
+                  </motion.p>
+                ) : (
+                  <motion.p
+                    key="arming"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="font-display text-[clamp(1.1rem,2.4vw,2.6rem)] uppercase tracking-[0.3em] text-moon-deep"
+                  >
+                    Read it…
+                  </motion.p>
+                )
               ) : null}
             </AnimatePresence>
 
@@ -160,15 +188,23 @@ export function BuzzHost({ room, state, send }: Props) {
             </button>
           </>
         )}
-        {state.phase === "open" && (
-          <>
-            <button onClick={() => send("reveal")} className="btn-ghost text-sm">
-              Show on TV
-            </button>
-            <button onClick={() => send("skip")} className="btn-ghost text-sm">
-              Nobody — next
-            </button>
-          </>
+
+        {/*
+          * Putting the answer on the TV is a normal part of running the game,
+          * not a hidden host tool. It used to exist only while buzzing was
+          * open and only as small grey text, so the only way to see an answer
+          * mid-round was the host squinting at Peek.
+          */}
+        {item && !state.revealed && state.phase !== "picking" && state.phase !== "done" && (
+          <button onClick={() => send("reveal")} className="btn-accent px-8 py-3">
+            Reveal the answer
+          </button>
+        )}
+
+        {(state.phase === "open" || state.phase === "buzzed") && (
+          <button onClick={() => send("skip")} className="btn-ghost text-sm">
+            Nobody got it — next
+          </button>
         )}
 
         {/* Host-only answer check — small on purpose. */}

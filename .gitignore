@@ -13,3 +13,6 @@ out
 .DS_Store
 next-env.d.ts
 *.tsbuildinfo
+
+# Room snapshots, so a restart doesn't end the night
+.bignight/

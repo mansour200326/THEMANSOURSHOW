@@ -1,7 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import type { BuzzState } from "@/lib/games/buzzEngine";
+import { type BuzzState, buzzArmed } from "@/lib/games/buzzEngine";
 import type { Player, Room } from "@/lib/room/types";
 
 type Props = {
@@ -14,6 +15,26 @@ type Props = {
 
 export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
   const iAmOut = state.lockedOut.includes(me.id);
+
+  /*
+   * The button is dead for a beat after the clue appears. Showing that plainly
+   * matters — a button that looks live but ignores you feels broken, and one
+   * that quietly locks you out for pressing it feels unfair unless it warned
+   * you first.
+   */
+  const [armed, setArmed] = useState(false);
+  useEffect(() => {
+    if (state.phase !== "open" || !state.openedAt) {
+      setArmed(false);
+      return;
+    }
+    const check = () => setArmed(buzzArmed(state));
+    check();
+    const id = window.setInterval(check, 80);
+    return () => window.clearInterval(id);
+  }, [state.phase, state.openedAt, state]);
+
+  const live = state.phase === "open" && armed && !iAmOut;
   const iBuzzed = state.buzzedBy === me.id;
   const someoneElse = Boolean(state.buzzedBy) && !iBuzzed;
 
@@ -86,18 +107,16 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
             ? "You're out this round"
             : someoneElse
               ? "Someone beat you to it"
-              : "Watch the TV"}
+              : state.phase === "open" && !armed
+                ? "Wait for it…"
+                : "Watch the TV"}
       </p>
 
       <motion.button
         onClick={onBuzz}
-        disabled={state.phase !== "open" || iAmOut}
+        disabled={!live}
         whileTap={{ scale: 0.94 }}
-        animate={
-          state.phase === "open" && !iAmOut
-            ? { scale: [1, 1.02, 1] }
-            : { scale: 1 }
-        }
+        animate={live ? { scale: [1, 1.02, 1] } : { scale: 1 }}
         transition={{ duration: 1.4, repeat: Infinity }}
         className={[
           "flex flex-1 items-center justify-center rounded-3xl border-4 font-display text-5xl font-bold uppercase tracking-widest transition-colors",
@@ -107,12 +126,12 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
               ? "border-white/10 bg-white/[0.02] text-moon-deep/40"
               : someoneElse
                 ? "border-white/10 bg-white/[0.02] text-moon-deep/70"
-                : state.phase === "open"
+                : live
                   ? "border-accent bg-accent/20 text-accent-bright"
                   : "border-white/10 bg-white/[0.03] text-moon-deep/70",
         ].join(" ")}
       >
-        {iBuzzed ? "YOU!" : iAmOut ? "OUT" : "BUZZ"}
+        {iBuzzed ? "YOU!" : iAmOut ? "OUT" : live ? "BUZZ" : "WAIT"}
       </motion.button>
 
       <p className="py-3 text-center font-display text-sm uppercase tracking-widest text-accent">

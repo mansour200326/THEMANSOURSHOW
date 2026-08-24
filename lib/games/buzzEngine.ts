@@ -37,11 +37,26 @@ export type BuzzState = {
   lockedOut: string[];
   /** Whoever answered last picks next. */
   picker: string | null;
+  /**
+   * When the clue went up. Buzzing before the room has had a chance to read it
+   * is how the fastest thumb wins every round rather than the fastest brain.
+   */
+  openedAt: number | null;
   revealed: boolean;
   lastScores: Record<string, number>;
 };
 
 const st = (room: Room) => room.game as BuzzState;
+
+/**
+ * How long the clue is on screen before the buzzers arm. Anyone who jumps the
+ * gun is locked out of that clue — the same penalty a real quiz show applies,
+ * and the only thing that actually stops people mashing the button.
+ */
+export const BUZZ_ARM_MS = 1200;
+
+export const buzzArmed = (s: BuzzState) =>
+  s.openedAt !== null && Date.now() - s.openedAt >= BUZZ_ARM_MS;
 
 export const buzzCurrent = (s: BuzzState): BuzzItem | null => {
   if (s.mode === "sequence") return s.items[s.index] ?? null;
@@ -79,6 +94,7 @@ export function createBuzzGame(
           buzzedBy: null,
           lockedOut: [],
           revealed: false,
+          openedAt: done ? null : Date.now(),
         },
       };
     }
@@ -129,6 +145,7 @@ export function createBuzzGame(
         lockedOut: [],
         picker: connectedPlayers(room)[0]?.id ?? null,
         revealed: false,
+        openedAt: spec.mode === "sequence" ? Date.now() : null,
         lastScores: {},
       };
       return { ...room, game: fresh };
@@ -148,7 +165,13 @@ export function createBuzzGame(
           if (!clueAt(s.board, { c, r })) return room;
           return {
             ...room,
-            game: { ...s, phase: "open", active: { c, r }, lastScores: {} },
+            game: {
+              ...s,
+              phase: "open",
+              active: { c, r },
+              openedAt: Date.now(),
+              lastScores: {},
+            },
           };
         }
 
@@ -160,6 +183,15 @@ export function createBuzzGame(
           if (s.phase !== "open" || !action.playerId) return room;
           if (s.buzzedBy) return room;
           if (s.lockedOut.includes(action.playerId)) return room;
+
+          // Jumped the gun: out of this one, and the board stays open.
+          if (!buzzArmed(s)) {
+            return {
+              ...room,
+              game: { ...s, lockedOut: [...s.lockedOut, action.playerId] },
+            };
+          }
+
           return {
             ...room,
             game: { ...s, phase: "buzzed", buzzedBy: action.playerId },
@@ -197,7 +229,10 @@ export function createBuzzGame(
           // Nobody left to try — show the answer and move on.
           return everyoneOut
             ? { ...penalised, game: { ...next, phase: "scored", revealed: true } }
-            : { ...penalised, game: { ...next, phase: "open" } };
+            : {
+                ...penalised,
+                game: { ...next, phase: "open", openedAt: Date.now() },
+              };
         }
 
         case "reveal":
@@ -217,7 +252,18 @@ export function createBuzzGame(
         /** Host reopens buzzing after a bad lockout. */
         case "reopen": {
           if (s.phase === "buzzed") {
-            return { ...room, game: { ...s, phase: "open", buzzedBy: null } };
+            return {
+              ...room,
+              game: {
+                ...s,
+                phase: "open",
+                buzzedBy: null,
+                // Re-arm, so the reopen isn't won by whoever was already
+                // holding their thumb over the button.
+                openedAt: Date.now(),
+                lockedOut: [],
+              },
+            };
           }
           return room;
         }
