@@ -116,6 +116,20 @@ export default function PlayPage({
     );
   }
 
+  /**
+   * Leaving properly, rather than closing the tab. A phone that just goes away
+   * stays in the room as a disconnected player, and games that wait on
+   * everybody will wait on them — which is how a night ends up restarted
+   * because one person went home.
+   */
+  const leave = () => {
+    if (!me) return;
+    if (!window.confirm("Leave the room? You'll drop out of the game.")) return;
+    send("player:quit", undefined, me.id);
+    window.localStorage.removeItem(idKey(roomCode));
+    setPlayerId(null);
+  };
+
   const state = room.game as
     | ((
         | RoundState
@@ -130,81 +144,100 @@ export default function PlayPage({
 
   if (room.gameId && state?.kind === "buzz") {
     return (
-      <BuzzPlayer
-        room={room}
-        state={state}
-        me={me}
-        onBuzz={() => send("buzz", undefined, me.id)}
-        onPick={(c, r) => send("pick", { c, r }, me.id)}
-      />
+      <>
+        <LeaveButton onLeave={leave} />
+        <BuzzPlayer
+          room={room}
+          state={state}
+          me={me}
+          onBuzz={() => send("buzz", undefined, me.id)}
+          onPick={(c, r) => send("pick", { c, r }, me.id)}
+        />
+      </>
     );
   }
 
   if (room.gameId && state?.kind === "live") {
     return (
-      <LivePlayer
-        state={state}
-        me={me}
-        onSubmit={(text) => send("submit", { text }, me.id)}
-        onClue={(text) => send("clue", { text }, me.id)}
-      />
+      <>
+        <LeaveButton onLeave={leave} />
+        <LivePlayer
+          state={state}
+          me={me}
+          onSubmit={(text) => send("submit", { text }, me.id)}
+          onClue={(text) => send("clue", { text }, me.id)}
+        />
+      </>
     );
   }
 
   if (room.gameId && state?.kind === "impostor") {
     return (
-      <ImpostorPlayer
-        room={room}
-        state={state}
-        me={me}
-        onReady={() => send("ready", undefined, me.id)}
-        onAccuse={() => send("accuse", undefined, me.id)}
-        onVote={(playerId) => send("vote", { playerId }, me.id)}
-        onGuessPlace={(placeIndex) => send("guess", { placeIndex }, me.id)}
-      />
+      <>
+        <LeaveButton onLeave={leave} />
+        <ImpostorPlayer
+          room={room}
+          state={state}
+          me={me}
+          onReady={() => send("ready", undefined, me.id)}
+          onAccuse={() => send("accuse", undefined, me.id)}
+          onVote={(playerId) => send("vote", { playerId }, me.id)}
+          onGuessPlace={(placeIndex) => send("guess", { placeIndex }, me.id)}
+        />
+      </>
     );
   }
 
   if (room.gameId && state?.kind === "grid") {
     return (
-      <GridPlayer
-        state={state}
-        me={me}
-        onClue={(word, count) => send("clue", { word, count }, me.id)}
-        onTap={(index) => send("tap", { index }, me.id)}
-        onPass={() => send("pass", undefined, me.id)}
-      />
+      <>
+        <LeaveButton onLeave={leave} />
+        <GridPlayer
+          state={state}
+          me={me}
+          onClue={(word, count) => send("clue", { word, count }, me.id)}
+          onTap={(index) => send("tap", { index }, me.id)}
+          onPass={() => send("pass", undefined, me.id)}
+        />
+      </>
     );
   }
 
   if (room.gameId && state?.kind === "sketch") {
     return (
-      <SketchPlayer
-        state={state}
-        me={me}
-        onStroke={(points, colour) => send("draw", { points, colour }, me.id)}
-        onLift={() => send("lift", undefined, me.id)}
-        onUndo={() => send("undo", undefined, me.id)}
-        onClear={() => send("clear", undefined, me.id)}
-        onGuess={(text) => send("guess", { text }, me.id)}
-      />
+      <>
+        <LeaveButton onLeave={leave} />
+        <SketchPlayer
+          state={state}
+          me={me}
+          onStroke={(points, colour) => send("draw", { points, colour }, me.id)}
+          onLift={() => send("lift", undefined, me.id)}
+          onUndo={() => send("undo", undefined, me.id)}
+          onClear={() => send("clear", undefined, me.id)}
+          onGuess={(text) => send("guess", { text }, me.id)}
+        />
+      </>
     );
   }
 
   if (room.gameId && state?.kind === "round") {
     return (
-      <RoundPlayer
-        room={room}
-        state={state}
-        me={me}
-        onSubmit={(text) => send("submit", { text }, me.id)}
-        onVote={(optionId) => send("vote", { optionId }, me.id)}
-      />
+      <>
+        <LeaveButton onLeave={leave} />
+        <RoundPlayer
+          room={room}
+          state={state}
+          me={me}
+          onSubmit={(text) => send("submit", { text }, me.id)}
+          onVote={(optionId) => send("vote", { optionId }, me.id)}
+        />
+      </>
     );
   }
 
   return (
     <Centered>
+      <LeaveButton onLeave={leave} />
       <p className="text-6xl">{me.emoji}</p>
       <h1 className="font-display text-3xl uppercase tracking-wide text-moon">
         {me.name}
@@ -214,6 +247,18 @@ export default function PlayPage({
         {me.score.toLocaleString()} points
       </p>
     </Centered>
+  );
+}
+
+/** Always reachable, never in the way of a buzzer. */
+function LeaveButton({ onLeave }: { onLeave: () => void }) {
+  return (
+    <button
+      onClick={onLeave}
+      className="fixed right-3 top-3 z-50 rounded-full border border-white/10 bg-midnight/70 px-3 py-1.5 font-display text-[0.65rem] uppercase tracking-widest text-moon-deep opacity-50 transition-opacity hover:opacity-100"
+    >
+      Leave
+    </button>
   );
 }
 

@@ -13,6 +13,7 @@ type Props = {
   onStart: (gameId: string) => void;
   onAddBots: () => void;
   onClearBots: () => void;
+  onKick: (playerId: string) => void;
 };
 
 /** Games that run on this screen alone — no room, no phones. */
@@ -39,7 +40,7 @@ const TV_ONLY = [
   },
 ];
 
-export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
+export function Lobby({ room, onStart, onAddBots, onClearBots, onKick }: Props) {
   const [joinUrl, setJoinUrl] = useState("");
   useEffect(() => setJoinUrl(`${window.location.host}/play`), []);
 
@@ -110,7 +111,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   className={[
-                    "flex items-center gap-2 rounded-full border px-3 py-1",
+                    "flex items-center gap-2 rounded-full border py-1 pl-3 pr-1",
                     p.bot
                       ? "border-white/10 bg-white/[0.03] text-moon-deep"
                       : "border-accent/30 bg-accent/[0.07] text-moon",
@@ -120,6 +121,15 @@ export function Lobby({ room, onStart, onAddBots, onClearBots }: Props) {
                   <span className="font-display text-sm uppercase tracking-wide">
                     {p.name}
                   </span>
+                  {/* Somebody who went home shouldn't hold the room up. */}
+                  <button
+                    onClick={() => onKick(p.id)}
+                    aria-label={`Remove ${p.name} from the room`}
+                    title={`Remove ${p.name}`}
+                    className="ml-0.5 flex h-6 w-6 items-center justify-center rounded-full text-moon-deep transition-colors hover:bg-rose-500/20 hover:text-rose-300"
+                  >
+                    ×
+                  </button>
                 </motion.span>
               ))}
             </AnimatePresence>

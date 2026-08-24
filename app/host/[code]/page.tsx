@@ -223,6 +223,7 @@ export default function HostPage({
       <Lobby
         room={room}
         onStart={(gameId) => setExplaining(gameId)}
+        onKick={(playerId) => send("player:kick", { id: playerId })}
         onAddBots={() => send("bots:add")}
         onClearBots={() => send("bots:clear")}
       />

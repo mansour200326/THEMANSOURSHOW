@@ -15,8 +15,57 @@ type Props = {
   onClue: (text: string) => void;
 };
 
+/**
+ * The same countdown the TV is showing. Answering under time pressure only
+ * works if the person answering can see the pressure.
+ */
+function useCountdown(startedAt: number | null, seconds: number) {
+  const [left, setLeft] = useState(seconds);
+  useEffect(() => {
+    if (!startedAt || !seconds) {
+      setLeft(seconds);
+      return;
+    }
+    const tick = () =>
+      setLeft(Math.max(0, seconds - (Date.now() - startedAt) / 1000));
+    tick();
+    const id = window.setInterval(tick, 200);
+    return () => window.clearInterval(id);
+  }, [startedAt, seconds]);
+  return left;
+}
+
+function Clock({ left, seconds }: { left: number; seconds: number }) {
+  if (!seconds) return null;
+  const fraction = Math.max(0, Math.min(1, left / seconds));
+  const urgent = left <= 5;
+  return (
+    <div className="mb-1">
+      <div className="h-2 overflow-hidden rounded-full bg-white/10">
+        <div
+          className={[
+            "h-full rounded-full transition-[width] duration-200 ease-linear",
+            urgent ? "bg-rose-400" : "bg-accent",
+          ].join(" ")}
+          style={{ width: `${fraction * 100}%` }}
+        />
+      </div>
+      <p
+        className={[
+          "mt-1 text-center font-display text-sm tabular-nums",
+          urgent ? "text-rose-400" : "text-moon-deep",
+        ].join(" ")}
+      >
+        {Math.ceil(left)}s
+      </p>
+    </div>
+  );
+}
+
 export function LivePlayer({ state, me, onSubmit, onClue }: Props) {
   const item = liveCurrent(state);
+  const left = useCountdown(state.startedAt, state.seconds);
+  const clock = <Clock left={left} seconds={state.seconds} />;
   const benched = state.benched.includes(me.id);
   const submitted = state.answers[me.id] !== undefined;
   const leading = state.lead === me.id;
@@ -71,6 +120,7 @@ export function LivePlayer({ state, me, onSubmit, onClue }: Props) {
           left={item?.left ?? ""}
           right={item?.right ?? ""}
           target={item?.target ?? 50}
+          clock={clock}
           onSend={onClue}
         />
       );
@@ -100,12 +150,17 @@ export function LivePlayer({ state, me, onSubmit, onClue }: Props) {
   }
 
   if (state.variant === "standing") {
-    return <AnswerBox prompt={item?.prompt ?? ""} onSend={onSubmit} />;
+    return <AnswerBox prompt={item?.prompt ?? ""} clock={clock} onSend={onSubmit} />;
   }
 
   if (state.variant === "timeline") {
     return (
-      <OrderBox events={liveShuffledEvents(state)} shuffled={state.shuffled} onSend={onSubmit} />
+      <OrderBox
+        events={liveShuffledEvents(state)}
+        shuffled={state.shuffled}
+        clock={clock}
+        onSend={onSubmit}
+      />
     );
   }
 
@@ -114,6 +169,7 @@ export function LivePlayer({ state, me, onSubmit, onClue }: Props) {
       left={item?.left ?? ""}
       right={item?.right ?? ""}
       clue={state.clue}
+      clock={clock}
       onSend={onSubmit}
     />
   );
@@ -131,14 +187,17 @@ function Centre({ children }: { children: React.ReactNode }) {
 
 function AnswerBox({
   prompt,
+  clock,
   onSend,
 }: {
   prompt: string;
+  clock: React.ReactNode;
   onSend: (text: string) => void;
 }) {
   const [text, setText] = useState("");
   return (
     <main className="flex min-h-dvh flex-col justify-center gap-5 p-6">
+      {clock}
       <p className="text-center text-lg text-moon/75">{prompt}</p>
       <input
         value={text}
@@ -167,10 +226,12 @@ function AnswerBox({
 function OrderBox({
   events,
   shuffled,
+  clock,
   onSend,
 }: {
   events: string[];
   shuffled: number[];
+  clock: React.ReactNode;
   onSend: (text: string) => void;
 }) {
   const [order, setOrder] = useState<number[]>([]);
@@ -184,6 +245,7 @@ function OrderBox({
 
   return (
     <main className="flex min-h-dvh flex-col justify-center gap-4 p-5">
+      {clock}
       <p className="text-center text-moon-dim">
         Tap them in order — earliest first.
       </p>
@@ -227,16 +289,19 @@ function ClueBox({
   left,
   right,
   target,
+  clock,
   onSend,
 }: {
   left: string;
   right: string;
   target: number;
+  clock: React.ReactNode;
   onSend: (text: string) => void;
 }) {
   const [clue, setClue] = useState("");
   return (
     <main className="flex min-h-dvh flex-col justify-center gap-5 p-6">
+      {clock}
       <p className="text-center font-display uppercase tracking-widest text-accent">
         Only you can see this
       </p>
@@ -265,16 +330,19 @@ function DialBox({
   left,
   right,
   clue,
+  clock,
   onSend,
 }: {
   left: string;
   right: string;
   clue: string;
+  clock: React.ReactNode;
   onSend: (text: string) => void;
 }) {
   const [value, setValue] = useState(50);
   return (
     <main className="flex min-h-dvh flex-col justify-center gap-6 p-6">
+      {clock}
       <p className="text-center font-display text-2xl uppercase tracking-wide text-accent">
         “{clue}”
       </p>

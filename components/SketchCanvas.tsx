@@ -27,6 +27,8 @@ export function SketchCanvas({
   const canvas = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
   const pending = useRef<number[]>([]);
+  /** The pointer that owns the stroke in progress. */
+  const active = useRef<number | null>(null);
   const flusher = useRef<number | null>(null);
 
   /* ------------------------------------------------------------ painting */
@@ -67,14 +69,22 @@ export function SketchCanvas({
   }, [strokes, live]);
 
   /* ------------------------------------------------------------- input */
+
+  /**
+   * Coordinates are clamped to the canvas rather than thrown away when they
+   * fall outside it. Dropping them meant a finger that strayed over the edge
+   * and came back drew a straight line between the two places it was last
+   * seen — one of the two ways a line appeared that nobody had drawn.
+   */
   const point = (e: React.PointerEvent) => {
     const el = canvas.current;
     if (!el) return null;
     const box = el.getBoundingClientRect();
-    const x = ((e.clientX - box.left) / box.width) * 1000;
-    const y = ((e.clientY - box.top) / box.height) * 1000;
-    if (x < 0 || x > 1000 || y < 0 || y > 1000) return null;
-    return [Math.round(x), Math.round(y)];
+    const clamp = (n: number) => Math.round(Math.min(1000, Math.max(0, n)));
+    return [
+      clamp(((e.clientX - box.left) / box.width) * 1000),
+      clamp(((e.clientY - box.top) / box.height) * 1000),
+    ];
   };
 
   /**
@@ -88,26 +98,40 @@ export function SketchCanvas({
     pending.current = [];
   };
 
+  /*
+   * One finger draws. The other way a line appeared on its own was a second
+   * touch — a palm on the screen, a thumb steadying the phone — because every
+   * pointer event was accepted regardless of which pointer it came from, so
+   * two contact points were merged into a single stroke and the line shot
+   * across the canvas between them. Only the pointer that began the stroke is
+   * listened to now, and nothing else can start one while it's down.
+   */
   const start = (e: React.PointerEvent) => {
     if (!onStroke) return;
+    if (active.current !== null) return; // already drawing with another finger
+    if (e.isPrimary === false) return;
     const p = point(e);
     if (!p) return;
+    active.current = e.pointerId;
     drawing.current = true;
     (e.target as Element).setPointerCapture?.(e.pointerId);
-    pending.current.push(...p);
+    pending.current = [...p];
     flush();
     flusher.current = window.setInterval(flush, 90);
   };
 
   const move = (e: React.PointerEvent) => {
     if (!drawing.current || !onStroke) return;
+    if (e.pointerId !== active.current) return;
     const p = point(e);
     if (p) pending.current.push(...p);
   };
 
-  const end = () => {
+  const end = (e?: React.PointerEvent) => {
     if (!drawing.current) return;
+    if (e && e.pointerId !== active.current) return;
     drawing.current = false;
+    active.current = null;
     if (flusher.current) window.clearInterval(flusher.current);
     flusher.current = null;
     flush();
@@ -128,7 +152,6 @@ export function SketchCanvas({
       onPointerMove={move}
       onPointerUp={end}
       onPointerCancel={end}
-      onPointerLeave={end}
       className={[
         // Paper, not a screen. Ink needs something to be ink on.
         "aspect-square touch-none rounded-2xl border border-white/15 bg-[#F4F2EC] shadow-tile",

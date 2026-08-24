@@ -82,6 +82,79 @@ function publish(room: Room) {
  * shouldn't walk into Sketch & Guess two thousand points ahead — every game
  * is its own contest, and the phones show the score of the game being played.
  */
+/**
+ * Someone has left. Hand on anything they were holding.
+ *
+ * A player who walks out mid-game used to strand whatever job they had — the
+ * pen in Sketch & Guess, the key card in Code Grid, the clue in Dial It In —
+ * and the round would sit there waiting for a person who had gone home. Which
+ * is exactly what happened: the room had to restart the whole game.
+ *
+ * Every case here hands the role to somebody still in the room, or ends the
+ * round if there's nobody sensible to hand it to.
+ */
+function releaseRoles(room: Room, goneId: string): Room {
+  const game = room.game as Record<string, unknown> | null;
+  if (!game?.kind) return room;
+  const others = room.players.filter((p) => p.connected && p.id !== goneId);
+  const nextId = others[0]?.id ?? null;
+
+  switch (game.kind) {
+    case "sketch": {
+      if (game.drawerId !== goneId) return room;
+      // Nobody left to draw — close the round on what's already down.
+      if (!nextId) return { ...room, game: { ...game, phase: "reveal" } };
+      return {
+        ...room,
+        game: { ...game, drawerId: nextId, strokes: [], live: { c: 0, p: [] }, startedAt: Date.now() },
+      };
+    }
+
+    case "live": {
+      if (game.lead !== goneId) return room;
+      return { ...room, game: { ...game, lead: nextId } };
+    }
+
+    case "grid": {
+      const teams = (game.teams as { name: string; spymaster: string | null; members: string[] }[]) ?? [];
+      if (!teams.some((t) => t.spymaster === goneId || t.members.includes(goneId))) {
+        return room;
+      }
+      return {
+        ...room,
+        game: {
+          ...game,
+          teams: teams.map((t) => {
+            const members = t.members.filter((id) => id !== goneId);
+            if (t.spymaster !== goneId) return { ...t, members };
+            // Promote a team-mate; a side with nobody left can't give clues.
+            return { ...t, spymaster: members[0] ?? null, members: members.slice(1) };
+          }),
+        },
+      };
+    }
+
+    case "impostor": {
+      // The impostor walking out makes the round unwinnable either way.
+      if (game.impostorId !== goneId) return room;
+      return { ...room, game: { ...game, phase: "reveal", outcome: "impostor-survived" } };
+    }
+
+    case "buzz": {
+      const patch: Record<string, unknown> = {};
+      if (game.buzzedBy === goneId) {
+        patch.buzzedBy = null;
+        patch.phase = "open";
+      }
+      if (game.picker === goneId) patch.picker = nextId;
+      return Object.keys(patch).length ? { ...room, game: { ...game, ...patch } } : room;
+    }
+
+    default:
+      return room;
+  }
+}
+
 const clearScores = (players: Player[]): Player[] =>
   players.map((p) => (p.score === 0 ? p : { ...p, score: 0 }));
 
@@ -130,11 +203,20 @@ function reduceRoom(room: Room, action: Action): Room {
         ),
       };
 
+    /** The host removing somebody, or somebody removing themselves. */
     case "player:kick":
-      return {
+    case "player:quit": {
+      const goneId =
+        action.type === "player:quit"
+          ? action.playerId
+          : String(action.payload?.id ?? "");
+      if (!goneId) return room;
+      const without: Room = {
         ...room,
-        players: room.players.filter((p) => p.id !== action.payload?.id),
+        players: room.players.filter((p) => p.id !== goneId),
       };
+      return releaseRoles(without, goneId);
+    }
 
     case "game:start": {
       const id = String(action.payload?.gameId ?? "");

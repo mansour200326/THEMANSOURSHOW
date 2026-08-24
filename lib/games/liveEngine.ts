@@ -56,6 +56,27 @@ export type LiveState = {
   lastScores: Record<string, number>;
   /** Who got it right last round, for the reveal screen. */
   correct: string[];
+  /**
+   * When the current phase started, so the TV can run a clock against it.
+   *
+   * Somebody who simply doesn't answer used to hold the whole room up
+   * indefinitely, and in an elimination game that's worse than a wrong answer
+   * — they can't be knocked out for it. The clock closes the round whether
+   * they've answered or not.
+   */
+  startedAt: number | null;
+  /** How long this phase gets. Zero means no clock. */
+  seconds: number;
+};
+
+/**
+ * How long each variant gets to answer. Ordering five things takes longer than
+ * typing a word, and the clue-giver has to think before anyone else can start.
+ */
+export const LIVE_SECONDS: Record<LiveVariant, { brief: number; collect: number }> = {
+  standing: { brief: 0, collect: 25 },
+  timeline: { brief: 0, collect: 45 },
+  dial: { brief: 35, collect: 30 },
 };
 
 const st = (room: Room) => room.game as LiveState;
@@ -121,9 +142,13 @@ export function createLiveGame(spec: LiveSpec, pack: LiveItem[]): GameModule {
   const beginRound = (room: Room, s: LiveState): Room => {
     const item = s.items[s.round];
     const players = liveActive(room, s);
+    const opening: LiveState["phase"] =
+      spec.variant === "dial" ? "brief" : "collect";
     const next: LiveState = {
       ...s,
-      phase: spec.variant === "dial" ? "brief" : "collect",
+      phase: opening,
+      startedAt: Date.now(),
+      seconds: LIVE_SECONDS[spec.variant][opening === "brief" ? "brief" : "collect"],
       answers: {},
       clue: "",
       lastScores: {},
@@ -207,7 +232,14 @@ export function createLiveGame(spec: LiveSpec, pack: LiveItem[]): GameModule {
     const scored = award(room, points);
     return {
       ...scored,
-      game: { ...st(scored), phase: "reveal", lastScores: points, benched, correct },
+      game: {
+        ...st(scored),
+        phase: "reveal",
+        lastScores: points,
+        benched,
+        correct,
+        startedAt: null,
+      },
     };
   };
 
@@ -244,6 +276,8 @@ export function createLiveGame(spec: LiveSpec, pack: LiveItem[]): GameModule {
         clue: "",
         lastScores: {},
         correct: [],
+        startedAt: null,
+        seconds: 0,
       };
       return beginRound({ ...room, game: fresh }, fresh);
     },
@@ -258,7 +292,17 @@ export function createLiveGame(spec: LiveSpec, pack: LiveItem[]): GameModule {
           if (s.phase !== "brief" || action.playerId !== s.lead) return room;
           const clue = String(action.payload?.text ?? "").trim().slice(0, 60);
           if (!clue) return room;
-          return { ...room, game: { ...s, phase: "collect", clue } };
+          // The clock restarts for the room now that the clue is out.
+          return {
+            ...room,
+            game: {
+              ...s,
+              phase: "collect",
+              clue,
+              startedAt: Date.now(),
+              seconds: LIVE_SECONDS[spec.variant].collect,
+            },
+          };
         }
 
         case "submit": {
@@ -277,7 +321,16 @@ export function createLiveGame(spec: LiveSpec, pack: LiveItem[]): GameModule {
         /** Host stops waiting on somebody who wandered off. */
         case "force": {
           if (s.phase === "brief") {
-            return { ...room, game: { ...s, phase: "collect", clue: s.clue || "—" } };
+            return {
+              ...room,
+              game: {
+                ...s,
+                phase: "collect",
+                clue: s.clue || "—",
+                startedAt: Date.now(),
+                seconds: LIVE_SECONDS[spec.variant].collect,
+              },
+            };
           }
           return s.phase === "collect" ? closeRound(room) : room;
         }

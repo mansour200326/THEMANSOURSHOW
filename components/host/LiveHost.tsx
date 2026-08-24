@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCue, useCueWhen } from "@/components/useCue";
 import { Tally } from "@/components/Tally";
@@ -29,6 +30,40 @@ export function LiveHost({ room, state, onForce, onNext, onQuit }: Props) {
   const players = connectedPlayers(room);
   const byId = (id: string) => players.find((p) => p.id === id);
   const lead = state.lead ? byId(state.lead) : undefined;
+
+  /*
+   * The clock lives on the TV — the server is only told once it hits zero,
+   * which keeps a ticking number out of the room state. When it does, the
+   * round closes on whatever has been submitted, so one person sitting on
+   * their hands can't hold up an elimination game they can't be knocked out of.
+   */
+  const [left, setLeft] = useState(state.seconds);
+  useEffect(() => {
+    if (!state.startedAt || !state.seconds) {
+      setLeft(state.seconds);
+      return;
+    }
+    const tick = () => {
+      const gone = (Date.now() - state.startedAt!) / 1000;
+      setLeft(Math.max(0, state.seconds - gone));
+    };
+    tick();
+    const id = window.setInterval(tick, 200);
+    return () => window.clearInterval(id);
+  }, [state.startedAt, state.seconds, state.phase]);
+
+  useEffect(() => {
+    const ticking = state.phase === "collect" || state.phase === "brief";
+    if (ticking && state.seconds > 0 && state.startedAt && left <= 0) onForce();
+  }, [left, state.phase, state.seconds, state.startedAt, onForce]);
+
+  const urgent = left <= 5 && left > 0;
+  useCue(
+    (state.phase === "collect" || state.phase === "brief") && urgent
+      ? Math.ceil(left)
+      : null,
+    "tick",
+  );
 
   // The answer going up, and whether anybody got it.
   useCue(
@@ -217,18 +252,37 @@ export function LiveHost({ room, state, onForce, onNext, onQuit }: Props) {
           </div>
         )}
 
-        {/* Who's still to answer */}
-        {state.phase === "collect" && state.variant !== "standing" && (
-          <p className="font-display text-sm uppercase tracking-[0.2em] text-moon-deep">
-            {Object.keys(state.answers).length} in ·{" "}
-            {players.filter(
-              (p) =>
-                state.answers[p.id] === undefined &&
-                !(state.variant === "dial" && p.id === state.lead),
-            ).length}{" "}
-            to go
-          </p>
-        )}
+        {/* The clock, and who's still to answer */}
+        {(state.phase === "collect" || state.phase === "brief") &&
+          state.seconds > 0 && (
+            <div className="flex flex-col items-center gap-[1vmin]">
+              <motion.span
+                animate={urgent ? { scale: [1, 1.1, 1] } : { scale: 1 }}
+                transition={{ duration: 0.5, repeat: urgent ? Infinity : 0 }}
+                className={[
+                  "font-display font-bold tabular-nums leading-none",
+                  "text-[clamp(2.5rem,9vw,7rem)]",
+                  urgent ? "text-rose-400" : "text-accent",
+                ].join(" ")}
+              >
+                {Math.ceil(left)}
+              </motion.span>
+              {state.phase === "collect" && (
+                <p className="font-display text-sm uppercase tracking-[0.2em] text-moon-deep">
+                  {Object.keys(state.answers).length} in ·{" "}
+                  {
+                    players.filter(
+                      (p) =>
+                        !state.benched.includes(p.id) &&
+                        state.answers[p.id] === undefined &&
+                        !(state.variant === "dial" && p.id === state.lead),
+                    ).length
+                  }{" "}
+                  still to answer
+                </p>
+              )}
+            </div>
+          )}
       </div>
 
       <AnimatePresence>
