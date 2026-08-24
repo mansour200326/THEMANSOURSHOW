@@ -28,6 +28,7 @@ import { sampleBoard, sampleFinalClue } from "@/lib/bigboard/sampleBoard";
 import { clearGame, loadGame, saveGame } from "@/lib/bigboard/storage";
 import type { GameState } from "@/lib/bigboard/types";
 import type { Board, FinalClue } from "@/lib/board/types";
+import { backHref } from "@/lib/backHref";
 
 /**
  * Big Board keeps no record of how the host called an answer, so the cue is
@@ -176,7 +177,7 @@ function BigBoardStage() {
         startLabel="Set it up"
         onStart={() => setExplained(true)}
         onBack={() => {
-          window.location.href = "/games";
+          window.location.href = backHref();
         }}
       />
     );

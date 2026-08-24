@@ -1,13 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { ROUND_CHOICES, roundsFor } from "@/lib/games/lengths";
 import { rulesFor } from "@/lib/games/rules";
 import { familyClass } from "@/lib/games/families";
 
 type Props = {
   gameId: string;
   name: string;
-  onStart: () => void;
+  /** The chosen length rides along, so every game can be cut short or run on. */
+  onStart: (rounds?: number) => void;
   onBack: () => void;
   /** Skip the bundled and AI content and write the whole thing yourself. */
   onWriteOwn?: () => void;
@@ -31,6 +34,8 @@ export function HowToPlay({
   startLabel = "Start the game",
 }: Props) {
   const rules = rulesFor(gameId);
+  const choices = ROUND_CHOICES[gameId];
+  const [rounds, setRounds] = useState(() => roundsFor(gameId));
 
   return (
     <main
@@ -104,8 +109,43 @@ export function HowToPlay({
           </motion.div>
         )}
 
+        {/*
+          * Length lives here rather than in a setup screen, because half the
+          * games never see one — and this is the screen the room is already
+          * looking at while somebody reads the rules out.
+          */}
+        {choices && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="mt-[3vh] flex flex-wrap items-center gap-3"
+          >
+            <span className="t-label font-display uppercase text-moon-deep">
+              Rounds
+            </span>
+            {choices.map((n) => (
+              <button
+                key={n}
+                onClick={() => setRounds(n)}
+                className={[
+                  "min-w-[3.5rem] rounded-xl border px-4 py-2.5 font-display tabular-nums transition-colors",
+                  rounds === n
+                    ? "border-accent bg-accent/15 text-accent-bright"
+                    : "border-white/12 text-moon/75 hover:border-white/25",
+                ].join(" ")}
+              >
+                {n}
+              </button>
+            ))}
+          </motion.div>
+        )}
+
         <div className="mt-[5vh] flex flex-wrap items-center gap-4">
-          <button onClick={onStart} className="btn-brand px-12 py-5 text-xl">
+          <button
+            onClick={() => onStart(choices ? rounds : undefined)}
+            className="btn-brand px-12 py-5 text-xl"
+          >
             {startLabel}
           </button>
           {onWriteOwn && (

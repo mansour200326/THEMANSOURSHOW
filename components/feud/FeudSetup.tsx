@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ShowMark } from "@/components/ShowMark";
 import { TeamsField, cleanTeamNames, startingTeams } from "@/components/setup/TeamsField";
 import { ThemeList, usableThemes } from "@/components/setup/ThemeList";
+import { backHref } from "@/lib/backHref";
 
 export type FeudConfig = {
   teamNames: string[];
@@ -45,14 +46,14 @@ export function FeudSetup({
   return (
     <main className="mx-auto min-h-dvh w-full max-w-3xl px-6 py-10">
       <header className="flex items-center justify-between">
-        <Link href="/games" className="opacity-80 transition hover:opacity-100">
+        <Link href={backHref()} className="opacity-80 transition hover:opacity-100">
           <ShowMark size="sm" />
         </Link>
         <Link
-          href="/games"
+          href={backHref()}
           className="font-display text-xs uppercase tracking-[0.2em] text-moon-deep hover:text-moon/75"
         >
-          ← Lineup
+          ← Back
         </Link>
       </header>
 

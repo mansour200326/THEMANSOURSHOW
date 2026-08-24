@@ -1,4 +1,5 @@
 import { matchAnswer } from "@/lib/feud/match";
+import { roundsFor } from "@/lib/games/lengths";
 import type { GameModule } from "@/lib/games/types";
 import { type Action, type Room, award, connectedPlayers } from "@/lib/room/types";
 
@@ -250,9 +251,15 @@ export function createLiveGame(spec: LiveSpec, pack: LiveItem[]): GameModule {
     needsPhones: true,
 
     init(room) {
-      const supplied = (room as unknown as { pendingItems?: LiveItem[] })
-        .pendingItems;
-      const chosen = (supplied?.length ? supplied : pack).slice(0, spec.rounds);
+      const primed = room as unknown as {
+        pendingItems?: LiveItem[];
+        pendingRounds?: number;
+      };
+      const supplied = primed.pendingItems;
+      const chosen = (supplied?.length ? supplied : pack).slice(
+        0,
+        roundsFor(spec.id, primed.pendingRounds),
+      );
       // The dial's hidden point has to move every game, so it's rolled at
       // kickoff rather than written into the pack. Kept off the extremes —
       // a target of 2 is a coin flip, not a clue.

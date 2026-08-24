@@ -41,6 +41,8 @@ export default function HostPage({
   // Every game explains itself first; some then ask what they're about.
   const [explaining, setExplaining] = useState<string | null>(null);
   const [setupFor, setSetupFor] = useState<string | null>(null);
+  /** Chosen on the rules screen; survives the setup step in between. */
+  const [rounds, setRounds] = useState<number | undefined>();
   /** Set while the host is writing their own content for a game. */
   const [writingFor, setWritingFor] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -74,7 +76,7 @@ export default function HostPage({
     const board = gameId === "trivia-royale";
     if (board ? config.categories.length < 3 : config.categories.length === 0) {
       setSetupFor(null);
-      send("game:start", { gameId, seconds });
+      send("game:start", { gameId, seconds, rounds });
       return;
     }
     setBusy(true);
@@ -93,6 +95,7 @@ export default function HostPage({
                 gameId,
                 themes: config.categories,
                 difficulty: config.difficulty,
+                rounds,
               },
         ),
       });
@@ -106,6 +109,7 @@ export default function HostPage({
         places: data.places,
         words: data.words,
         seconds,
+        rounds,
       });
     } catch (e) {
       // A cancel isn't an error worth putting on the TV.
@@ -192,11 +196,12 @@ export default function HostPage({
           setExplaining(null);
           setWritingFor(id);
         }}
-        onStart={() => {
+        onStart={(chosen) => {
           const id = explaining;
+          setRounds(chosen);
           setExplaining(null);
           if (NEEDS_SETUP[id]) setSetupFor(id);
-          else send("game:start", { gameId: id });
+          else send("game:start", { gameId: id, rounds: chosen });
         }}
       />
     );

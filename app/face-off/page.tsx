@@ -19,6 +19,7 @@ import {
 import { resolveGuess } from "@/lib/feud/judge";
 import { sampleFeudPack } from "@/lib/feud/samplePack";
 import { type FeudQuestion, type FeudState, otherTeam } from "@/lib/feud/types";
+import { backHref } from "@/lib/backHref";
 
 const KEY = "bignight:feud:v1";
 
@@ -142,7 +143,7 @@ function FaceOffStage() {
         startLabel="Set it up"
         onStart={() => setExplained(true)}
         onBack={() => {
-          window.location.href = "/games";
+          window.location.href = backHref();
         }}
       />
     );

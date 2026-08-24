@@ -27,6 +27,8 @@ const RequestSchema = z.object({
   ]),
   themes: z.array(z.string().max(80)).max(6).optional(),
   difficulty: z.enum(["easy", "medium", "hard"]).optional(),
+  /** How many rounds the host chose, so the pack is written to fit. */
+  rounds: z.number().int().min(1).max(30).optional(),
 });
 
 /**
@@ -61,21 +63,29 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: "Bad request." }, { status: 400 });
   }
-  const { gameId, themes = [], difficulty = "medium" } = parsed.data;
+  const { gameId, themes = [], difficulty = "medium", rounds } = parsed.data;
+
+  /*
+   * Write as much as the host asked to play, not a fixed number. These used
+   * to be hardcoded, so choosing six rounds still paid for twelve questions
+   * and choosing twelve quietly got you six.
+   */
+  const many = (fallback: number) =>
+    rounds && rounds > 0 ? Math.min(30, Math.max(3, rounds)) : fallback;
 
   try {
     switch (gameId) {
       case "last-one-standing":
         return NextResponse.json({
-          items: await generateStandingQuestions({ themes, count: 12, difficulty }),
+          items: await generateStandingQuestions({ themes, count: many(12), difficulty }),
         });
       case "timeline":
         return NextResponse.json({
-          items: await generateTimelineRounds({ themes, count: 6, difficulty }),
+          items: await generateTimelineRounds({ themes, count: many(6), difficulty }),
         });
       case "dial-it-in":
         return NextResponse.json({
-          items: await generateSpectrums({ themes, count: 8 }),
+          items: await generateSpectrums({ themes, count: many(8) }),
         });
       case "impostor":
         return NextResponse.json({
@@ -87,11 +97,11 @@ export async function POST(request: Request) {
         });
       case "sketch-and-guess":
         return NextResponse.json({
-          words: await generateWordPack({ kind: "sketch", themes, count: 12 }),
+          words: await generateWordPack({ kind: "sketch", themes, count: many(12) }),
         });
       case "emoji-riddles":
         return NextResponse.json({
-          items: await generateEmojiRiddles({ themes, count: 18, difficulty }),
+          items: await generateEmojiRiddles({ themes, count: many(18), difficulty }),
         });
     }
   } catch (error) {

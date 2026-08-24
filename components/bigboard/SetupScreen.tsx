@@ -9,6 +9,7 @@ import { TeamsField, cleanTeamNames, startingTeams } from "@/components/setup/Te
 import { ThemeList, usableThemes } from "@/components/setup/ThemeList";
 import type { Difficulty } from "@/lib/difficulty";
 import { type Rules, defaultRules } from "@/lib/bigboard/types";
+import { backHref } from "@/lib/backHref";
 
 const MIN_CATEGORIES = 3;
 const MAX_CATEGORIES = 6;
@@ -115,14 +116,14 @@ export function SetupScreen({
   return (
     <main className="mx-auto min-h-dvh w-full max-w-6xl px-6 py-10">
       <header className="flex items-center justify-between">
-        <Link href="/games" className="opacity-80 transition hover:opacity-100">
+        <Link href={backHref()} className="opacity-80 transition hover:opacity-100">
           <ShowMark size="sm" />
         </Link>
         <Link
-          href="/games"
+          href={backHref()}
           className="font-display text-xs uppercase tracking-[0.2em] text-moon-deep hover:text-moon/75"
         >
-          ← Lineup
+          ← Back
         </Link>
       </header>
 

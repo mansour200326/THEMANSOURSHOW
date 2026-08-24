@@ -1,3 +1,4 @@
+import { roundsFor } from "@/lib/games/lengths";
 import type { GameModule } from "@/lib/games/types";
 import {
   type Action,
@@ -129,10 +130,13 @@ export function createRoundGame(
 
     init(room) {
       // A pack the host wrote overrides the bundled one.
-      const supplied = (room as unknown as { pendingPrompts?: Prompt[] })
-        .pendingPrompts;
-      const source = supplied?.length ? supplied : pack;
-      const prompts = shuffle(source).slice(0, spec.rounds);
+      const primed = room as unknown as {
+        pendingPrompts?: Prompt[];
+        pendingRounds?: number;
+      };
+      const source = primed.pendingPrompts?.length ? primed.pendingPrompts : pack;
+      // The length is the host's, within what the game offers.
+      const prompts = shuffle(source).slice(0, roundsFor(spec.id, primed.pendingRounds));
       const fresh: RoundState = {
         kind: "round",
         phase: startPhase,

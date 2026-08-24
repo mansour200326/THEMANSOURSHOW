@@ -9,7 +9,7 @@ import {
   packToTimeline,
 } from "./convert";
 import { PACK_KIND, PACK_MINIMUM, emptyPackData } from "./types";
-import { lineup } from "../lineup";
+import { EVERY_GAME_ID } from "../games/everyGame";
 
 let pass = 0, fail = 0;
 const check = (name: string, got: unknown, want: unknown) => {
@@ -19,12 +19,12 @@ const check = (name: string, got: unknown, want: unknown) => {
 };
 
 // Every game in the lineup must have a shape and a blank pack to start from.
-const missing = lineup.filter((g) => !PACK_KIND[g.slug]);
-check("every game has a pack shape", missing.map((g) => g.slug), []);
-for (const g of lineup) {
-  const kind = PACK_KIND[g.slug];
-  check(`${g.slug} has a minimum`, typeof PACK_MINIMUM[kind], "number");
-  check(`${g.slug} has a blank pack`, Array.isArray(emptyPackData(kind)), true);
+const missing = EVERY_GAME_ID.filter((id) => !PACK_KIND[id]);
+check("every game has a pack shape", missing, []);
+for (const id of EVERY_GAME_ID) {
+  const kind = PACK_KIND[id];
+  check(`${id} has a minimum`, typeof PACK_MINIMUM[kind], "number");
+  check(`${id} has a blank pack`, Array.isArray(emptyPackData(kind)), true);
 }
 
 // --- half-finished rows are dropped, not fatal ---

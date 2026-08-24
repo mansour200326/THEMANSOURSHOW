@@ -7,6 +7,7 @@ import { ShowMark } from "@/components/ShowMark";
 import { familyClass } from "@/lib/games/families";
 import { gameList } from "@/lib/games/registry";
 import type { Room } from "@/lib/room/types";
+import { SCREEN_ONLY } from "@/lib/games/screenOnly";
 
 type Props = {
   room: Room;
@@ -17,29 +18,6 @@ type Props = {
 };
 
 /** Games that run on this screen alone — no room, no phones. */
-const TV_ONLY = [
-  {
-    id: "big-board",
-    name: "Big Board",
-    href: "/big-board",
-  },
-  {
-    id: "face-off",
-    name: "Face-Off",
-    href: "/face-off",
-  },
-  {
-    id: "categories",
-    name: "Categories",
-    href: "/categories",
-  },
-  {
-    id: "three-in-five",
-    name: "Three in Five",
-    href: "/three-in-five",
-  },
-];
-
 export function Lobby({ room, onStart, onAddBots, onClearBots, onKick }: Props) {
   const [joinUrl, setJoinUrl] = useState("");
   useEffect(() => setJoinUrl(`${window.location.host}/play`), []);
@@ -148,10 +126,12 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick }: Props) 
         * through them. From lg the rows are fixed and the whole lineup fits.
         */}
       <section className="grid grid-cols-2 gap-2.5 auto-rows-[minmax(6.5rem,auto)] sm:grid-cols-3 lg:min-h-0 lg:flex-1 lg:auto-rows-auto lg:grid-cols-4 lg:grid-rows-4 lg:gap-[0.9vmin] xl:grid-cols-6 xl:grid-rows-3">
-        {TV_ONLY.map((game) => (
+        {SCREEN_ONLY.map((game) => (
           <Link
             key={game.id}
-            href={game.href}
+            // Carries the room, so "back" from these lands in the lobby
+            // rather than dumping the host out of their own party.
+            href={`${game.href}?room=${room.code}`}
             /* Each card is lit by its own game's colour, so the grid reads as a lineup. */
             className={`group block min-h-0 ${familyClass(game.id)}`}
           >

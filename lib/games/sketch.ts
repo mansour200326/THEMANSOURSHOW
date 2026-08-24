@@ -1,4 +1,5 @@
 import { matchAnswer } from "@/lib/feud/match";
+import { roundsFor } from "@/lib/games/lengths";
 import type { GameModule } from "@/lib/games/types";
 import { type Action, type Room, award, connectedPlayers } from "@/lib/room/types";
 
@@ -156,11 +157,14 @@ export function createSketchGame(pool: string[]): GameModule {
     needsPhones: true,
 
     init(room) {
-      const supplied = (room as unknown as { pendingWords?: string[] })
-        .pendingWords;
+      const primed = room as unknown as {
+        pendingWords?: string[];
+        pendingRounds?: number;
+      };
+      const supplied = primed.pendingWords;
       const words = [...(supplied?.length ? supplied : pool)]
         .sort(() => Math.random() - 0.5)
-        .slice(0, 8);
+        .slice(0, roundsFor("sketch-and-guess", primed.pendingRounds));
       const fresh: SketchState = {
         kind: "sketch",
         phase: "drawing",

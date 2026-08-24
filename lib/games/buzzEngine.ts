@@ -1,6 +1,7 @@
 import { type Board, type TileRef, clueAt, tileKey, totalTiles } from "@/lib/board/types";
 import type { GameModule } from "@/lib/games/types";
 import { type Action, type Room, award, connectedPlayers } from "@/lib/room/types";
+import { roundsFor } from "@/lib/games/lengths";
 
 /**
  * Race-to-answer games. The server decides who buzzed first — phones only ever
@@ -127,11 +128,18 @@ export function createBuzzGame(
       const primed = room as unknown as {
         pendingBoard?: Board;
         pendingItems?: BuzzItem[];
+        pendingRounds?: number;
       };
       const supplied = primed.pendingBoard;
-      const items = primed.pendingItems?.length
+      const all = primed.pendingItems?.length
         ? primed.pendingItems
         : (content.items ?? []);
+      // A board game's length is its board; a run of riddles is as long as
+      // the host wants it to be.
+      const items =
+        spec.mode === "sequence"
+          ? all.slice(0, roundsFor(spec.id, primed.pendingRounds))
+          : all;
       const fresh: BuzzState = {
         kind: "buzz",
         mode: spec.mode,
