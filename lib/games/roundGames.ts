@@ -7,6 +7,7 @@ import {
   tally,
 } from "@/lib/games/roundEngine";
 import { type Room, connectedPlayers } from "@/lib/room/types";
+import { normalise } from "@/lib/feud/match";
 
 /* ------------------------------------------------------------ content packs */
 
@@ -174,9 +175,14 @@ export const BLUFF_REAL_ID = REAL;
 
 /* ------------------------------------------------------------ 4. Groupthink */
 
-const normalise = (text: string) =>
-  text.trim().toLowerCase().replace(/[^a-z0-9؀-ۿ ]/g, "");
-
+/*
+ * Grouping used to be done by a local rule that only stripped punctuation, so
+ * "The Beach" and "beach" were two different answers and a round where four
+ * people plainly agreed paid nobody a thing. The game is "answer like everyone
+ * else would" — it cannot be decided on whether people typed the same
+ * characters. It uses the same matcher as the survey board now, which drops
+ * filler words and plurals, so agreeing counts as agreeing.
+ */
 export const herdMentality = createRoundGame(
   {
     id: "groupthink",

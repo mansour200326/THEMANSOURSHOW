@@ -9,6 +9,7 @@ import { ImpostorHost } from "@/components/host/ImpostorHost";
 import { LiveHost } from "@/components/host/LiveHost";
 import { SketchHost } from "@/components/host/SketchHost";
 import { GameSetup } from "@/components/host/GameSetup";
+import { RoomCodeChip } from "@/components/host/RoomCodeChip";
 import { Generating } from "@/components/Generating";
 import { HowToPlay } from "@/components/HowToPlay";
 import { PackWorkshop } from "@/components/packs/PackWorkshop";
@@ -239,82 +240,93 @@ export default function HostPage({
     | (RoundState | BuzzState | LiveState | ImpostorState | CodeGridState | SketchState)
     | null;
 
-  if (state?.kind === "buzz") {
-    return (
-      <BuzzHost
-        room={room}
-        state={state}
-        send={(type, payload) => send(type, payload)}
-      />
-    );
-  }
+  const inGame = (() => {
+    if (state?.kind === "buzz") {
+      return (
+        <BuzzHost
+          room={room}
+          state={state}
+          send={(type, payload) => send(type, payload)}
+        />
+      );
+    }
 
-  if (state?.kind === "live") {
-    return (
-      <LiveHost
-        room={room}
-        state={state}
-        onForce={() => send("force")}
-        onNext={() => send("next")}
-        onQuit={() => send("game:end")}
-      />
-    );
-  }
+    if (state?.kind === "live") {
+      return (
+        <LiveHost
+          room={room}
+          state={state}
+          onForce={() => send("force")}
+          onNext={() => send("next")}
+          onQuit={() => send("game:end")}
+        />
+      );
+    }
 
-  if (state?.kind === "impostor") {
-    return (
-      <ImpostorHost
-        room={room}
-        state={state}
-        onStart={() => send("start")}
-        onForce={() => send("force")}
-        onTimeUp={() => send("timeup")}
-        onNext={() => send("next")}
-        onQuit={() => send("game:end")}
-      />
-    );
-  }
+    if (state?.kind === "impostor") {
+      return (
+        <ImpostorHost
+          room={room}
+          state={state}
+          onStart={() => send("start")}
+          onForce={() => send("force")}
+          onTimeUp={() => send("timeup")}
+          onNext={() => send("next")}
+          onQuit={() => send("game:end")}
+        />
+      );
+    }
 
-  if (state?.kind === "grid") {
-    return (
-      <GridHost
-        room={room}
-        state={state}
-        onBegin={() => send("begin")}
-        onQuit={() => send("game:end")}
-      />
-    );
-  }
+    if (state?.kind === "grid") {
+      return (
+        <GridHost
+          room={room}
+          state={state}
+          onBegin={() => send("begin")}
+          onQuit={() => send("game:end")}
+        />
+      );
+    }
 
-  if (state?.kind === "sketch") {
-    return (
-      <SketchHost
-        room={room}
-        state={state}
-        onTimeUp={() => send("timeup")}
-        onNext={() => send("next")}
-        onQuit={() => send("game:end")}
-      />
-    );
-  }
+    if (state?.kind === "sketch") {
+      return (
+        <SketchHost
+          room={room}
+          state={state}
+          onTimeUp={() => send("timeup")}
+          onNext={() => send("next")}
+          onQuit={() => send("game:end")}
+        />
+      );
+    }
 
-  if (state?.kind === "round") {
-    return (
-      <RoundHost
-        room={room}
-        state={state}
-        onForce={() => send("force")}
-        onNext={() => send("next")}
-        onQuit={() => send("game:end")}
-      />
-    );
-  }
+    if (state?.kind === "round") {
+      return (
+        <RoundHost
+          room={room}
+          state={state}
+          onForce={() => send("force")}
+          onNext={() => send("next")}
+          onQuit={() => send("game:end")}
+        />
+      );
+    }
 
+    return (
+      <main className="flex min-h-dvh items-center justify-center">
+        <button onClick={() => send("game:end")} className="btn-ghost">
+          Back to the lobby
+        </button>
+      </main>
+    );
+  })();
+
+  // The code used to vanish the moment a game started, so a phone that died
+  // mid-night had no way back into the room.
   return (
-    <main className="flex min-h-dvh items-center justify-center">
-      <button onClick={() => send("game:end")} className="btn-ghost">
-        Back to the lobby
-      </button>
-    </main>
+    <>
+      {inGame}
+      <RoomCodeChip code={roomCode} />
+    </>
   );
 }
