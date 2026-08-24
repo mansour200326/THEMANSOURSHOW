@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { callerKey, rateLimit } from "@/lib/rateLimit";
 import { z } from "zod";
 import {
   friendlyAiError,
@@ -34,6 +35,15 @@ const RequestSchema = z.object({
  * `game:start` carries through to init.
  */
 export async function POST(request: Request) {
+  // Public URL, no accounts, our API key. See lib/rateLimit.ts.
+  const limit = rateLimit(`content:${callerKey(request)}`, 30, 60 * 60 * 1000);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "That's a lot of writing in one hour. Try again shortly." },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfter) } },
+    );
+  }
+
   if (!hasApiKey()) {
     return NextResponse.json(
       { error: "No ANTHROPIC_API_KEY on the server." },

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { callerKey, rateLimit } from "@/lib/rateLimit";
 import { z } from "zod";
 import { hasApiKey, judgeGuess } from "@/lib/ai";
 
@@ -21,6 +22,15 @@ const RequestSchema = z.object({
  * falls back to its own string matching rather than eating a strike over it.
  */
 export async function POST(request: Request) {
+  // Public URL, no accounts, our API key. See lib/rateLimit.ts.
+  const limit = rateLimit(`judge:${callerKey(request)}`, 300, 60 * 60 * 1000);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "That's a lot of writing in one hour. Try again shortly." },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfter) } },
+    );
+  }
+
   if (!hasApiKey()) {
     return NextResponse.json({ index: null, judged: false });
   }

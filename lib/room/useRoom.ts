@@ -5,6 +5,31 @@ import type { Room } from "@/lib/room/types";
 
 export type Connection = "connecting" | "open" | "lost" | "missing";
 
+/*
+ * The live connection state, published for anything that wants to show it.
+ *
+ * There is only ever one room stream per screen, and the thing that needs to
+ * report on it — a banner pinned to the top of the page — sits outside every
+ * one of these components, in the layout. Threading the status back up through
+ * pages that each have a dozen early returns would have meant restructuring
+ * all of them; this is the same shape the sound control already uses.
+ */
+const watchers = new Set<(status: Connection) => void>();
+let current: Connection = "connecting";
+
+export function watchConnection(fn: (status: Connection) => void) {
+  watchers.add(fn);
+  fn(current);
+  return () => {
+    watchers.delete(fn);
+  };
+}
+
+function announce(status: Connection) {
+  current = status;
+  watchers.forEach((fn) => fn(status));
+}
+
 /**
  * Holds one SSE connection to the room and gives back the latest snapshot.
  * EventSource reconnects on its own, but a room that 404s (server restarted,
@@ -15,7 +40,11 @@ export function useRoom(code: string, viewerId?: string | null) {
   // No id means the TV, which everybody in the room can look at.
   const as = viewerId ? `?as=${encodeURIComponent(viewerId)}` : "";
   const [room, setRoom] = useState<Room | null>(null);
-  const [status, setStatus] = useState<Connection>("connecting");
+  const [status, setStatusRaw] = useState<Connection>("connecting");
+  const setStatus = useCallback((next: Connection) => {
+    setStatusRaw(next);
+    announce(next);
+  }, []);
   const version = useRef(-1);
 
   useEffect(() => {
@@ -51,8 +80,9 @@ export function useRoom(code: string, viewerId?: string | null) {
     return () => {
       cancelled = true;
       source?.close();
+      announce("connecting");
     };
-  }, [code, as]);
+  }, [code, as, setStatus]);
 
   const send = useCallback(
     async (

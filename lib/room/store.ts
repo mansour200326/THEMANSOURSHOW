@@ -40,7 +40,30 @@ export function getRoom(code: string): Room | undefined {
   return rooms.get(code.toUpperCase());
 }
 
+/**
+ * Rooms nobody has touched in this long are dropped.
+ *
+ * Nothing ever removed a room before: the map grew for the life of the
+ * process, and once rooms were being written to disk every one ever created
+ * was re-serialised on every change — including a drawing in progress, which
+ * mutates the room eleven times a second. A month of parties would have been
+ * doing that to a megabyte of dead rooms. Twelve hours is longer than any
+ * night and far shorter than a leak.
+ */
+const ROOM_TTL_MS = 12 * 60 * 60 * 1000;
+
+function prune() {
+  const cutoff = Date.now() - ROOM_TTL_MS;
+  for (const [code, room] of rooms) {
+    if ((room.touchedAt ?? room.createdAt) < cutoff) {
+      rooms.delete(code);
+      listeners.delete(code);
+    }
+  }
+}
+
 export function createRoom(): Room {
+  prune();
   let code = makeRoomCode();
   // Vanishingly unlikely, but a collision would hijack someone else's game.
   while (rooms.has(code)) code = makeRoomCode();
@@ -51,6 +74,7 @@ export function createRoom(): Room {
     gameId: null,
     game: null,
     createdAt: Date.now(),
+    touchedAt: Date.now(),
     version: 0,
   };
   rooms.set(code, room);
@@ -72,11 +96,12 @@ export function subscribe(code: string, fn: Listener): () => void {
 }
 
 function publish(room: Room) {
-  rooms.set(room.code, room);
+  const live = { ...room, touchedAt: Date.now() };
+  rooms.set(live.code, live);
   saveRooms(rooms.values());
-  listeners.get(room.code)?.forEach((fn) => {
+  listeners.get(live.code)?.forEach((fn) => {
     try {
-      fn(room);
+      fn(live);
     } catch {
       // A dead SSE connection shouldn't take down everyone else's game.
     }

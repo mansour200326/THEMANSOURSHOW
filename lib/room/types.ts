@@ -24,6 +24,8 @@ export type Room = {
   /** Whatever the active game module is tracking. */
   game: unknown;
   createdAt: number;
+  /** Last change of any kind. What decides when a dead room is dropped. */
+  touchedAt?: number;
   /** Bumped on every mutation so clients can drop stale snapshots. */
   version: number;
 };

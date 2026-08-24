@@ -2,7 +2,7 @@
  * How each game works, in the words you'd use to explain it to the room.
  *
  * These go on screen before anything starts, because the host shouldn't have
- * to remember the rules to fourteen games — and because half the room has
+ * to remember the rules to sixteen games — and because half the room has
  * never played any of them. Written to be read aloud off a TV: short lines,
  * no jargon, and the scoring said plainly rather than left to be discovered.
  */
