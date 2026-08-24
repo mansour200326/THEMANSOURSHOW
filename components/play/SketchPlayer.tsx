@@ -83,7 +83,7 @@ export function SketchPlayer({
         />
 
         {/* Big enough to hit with a thumb while the clock is running. */}
-        <div className="flex justify-between gap-1.5">
+        <div className="grid grid-cols-6 gap-2">
           {SKETCH_COLOURS.map((hex, i) => (
             <button
               key={hex}
@@ -92,10 +92,10 @@ export function SketchPlayer({
               aria-label={`Colour ${i + 1}`}
               aria-pressed={colour === i}
               className={[
-                "h-11 flex-1 rounded-full border-2 transition-transform",
+                "h-11 rounded-full border-2 transition-transform",
                 colour === i
-                  ? "scale-110 border-moon"
-                  : "border-white/15 active:scale-95",
+                  ? "scale-110 border-moon shadow-glow"
+                  : "border-white/20 active:scale-95",
               ].join(" ")}
               style={{ backgroundColor: hex }}
             />

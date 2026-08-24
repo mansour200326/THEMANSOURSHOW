@@ -20,12 +20,77 @@ const FILLER = new Set([
   "some", "of", "to", "and", "or", "in", "on", "at", "is", "are",
 ]);
 
+/**
+ * Number words and numerals are the same answer.
+ *
+ * Asked how many strings a violin has, half a room types "four" and half types
+ * "4", and marking one of those wrong is indefensible. Everything collapses to
+ * digits, so whichever way anybody typed it they meet in the middle.
+ */
+const UNITS: Record<string, number> = {
+  zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7,
+  eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13,
+  fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18,
+  nineteen: 19, twenty: 20, thirty: 30, forty: 40, fourty: 40, fifty: 50,
+  sixty: 60, seventy: 70, eighty: 80, ninety: 90,
+};
+const SCALES: Record<string, number> = {
+  hundred: 100, thousand: 1000, million: 1000000, billion: 1000000000,
+};
+
+/**
+ * Turns any run of number words into the number it spells. Anything that isn't
+ * a number passes through untouched, so "the nile" is left alone.
+ */
+function numeralise(words: string[]): string[] {
+  const out: string[] = [];
+  let total = 0;
+  let current = 0;
+  let counting = false;
+
+  const flush = () => {
+    if (counting) out.push(String(total + current));
+    total = 0;
+    current = 0;
+    counting = false;
+  };
+
+  for (const word of words) {
+    if (word in UNITS) {
+      current += UNITS[word];
+      counting = true;
+    } else if (word in SCALES) {
+      const scale = SCALES[word];
+      // "two hundred" multiplies what's pending; "a thousand" starts at one.
+      if (scale >= 1000) {
+        total += (current || 1) * scale;
+        current = 0;
+      } else {
+        current = (current || 1) * scale;
+      }
+      counting = true;
+    } else if (counting && word === "and") {
+      // "four hundred and forty" is one number, not two.
+      continue;
+    } else {
+      flush();
+      out.push(word);
+    }
+  }
+  flush();
+  return out;
+}
+
 /** Lowercase, strip punctuation, drop filler words, singularise crudely. */
 export function normalise(text: string): string {
-  return text
+  const words = text
     .toLowerCase()
+    // Hyphens join number words — "twenty-one" has to split before counting.
     .replace(/[^\p{L}\p{N}\s]/gu, " ")
     .split(/\s+/)
+    .filter(Boolean);
+
+  return numeralise(words)
     .filter((w) => w && !FILLER.has(w))
     .map((w) => (w.length > 3 && w.endsWith("s") && !w.endsWith("ss") ? w.slice(0, -1) : w))
     .join(" ")

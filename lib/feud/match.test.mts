@@ -43,12 +43,37 @@ const CASES: Case[] = [
   // Already face-up answers are never re-opened (revealed handled below).
 ];
 
+// Numbers, which is where a real game came unstuck: asked how many strings a
+// violin has, half the room typed "four" and half typed "4".
+const numbers: Array<[string, string, boolean]> = [
+  ["4", "Four", true],
+  ["four", "4", true],
+  ["6", "six", true],
+  ["twenty one", "21", true],
+  ["twenty-one", "21", true],
+  ["1440", "One thousand four hundred and forty", true],
+  ["two hundred", "200", true],
+  ["a thousand", "1000", true],
+  // Still has to say no to the wrong number.
+  ["five", "4", false],
+  ["40", "four", false],
+  // And words that merely contain a number word are left alone.
+  ["Tennessee", "10", false],
+];
+
 let pass = 0, fail = 0;
 for (const [guess, answers, mode, want] of CASES) {
   const got = matchAnswer(guess, answers, [], mode)?.index ?? null;
   const ok = got === want;
   ok ? pass++ : fail++;
   if (!ok) console.log(`FAIL  ${mode.padEnd(7)} "${guess}" -> ${got} (want ${want})`);
+}
+
+for (const [guess, answer, want] of numbers) {
+  const got = matchAnswer(guess, [A(answer)], [], "lenient") !== null;
+  const ok = got === want;
+  ok ? pass++ : fail++;
+  if (!ok) console.log(`FAIL  numbers: "${guess}" vs "${answer}" -> ${got} (want ${want})`);
 }
 
 // Revealed answers stay shut.

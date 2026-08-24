@@ -20,16 +20,26 @@ import { type Action, type Room, award, connectedPlayers } from "@/lib/room/type
  * The colours a drawer can pick from. Stored as an index rather than a hex
  * string — this array streams to every phone many times a second, and an
  * index is one byte where "#37D3C8" is nine.
+ *
+ * These are ink colours, not screen colours, because the canvas is paper. The
+ * first palette was the app's own neons on a midnight square, which had no
+ * black in it — there was nowhere for black to go — and washed out anything
+ * dark. A drawing surface wants to be the one light thing in the room, the way
+ * every drawing game has ever done it.
  */
 export const SKETCH_COLOURS = [
-  "#F4F2EC", // moonlight
-  "#FF6B57", // coral
-  "#37D3C8", // aqua
-  "#A8E05F", // lime
-  "#E8508D", // magenta
-  "#8E7CFF", // violet
-  "#FFC857", // amber
-  "#5BA8FF", // sky
+  "#14161C", // black
+  "#D92B2B", // red
+  "#E8720C", // orange
+  "#E0A400", // amber
+  "#1F9B4B", // green
+  "#0FA3A3", // teal
+  "#1F6FE0", // blue
+  "#7A4DD6", // violet
+  "#D6338C", // pink
+  "#8A5A3C", // brown
+  "#7C8497", // grey
+  "#FFFFFF", // white
 ] as const;
 
 /**
@@ -183,11 +193,31 @@ export function createSketchGame(pool: string[]): GameModule {
                   Math.round(Number(action.payload?.colour) || 0),
                 ),
               );
-          const live: Stroke = {
-            c: colour,
-            p: [...s.live.p, ...points].slice(-MAX_POINTS_PER_STROKE),
-          };
-          return { ...room, game: { ...s, live } };
+          const grown = [...s.live.p, ...points];
+
+          /*
+           * A long unbroken line used to erase its own beginning: the cap was
+           * applied with slice(-n), which keeps the LAST n numbers, so once you
+           * passed it the oldest points fell off while your finger was still
+           * moving. The cap still has to exist — this array is re-broadcast to
+           * every phone many times a second — but it's enforced by banking the
+           * line so far and starting a new one from the point the pen is at,
+           * which joins up invisibly and keeps everything already drawn.
+           */
+          if (grown.length > MAX_POINTS_PER_STROKE) {
+            const banked: Stroke = { c: colour, p: grown };
+            const [lastX, lastY] = grown.slice(-2);
+            return {
+              ...room,
+              game: {
+                ...s,
+                strokes: [...s.strokes, banked].slice(-MAX_STROKES),
+                live: { c: colour, p: [lastX, lastY] },
+              },
+            };
+          }
+
+          return { ...room, game: { ...s, live: { c: colour, p: grown } } };
         }
 
         /** Pen lifted — bank the line. */

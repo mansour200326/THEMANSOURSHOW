@@ -30,6 +30,9 @@ export type Cue =
 
 const STORAGE_KEY = "bignight:muted";
 
+/** A cue older than this missed its moment and is better off dropped. */
+const STALE_MS = 1500;
+
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
 let muted = false;
@@ -279,8 +282,39 @@ export function play(cue: Cue): boolean {
   if (muted) return false;
   const c = audio();
   if (!c || !master) return false;
-  // A suspended context accepts the notes and plays none of them.
-  if (c.state !== "running") return false;
+
+  /*
+   * This is why the sound came and went.
+   *
+   * A browser parks the audio context whenever it feels like it — the tab goes
+   * to the background, the machine sleeps, the page sits idle — and a parked
+   * context accepts every note and plays none of them. `audio()` asks it to
+   * resume, but resume() is asynchronous, so the cue that triggered the wake-up
+   * was always scheduled into a context that hadn't woken yet and was simply
+   * lost. The first buzz after any interruption never sounded.
+   *
+   * So a cue that arrives early waits for the context instead of being dropped.
+   * The cutoff matters: coming back to a tab that has been closed for ten
+   * minutes shouldn't replay everything that happened while you were away.
+   */
+  if (c.state !== "running") {
+    const queuedAt = Date.now();
+    void Promise.resolve(c.resume())
+      .then(() => {
+        if (muted || Date.now() - queuedAt > STALE_MS) return;
+        try {
+          CUES[cue](c);
+        } catch {
+          /* see below */
+        }
+      })
+      .catch(() => {
+        // Still shut, which means the page hasn't been touched yet. Nothing to
+        // be done, and nothing worth breaking a game over.
+      });
+    return false;
+  }
+
   try {
     CUES[cue](c);
     return true;
