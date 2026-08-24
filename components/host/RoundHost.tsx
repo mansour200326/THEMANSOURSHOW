@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { BLUFF_REAL_ID } from "@/lib/games/roundGames";
+import { normalise } from "@/lib/feud/match";
 import { Tally } from "@/components/Tally";
 import { useCue, useCueWhen } from "@/components/useCue";
 import type { RoundState } from "@/lib/games/roundEngine";
@@ -155,6 +156,26 @@ export function RoundHost({ room, state, onForce, onNext, onQuit }: Props) {
                             {author.emoji} {author.name}
                           </span>
                         )}
+                        {/*
+                          * Who fell for it. A bluffing game that only ever
+                          * showed a number was hiding the best part of the
+                          * round: not that a lie worked, but on whom.
+                          */}
+                        {revealed && count > 0 && (
+                          <span className="flex shrink-0 gap-1">
+                            {Object.entries(state.votes)
+                              .filter(([, id]) => id === option.id)
+                              .map(([voterId]) => (
+                                <span
+                                  key={voterId}
+                                  title={playerById(room, voterId)?.name}
+                                  className="text-[clamp(0.9rem,1.5vw,1.6rem)]"
+                                >
+                                  {playerById(room, voterId)?.emoji}
+                                </span>
+                              ))}
+                          </span>
+                        )}
                         {revealed && (
                           <span className="font-display text-[clamp(1rem,1.8vw,2rem)] font-bold tabular-nums text-accent">
                             {count}
@@ -204,19 +225,28 @@ export function RoundHost({ room, state, onForce, onNext, onQuit }: Props) {
   );
 }
 
+/*
+ * The TV used to group by the raw text while the scoring grouped by the
+ * normalised text, so "the beach" and "Beach" were paid as one answer and
+ * displayed as two — the board contradicted the scoreboard. Both sides count
+ * the same way now, and the label is the wording the most people used.
+ */
 function HerdResults({ room, state }: { room: Room; state: RoundState }) {
-  const groups: Record<string, string[]> = {};
+  const groups: Record<string, { label: string; ids: string[] }> = {};
   Object.entries(state.submissions).forEach(([playerId, text]) => {
-    (groups[text.trim().toLowerCase()] ??= []).push(playerId);
+    const key = normalise(text) || text.trim().toLowerCase();
+    (groups[key] ??= { label: text.trim(), ids: [] }).ids.push(playerId);
   });
-  const sorted = Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
-  const biggest = sorted[0]?.[1].length ?? 0;
+  const sorted = Object.entries(groups).sort(
+    (a, b) => b[1].ids.length - a[1].ids.length,
+  );
+  const biggest = sorted[0]?.[1].ids.length ?? 0;
 
   return (
     <div className="space-y-[1vmin]">
-      {sorted.map(([answer, ids]) => (
+      {sorted.map(([key, { label, ids }]) => (
         <div
-          key={answer}
+          key={key}
           className={[
             "flex items-center justify-between gap-4 rounded-xl border px-5 py-[1.4vmin]",
             ids.length === biggest && biggest > 1
@@ -225,7 +255,7 @@ function HerdResults({ room, state }: { room: Room; state: RoundState }) {
           ].join(" ")}
         >
           <span className="truncate font-display text-[clamp(1rem,2vw,2.2rem)] uppercase tracking-wide text-moon">
-            {answer}
+            {label}
           </span>
           <span className="flex shrink-0 gap-2">
             {ids.map((id) => (

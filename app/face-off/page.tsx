@@ -260,6 +260,7 @@ function FaceOffStage() {
                 onReveal={(index) => dispatch({ type: "REVEAL", index })}
                 onStrike={() => dispatch({ type: "STRIKE" })}
                 onNextRound={() => dispatch({ type: "NEXT_ROUND" })}
+                onClock={(run) => dispatch({ type: "CLOCK", run })}
               />
             )}
 

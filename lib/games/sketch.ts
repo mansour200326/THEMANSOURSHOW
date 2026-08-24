@@ -43,15 +43,26 @@ export const SKETCH_COLOURS = [
 ] as const;
 
 /**
- * One line. `p` is a flat [x, y, x, y, …] list in 0-1000 grid space and `c` is
- * an index into SKETCH_COLOURS. The keys are one letter for the same reason
- * the colour is an index: this is the only state in the product that streams
- * continuously, and every byte is sent again on each update.
+ * Nib widths, as a fraction of the canvas. A drawing needs both a fat pen for
+ * the shape of the thing and a thin one for the face on it, and 1000-grid
+ * space means the same line is the same weight on a phone and a TV.
  */
-export type Stroke = { c: number; p: number[] };
+export const SKETCH_WIDTHS = [0.004, 0.008, 0.018, 0.04] as const;
+
+/**
+ * One line. `p` is a flat [x, y, x, y, …] list in 0-1000 grid space, `c` is an
+ * index into SKETCH_COLOURS and `w` into SKETCH_WIDTHS. The keys are one
+ * letter for the same reason those are indices: this is the only state in the
+ * product that streams continuously, and every byte is sent again on each
+ * update.
+ */
+export type Stroke = { c: number; p: number[]; w?: number };
 
 export const strokeColour = (stroke: Stroke) =>
   SKETCH_COLOURS[stroke.c] ?? SKETCH_COLOURS[0];
+
+export const strokeWidth = (stroke: Stroke) =>
+  SKETCH_WIDTHS[stroke.w ?? 1] ?? SKETCH_WIDTHS[1];
 
 export type SketchState = {
   kind: "sketch";
@@ -182,17 +193,17 @@ export function createSketchGame(pool: string[]): GameModule {
                 .map(Math.round)
             : [];
           if (!points.length) return room;
-          // The colour is taken from whatever the pen was set to when the
-          // stroke began, so switching mid-line can't recolour it halfway.
-          const colour = s.live.p.length
-            ? s.live.c
-            : Math.max(
-                0,
-                Math.min(
-                  SKETCH_COLOURS.length - 1,
-                  Math.round(Number(action.payload?.colour) || 0),
-                ),
-              );
+          const clampIndex = (value: unknown, count: number) =>
+            Math.max(0, Math.min(count - 1, Math.round(Number(value) || 0)));
+          // Both are taken from whatever the pen was set to when the stroke
+          // began, so switching mid-line can't redraw it halfway.
+          const fresh = !s.live.p.length;
+          const colour = fresh
+            ? clampIndex(action.payload?.colour, SKETCH_COLOURS.length)
+            : s.live.c;
+          const width = fresh
+            ? clampIndex(action.payload?.width, SKETCH_WIDTHS.length)
+            : (s.live.w ?? 1);
           const grown = [...s.live.p, ...points];
 
           /*
@@ -205,19 +216,19 @@ export function createSketchGame(pool: string[]): GameModule {
            * which joins up invisibly and keeps everything already drawn.
            */
           if (grown.length > MAX_POINTS_PER_STROKE) {
-            const banked: Stroke = { c: colour, p: grown };
+            const banked: Stroke = { c: colour, w: width, p: grown };
             const [lastX, lastY] = grown.slice(-2);
             return {
               ...room,
               game: {
                 ...s,
                 strokes: [...s.strokes, banked].slice(-MAX_STROKES),
-                live: { c: colour, p: [lastX, lastY] },
+                live: { c: colour, w: width, p: [lastX, lastY] },
               },
             };
           }
 
-          return { ...room, game: { ...s, live: { c: colour, p: grown } } };
+          return { ...room, game: { ...s, live: { c: colour, w: width, p: grown } } };
         }
 
         /** Pen lifted — bank the line. */

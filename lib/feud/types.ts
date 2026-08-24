@@ -52,6 +52,13 @@ export type FeudState = {
   struckOut: number[];
   /** Stamped when the board changes hands, so the TV can announce it. */
   handoverAt: number | null;
+  /**
+   * The shot clock. Nothing enforces it — a team that runs out doesn't strike
+   * automatically, because a clock that punishes you over a slow phone is
+   * worse than no clock. It's there to be looked at: it stops the huddle that
+   * goes on for two minutes, and the host still calls it.
+   */
+  clock: { startedAt: number; seconds: number } | null;
   /** What the host last typed, and whether it landed. */
   lastGuess: {
     text: string;
@@ -64,6 +71,9 @@ export type FeudState = {
 };
 
 export const STRIKES_ALLOWED = 3;
+
+/** Long enough to think, short enough that you can hear it. */
+export const FEUD_CLOCK_SECONDS = 20;
 
 export const currentQuestion = (state: FeudState): FeudQuestion | undefined =>
   state.questions[state.round];

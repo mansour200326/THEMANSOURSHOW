@@ -2,6 +2,7 @@ import {
   type FeudQuestion,
   type FeudState,
   type FeudTeam,
+  FEUD_CLOCK_SECONDS,
   STRIKES_ALLOWED,
   allRevealed,
   currentQuestion,
@@ -25,6 +26,7 @@ export const emptyFeud = (): FeudState => ({
   contributions: [],
   struckOut: [],
   handoverAt: null,
+  clock: null,
   lastGuess: null,
   past: [],
 });
@@ -35,6 +37,7 @@ export type FeudAction =
   | { type: "GUESS"; text: string; matched: number | null; repeat?: boolean }
   | { type: "REVEAL"; index: number }
   | { type: "STRIKE" }
+  | { type: "CLOCK"; run: boolean }
   | { type: "NEXT_ROUND" }
   | { type: "UNDO" }
   | { type: "RESET" }
@@ -62,7 +65,7 @@ function endRound(
   const everything = question
     ? question.answers.map((_, i) => i)
     : state.revealed;
-  return { ...state, phase: "round-end", outcome, revealed: everything };
+  return { ...state, phase: "round-end", outcome, revealed: everything, clock: null };
 }
 
 export function feudReducer(state: FeudState, action: FeudAction): FeudState {
@@ -79,8 +82,26 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
 
     case "SET_CONTROL": {
       if (state.phase !== "face-off") return state;
-      return { ...state, control: action.team, phase: "play" };
+      return {
+        ...state,
+        control: action.team,
+        phase: "play",
+        clock: { startedAt: Date.now(), seconds: FEUD_CLOCK_SECONDS },
+      };
     }
+
+    /**
+     * Stop the clock. Somebody always needs the toilet, and the alternative is
+     * the host watching the room argue with a number counting down at them.
+     */
+    case "CLOCK":
+      if (state.phase !== "play") return state;
+      return {
+        ...state,
+        clock: action.run
+          ? { startedAt: Date.now(), seconds: FEUD_CLOCK_SECONDS }
+          : null,
+      };
 
     /**
      * The host types what the team shouted. A near miss still counts — the
@@ -136,6 +157,8 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
           i === state.control ? n + 1 : n,
         ),
         handoverAt: null,
+        // A right answer buys you the full think time for the next one.
+        clock: state.clock ? { ...state.clock, startedAt: Date.now() } : null,
       };
       return allRevealed(next) ? endRound(next, "cleared") : next;
     }
@@ -148,6 +171,8 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
         past: snapshot(state),
         strikes,
         handoverAt: null,
+        // So does a wrong one — the pressure is on the answer, not the round.
+        clock: state.clock ? { ...state.clock, startedAt: Date.now() } : null,
       };
       if (strikes < STRIKES_ALLOWED) return next;
 
@@ -156,7 +181,13 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
       const out = { ...next, struckOut: [...next.struckOut, next.control] };
       const heir = nextInLine(out);
       if (heir !== undefined) {
-        return { ...out, control: heir, strikes: 0, handoverAt: Date.now() };
+        return {
+          ...out,
+          control: heir,
+          strikes: 0,
+          handoverAt: Date.now(),
+          clock: { startedAt: Date.now(), seconds: FEUD_CLOCK_SECONDS },
+        };
       }
 
       // Nobody left to try. Everyone keeps what they opened; show the rest.
@@ -182,6 +213,7 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
         contributions: state.teams.map(() => 0),
         struckOut: [],
         handoverAt: null,
+        clock: null,
         // Loser of the last round starts the next one.
         control: otherTeam(state),
       };

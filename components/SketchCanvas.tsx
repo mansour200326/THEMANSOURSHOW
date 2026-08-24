@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { type Stroke, strokeColour } from "@/lib/games/sketch";
+import { type Stroke, strokeColour, strokeWidth } from "@/lib/games/sketch";
 
 /**
  * Draws the strokes on a square canvas, in the 0-1000 grid space they're
@@ -12,6 +12,7 @@ export function SketchCanvas({
   live,
   className,
   colour = 0,
+  width = 1,
   onStroke,
   onLift,
 }: {
@@ -20,8 +21,10 @@ export function SketchCanvas({
   className?: string;
   /** Index into SKETCH_COLOURS — only used by the canvas being drawn on. */
   colour?: number;
+  /** Index into SKETCH_WIDTHS — likewise. */
+  width?: number;
   /** Present when this canvas is the one being drawn on. */
-  onStroke?: (points: number[], colour: number) => void;
+  onStroke?: (points: number[], colour: number, width: number) => void;
   onLift?: () => void;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -50,11 +53,13 @@ export function SketchCanvas({
     ctx.clearRect(0, 0, size, size);
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.lineWidth = Math.max(2, size / 140);
 
     const paint = (stroke: Stroke) => {
       if (stroke.p.length < 4) return;
       ctx.strokeStyle = strokeColour(stroke);
+      // Width is a fraction of the canvas, so the same line is the same
+      // weight on the drawer's phone and on the TV.
+      ctx.lineWidth = Math.max(1.5, strokeWidth(stroke) * size);
       ctx.beginPath();
       for (let i = 0; i < stroke.p.length; i += 2) {
         const x = (stroke.p[i] / 1000) * size;
@@ -94,7 +99,7 @@ export function SketchCanvas({
    */
   const flush = () => {
     if (!pending.current.length || !onStroke) return;
-    onStroke(pending.current, colour);
+    onStroke(pending.current, colour, width);
     pending.current = [];
   };
 

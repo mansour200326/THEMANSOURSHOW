@@ -18,7 +18,8 @@ export type GridOwner = "a" | "b" | "neutral" | "assassin" | "hidden";
 
 export type CodeGridState = {
   kind: "grid";
-  phase: "clue" | "guess" | "done";
+  /** teams — the room is still sorting out who's on which side. */
+  phase: "teams" | "clue" | "guess" | "done";
   words: string[];
   /** Who each word belongs to. Never sent to a phone that isn't a spymaster. */
   key: GridOwner[];
@@ -123,7 +124,10 @@ export function createCodeGrid(wordPool: string[]): GameModule {
       const first: 0 | 1 = Math.random() < 0.5 ? 0 : 1;
       const fresh: CodeGridState = {
         kind: "grid",
-        phase: "clue",
+        // Split at random to begin with, but the room gets to fix it before
+        // anything starts. Four people dealt into the wrong pairs was the
+        // fastest way to make this game not work.
+        phase: "teams",
         words: shuffle(pool).slice(0, GRID_SIZE),
         key: buildKey(first),
         revealed: [],
@@ -142,6 +146,46 @@ export function createCodeGrid(wordPool: string[]): GameModule {
       if (!s) return room;
 
       switch (action.type) {
+        /** Moving somebody, or handing over the key card, before kickoff. */
+        case "assign": {
+          if (s.phase !== "teams") return room;
+          const who = String(action.payload?.playerId ?? "");
+          const team = Number(action.payload?.team);
+          const asSpymaster = Boolean(action.payload?.spymaster);
+          if (!who || (team !== 0 && team !== 1)) return room;
+
+          const teams = s.teams.map((t, i) => {
+            // Take them off whichever side they were on.
+            const stripped = {
+              ...t,
+              spymaster: t.spymaster === who ? null : t.spymaster,
+              members: t.members.filter((id) => id !== who),
+            };
+            if (i !== team) return stripped;
+            if (!asSpymaster) {
+              return { ...stripped, members: [...stripped.members, who] };
+            }
+            // Only one key card per side; whoever had it becomes a guesser.
+            return {
+              ...stripped,
+              spymaster: who,
+              members: stripped.spymaster
+                ? [...stripped.members, stripped.spymaster]
+                : stripped.members,
+            };
+          }) as CodeGridState["teams"];
+
+          return { ...room, game: { ...s, teams } };
+        }
+
+        /** The room is happy with the sides. */
+        case "begin": {
+          if (s.phase !== "teams") return room;
+          // Both sides need somebody who can see the key, or it can't be played.
+          if (s.teams.some((t) => !t.spymaster)) return room;
+          return { ...room, game: { ...s, phase: "clue" } };
+        }
+
         /** Only the spymaster whose turn it is may speak. */
         case "clue": {
           if (s.phase !== "clue" || !action.playerId) return room;

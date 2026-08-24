@@ -62,15 +62,18 @@ export default function HostPage({
 
   const launch = async (
     gameId: string,
-    config: { categories: string[]; difficulty: string },
+    config: { categories: string[]; difficulty: string; minutes?: number },
   ) => {
+    // The round length is a setting, not content — it goes with every start,
+    // written pack or not.
+    const seconds = config.minutes ? config.minutes * 60 : undefined;
     setSetupError(null);
     // Trivia Royale needs a full board; the rest are happy with their
     // bundled pack if the host doesn't want to wait for a written one.
     const board = gameId === "trivia-royale";
     if (board ? config.categories.length < 3 : config.categories.length === 0) {
       setSetupFor(null);
-      send("game:start", { gameId });
+      send("game:start", { gameId, seconds });
       return;
     }
     setBusy(true);
@@ -101,6 +104,7 @@ export default function HostPage({
         items: data.items,
         places: data.places,
         words: data.words,
+        seconds,
       });
     } catch (e) {
       // A cancel isn't an error worth putting on the TV.
@@ -202,6 +206,7 @@ export default function HostPage({
       <GameSetup
         gameName={NEEDS_SETUP[setupFor]}
         needsBoard={setupFor === "trivia-royale"}
+        lengths={setupFor === "impostor" ? [4, 6, 8, 10] : undefined}
         busy={busy}
         error={setupError}
         onCancel={() => {
@@ -271,7 +276,14 @@ export default function HostPage({
   }
 
   if (state?.kind === "grid") {
-    return <GridHost room={room} state={state} onQuit={() => send("game:end")} />;
+    return (
+      <GridHost
+        room={room}
+        state={state}
+        onBegin={() => send("begin")}
+        onQuit={() => send("game:end")}
+      />
+    );
   }
 
   if (state?.kind === "sketch") {

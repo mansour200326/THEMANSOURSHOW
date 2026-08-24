@@ -2,14 +2,18 @@
 
 import { useState } from "react";
 import { SketchCanvas } from "@/components/SketchCanvas";
-import { SKETCH_COLOURS, type SketchState } from "@/lib/games/sketch";
+import {
+  SKETCH_COLOURS,
+  SKETCH_WIDTHS,
+  type SketchState,
+} from "@/lib/games/sketch";
 import type { ViewerExtras } from "@/lib/room/redact";
 import type { Player } from "@/lib/room/types";
 
 type Props = {
   state: SketchState & ViewerExtras;
   me: Player;
-  onStroke: (points: number[], colour: number) => void;
+  onStroke: (points: number[], colour: number, width: number) => void;
   onLift: () => void;
   onUndo: () => void;
   onClear: () => void;
@@ -27,6 +31,7 @@ export function SketchPlayer({
 }: Props) {
   const [text, setText] = useState("");
   const [colour, setColour] = useState(0);
+  const [width, setWidth] = useState(1);
   const drawing = state.drawerId === me.id;
 
   if (state.phase === "done") {
@@ -77,6 +82,7 @@ export function SketchPlayer({
           strokes={state.strokes}
           live={state.live}
           colour={colour}
+          width={width}
           onStroke={onStroke}
           onLift={onLift}
           className="w-full"
@@ -99,6 +105,34 @@ export function SketchPlayer({
               ].join(" ")}
               style={{ backgroundColor: hex }}
             />
+          ))}
+        </div>
+
+        {/* Nib. A dot the size of the line it draws, so there's nothing to read. */}
+        <div className="flex items-center justify-center gap-3">
+          {SKETCH_WIDTHS.map((w, i) => (
+            <button
+              key={w}
+              type="button"
+              onClick={() => setWidth(i)}
+              aria-label={`Nib ${i + 1}`}
+              aria-pressed={width === i}
+              className={[
+                "flex h-12 w-12 items-center justify-center rounded-full border transition-colors",
+                width === i
+                  ? "border-accent bg-accent/15"
+                  : "border-white/15 active:bg-white/5",
+              ].join(" ")}
+            >
+              <span
+                className="rounded-full"
+                style={{
+                  width: `${Math.max(4, w * 190)}px`,
+                  height: `${Math.max(4, w * 190)}px`,
+                  backgroundColor: SKETCH_COLOURS[colour],
+                }}
+              />
+            </button>
           ))}
         </div>
 

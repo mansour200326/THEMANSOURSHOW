@@ -11,6 +11,7 @@ type Props = {
   onClue: (word: string, count: number) => void;
   onTap: (index: number) => void;
   onPass: () => void;
+  onAssign: (playerId: string, team: 0 | 1, spymaster: boolean) => void;
 };
 
 /** The key card, as seen by the two people allowed to see it. */
@@ -22,7 +23,7 @@ const KEY_FACE: Record<string, string> = {
   hidden: "border-white/12 bg-white/[0.03] text-moon/75",
 };
 
-export function GridPlayer({ state, me, onClue, onTap, onPass }: Props) {
+export function GridPlayer({ state, me, onClue, onTap, onPass, onAssign }: Props) {
   const [word, setWord] = useState("");
   const [count, setCount] = useState(2);
 
@@ -39,6 +40,68 @@ export function GridPlayer({ state, me, onClue, onTap, onPass }: Props) {
         </p>
         <p className="text-moon-dim">Look at the TV.</p>
       </Centre>
+    );
+  }
+
+  /* ---- sorting out the sides, before anything starts ---- */
+  if (state.phase === "teams") {
+    return (
+      <main className="flex min-h-dvh flex-col justify-center gap-4 p-5">
+        <p className="text-center font-display text-xs uppercase tracking-[0.25em] text-moon-deep">
+          Pick your side
+        </p>
+        {state.teams.map((t, i) => {
+          const side = i as 0 | 1;
+          const mine = team === side;
+          const keyCard = t.spymaster === me.id;
+          return (
+            <div
+              key={i}
+              className={[
+                "rounded-2xl border p-4 transition-colors",
+                mine
+                  ? i === 0
+                    ? "border-sky-400/70 bg-sky-500/10"
+                    : "border-amber-400/70 bg-amber-500/10"
+                  : "border-white/12 bg-white/[0.03]",
+              ].join(" ")}
+            >
+              <p className="font-display text-lg uppercase tracking-wide text-moon">
+                {t.name}
+              </p>
+              <div className="mt-3 flex gap-2">
+                <button
+                  onClick={() => onAssign(me.id, side, false)}
+                  disabled={mine && !keyCard}
+                  className={[
+                    "flex-1 rounded-xl border py-3 font-display text-sm uppercase tracking-wide",
+                    mine && !keyCard
+                      ? "border-accent bg-accent/20 text-accent-bright"
+                      : "border-white/15 text-moon/75",
+                  ].join(" ")}
+                >
+                  {mine && !keyCard ? "You're guessing" : "Guess"}
+                </button>
+                <button
+                  onClick={() => onAssign(me.id, side, true)}
+                  disabled={keyCard}
+                  className={[
+                    "flex-1 rounded-xl border py-3 font-display text-sm uppercase tracking-wide",
+                    keyCard
+                      ? "border-accent bg-accent/20 text-accent-bright"
+                      : "border-white/15 text-moon/75",
+                  ].join(" ")}
+                >
+                  {keyCard ? "You hold the key" : "Take the key"}
+                </button>
+              </div>
+            </div>
+          );
+        })}
+        <p className="text-center text-sm text-moon-deep">
+          One person per side holds the key card. Sit next to your team.
+        </p>
+      </main>
     );
   }
 

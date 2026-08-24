@@ -151,8 +151,11 @@ export function createImpostorGame(pack: ImpostorPlace[]): GameModule {
     needsPhones: true,
 
     init(room) {
-      const supplied = (room as unknown as { pendingPlaces?: ImpostorPlace[] })
-        .pendingPlaces;
+      const primed = room as unknown as {
+        pendingPlaces?: ImpostorPlace[];
+        pendingSeconds?: number;
+      };
+      const supplied = primed.pendingPlaces;
       const fresh: ImpostorState = {
         kind: "impostor",
         phase: "deal",
@@ -162,7 +165,9 @@ export function createImpostorGame(pack: ImpostorPlace[]): GameModule {
         impostorId: null,
         ready: [],
         startedAt: null,
-        seconds: IMPOSTOR_SECONDS,
+        // Eight minutes suits about six people. Four is far too long for
+        // three players and nowhere near enough for ten, so the host picks.
+        seconds: primed.pendingSeconds ?? IMPOSTOR_SECONDS,
         calledBy: null,
         votes: {},
         guessedPlace: null,

@@ -19,6 +19,9 @@ type Props = {
   onQuit: () => void;
 };
 
+/** Long enough to read the line and disagree with it. */
+const REVEAL_BEAT_MS = 900;
+
 const TITLES: Record<LiveState["variant"], string> = {
   standing: "Last One Standing",
   timeline: "Timeline",
@@ -58,6 +61,27 @@ export function LiveHost({ room, state, onForce, onNext, onQuit }: Props) {
   }, [left, state.phase, state.seconds, state.startedAt, onForce]);
 
   const urgent = left <= 5 && left > 0;
+
+  /*
+   * Timeline used to drop all five events on screen 0.18s apart, which reads
+   * as instantly — the answer arrived before anyone had looked at it. They
+   * come out one at a time now, earliest first, so the room can be wrong out
+   * loud before the next one lands.
+   */
+  const [shown, setShown] = useState(0);
+  const events = item?.events?.length ?? 0;
+  useEffect(() => {
+    if (state.variant !== "timeline" || state.phase !== "reveal") {
+      setShown(0);
+      return;
+    }
+    setShown(1);
+    const id = window.setInterval(() => {
+      setShown((n) => Math.min(events, n + 1));
+    }, REVEAL_BEAT_MS);
+    return () => window.clearInterval(id);
+  }, [state.variant, state.phase, state.round, events]);
+  useCue(shown, shown > 0 ? "reveal" : null);
   useCue(
     (state.phase === "collect" || state.phase === "brief") && urgent
       ? Math.ceil(left)
@@ -190,12 +214,12 @@ export function LiveHost({ room, state, onForce, onNext, onQuit }: Props) {
               </div>
             ) : (
               <div className="flex flex-col gap-[1.2vmin]">
-                {(item?.events ?? []).map((event, i) => (
+                {(item?.events ?? []).slice(0, shown).map((event, i) => (
                   <motion.div
                     key={i}
-                    initial={{ opacity: 0, x: -20 }}
+                    initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.18 }}
+                    transition={{ type: "spring", stiffness: 220, damping: 22 }}
                     className="flex items-center gap-4 rounded-xl border border-accent/50 bg-accent/[0.08] px-6 py-[1.6vmin] text-left"
                   >
                     <span className="accent-text font-display text-[clamp(1.2rem,2.4vw,2.6rem)] font-bold tabular-nums">

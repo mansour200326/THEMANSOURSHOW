@@ -241,6 +241,7 @@ function reduceRoom(room: Room, action: Action): Room {
         "pendingPlaces",
         "pendingWords",
         "pendingPrompts",
+        "pendingSeconds",
       ] as const;
       const primed = {
         ...room,
@@ -252,6 +253,7 @@ function reduceRoom(room: Room, action: Action): Room {
         pendingItems: action.payload?.items,
         pendingPlaces: action.payload?.places,
         pendingWords: action.payload?.words,
+        pendingSeconds: action.payload?.seconds,
         pendingPrompts: action.payload?.prompts,
       };
       const started = game.init(primed as typeof room);

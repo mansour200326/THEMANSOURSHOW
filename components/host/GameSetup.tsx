@@ -15,7 +15,17 @@ type Props = {
   onCancel: () => void;
   /** Write the content by hand instead of generating it. */
   onWriteOwn?: () => void;
-  onStart: (config: { categories: string[]; difficulty: Difficulty }) => void;
+  /**
+   * Games where the length is the whole shape of the round get to choose it.
+   * Eight minutes of one conversation is a long time if the room is four
+   * people, and far too short if it's ten.
+   */
+  lengths?: number[];
+  onStart: (config: {
+    categories: string[];
+    difficulty: Difficulty;
+    minutes?: number;
+  }) => void;
   /** Set while the board is being written. */
   busy?: boolean;
   error?: string | null;
@@ -30,6 +40,7 @@ const SLOTS = 4;
 export function GameSetup({
   gameName,
   needsBoard = false,
+  lengths,
   onCancel,
   onWriteOwn,
   onStart,
@@ -39,6 +50,7 @@ export function GameSetup({
   const [categories, setCategories] = useState<string[]>(Array(SLOTS).fill(""));
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [suggesting, setSuggesting] = useState(false);
+  const [minutes, setMinutes] = useState(lengths?.[Math.floor(lengths.length / 2)]);
 
   const filled = categories.map((c) => c.trim()).filter(Boolean);
 
@@ -106,6 +118,30 @@ export function GameSetup({
         <DifficultyBar value={difficulty} onChange={setDifficulty} />
       </div>
 
+      {lengths && (
+        <div>
+          <h2 className="mb-3 font-display text-lg uppercase tracking-widest text-moon/75">
+            How long
+          </h2>
+          <div className="flex gap-2">
+            {lengths.map((n) => (
+              <button
+                key={n}
+                onClick={() => setMinutes(n)}
+                className={[
+                  "flex-1 rounded-xl border py-3 font-display uppercase tracking-wide tabular-nums transition-colors",
+                  minutes === n
+                    ? "border-accent bg-accent/15 text-accent-bright"
+                    : "border-white/12 text-moon/75 hover:border-white/25",
+                ].join(" ")}
+              >
+                {n} min
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {error && (
         <motion.p
           initial={{ opacity: 0, y: -6 }}
@@ -118,7 +154,7 @@ export function GameSetup({
 
       <div className="flex flex-col items-center gap-3">
         <button
-          onClick={() => onStart({ categories: filled, difficulty })}
+          onClick={() => onStart({ categories: filled, difficulty, minutes })}
           disabled={(needsBoard && filled.length < 3) || (!needsBoard && !filled.length) || busy}
           className="btn-brand w-full py-5 text-xl"
         >
@@ -133,7 +169,7 @@ export function GameSetup({
         )}
         <div className="flex gap-3">
           <button
-            onClick={() => onStart({ categories: [], difficulty })}
+            onClick={() => onStart({ categories: [], difficulty, minutes })}
             disabled={busy}
             className="btn-ghost text-sm"
           >

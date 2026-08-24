@@ -198,6 +198,9 @@ export default function PlayPage({
           onClue={(word, count) => send("clue", { word, count }, me.id)}
           onTap={(index) => send("tap", { index }, me.id)}
           onPass={() => send("pass", undefined, me.id)}
+          onAssign={(playerId, team, spymaster) =>
+            send("assign", { playerId, team, spymaster }, me.id)
+          }
         />
       </>
     );
@@ -210,7 +213,9 @@ export default function PlayPage({
         <SketchPlayer
           state={state}
           me={me}
-          onStroke={(points, colour) => send("draw", { points, colour }, me.id)}
+          onStroke={(points, colour, width) =>
+            send("draw", { points, colour, width }, me.id)
+          }
           onLift={() => send("lift", undefined, me.id)}
           onUndo={() => send("undo", undefined, me.id)}
           onClear={() => send("clear", undefined, me.id)}

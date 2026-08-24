@@ -9,6 +9,7 @@ import { type Room, connectedPlayers } from "@/lib/room/types";
 type Props = {
   room: Room;
   state: CodeGridState & ViewerExtras;
+  onBegin: () => void;
   onQuit: () => void;
 };
 
@@ -20,7 +21,7 @@ const FACE: Record<string, string> = {
   assassin: "border-rose-500 bg-rose-950 text-rose-300",
 };
 
-export function GridHost({ room, state, onQuit }: Props) {
+export function GridHost({ room, state, onBegin, onQuit }: Props) {
   const players = connectedPlayers(room);
   const name = (id: string | null) =>
     players.find((p) => p.id === id)?.name ?? "—";
@@ -30,6 +31,75 @@ export function GridHost({ room, state, onQuit }: Props) {
   useCue(state.clue?.word ?? null, state.clue ? "pop" : null);
   useCueWhen(state.struckAssassin, "wrong");
   useCueWhen(state.phase === "done" && !state.struckAssassin, "fanfare");
+
+  /*
+   * The sides used to be dealt at random the instant the game loaded, key
+   * cards included. Four people put into the wrong two pairs is the fastest
+   * way to ruin this game, and there was no way to undo it short of quitting.
+   * Now the random deal is only a starting suggestion and the room fixes it on
+   * their phones while the TV shows where everybody has landed.
+   */
+  if (state.phase === "teams") {
+    const ready = state.teams.every((t) => t.spymaster);
+    return (
+      <main className="flex h-dvh flex-col gap-[3vmin] p-[4vmin]">
+        <h2 className="shrink-0 text-center font-display t-title uppercase tracking-tight text-moon">
+          Pick your sides
+        </h2>
+        <p className="shrink-0 text-center t-label text-moon-deep">
+          On your phone: choose a side, and one of you takes the key card.
+        </p>
+        <div className="grid min-h-0 flex-1 grid-cols-2 gap-[3vmin]">
+          {state.teams.map((t, i) => (
+            <div
+              key={i}
+              className={[
+                "flex min-h-0 flex-col gap-[1.5vmin] rounded-3xl border p-[3vmin]",
+                i === 0
+                  ? "border-sky-400/50 bg-sky-500/[0.07]"
+                  : "border-amber-400/50 bg-amber-500/[0.07]",
+              ].join(" ")}
+            >
+              <p
+                className={[
+                  "font-display text-[clamp(1.2rem,3vw,2.6rem)] uppercase tracking-wide",
+                  i === 0 ? "text-sky-200" : "text-amber-200",
+                ].join(" ")}
+              >
+                {t.name}
+              </p>
+              <p className="t-label uppercase tracking-[0.2em] text-moon-deep">
+                Key card
+              </p>
+              <p className="font-display text-[clamp(1rem,2.2vw,2rem)] text-moon">
+                {t.spymaster ? name(t.spymaster) : "— nobody yet —"}
+              </p>
+              <p className="mt-[1vmin] t-label uppercase tracking-[0.2em] text-moon-deep">
+                Guessing
+              </p>
+              <p className="text-[clamp(0.8rem,1.6vw,1.4rem)] leading-relaxed text-moon/75">
+                {t.members.length
+                  ? t.members.map(name).join(" · ")
+                  : "— nobody yet —"}
+              </p>
+            </div>
+          ))}
+        </div>
+        <div className="flex shrink-0 items-center justify-center gap-4">
+          <button
+            onClick={onBegin}
+            disabled={!ready}
+            className="btn-brand px-10 py-4 text-lg disabled:opacity-40"
+          >
+            {ready ? "Deal the words" : "Both sides need a key card"}
+          </button>
+          <button onClick={onQuit} className="btn-ghost px-5 py-3 text-sm">
+            End segment
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   if (state.phase === "done") {
     return (

@@ -17,6 +17,7 @@ type Props = {
   onReveal: (index: number) => void;
   onStrike: () => void;
   onNextRound: () => void;
+  onClock: (run: boolean) => void;
 };
 
 export function FeudBoard({
@@ -26,6 +27,7 @@ export function FeudBoard({
   onReveal,
   onStrike,
   onNextRound,
+  onClock,
 }: Props) {
   const [draft, setDraft] = useState("");
   const box = useRef<HTMLInputElement>(null);
@@ -51,6 +53,9 @@ export function FeudBoard({
   );
   useCue(state.handoverAt, state.handoverAt ? "whoosh" : null);
   useCueWhen(state.phase === "round-end", "correct");
+
+  const left = useShotClock(state.clock);
+  useCueWhen(left !== null && left <= 0, "strike");
 
   if (!question) return null;
 
@@ -98,6 +103,31 @@ export function FeudBoard({
           ))}
         </span>
       </div>
+
+      {/* Think time */}
+      {left !== null && (
+        <div className="flex shrink-0 items-center justify-center gap-3">
+          <div className="h-[1.2vmin] min-h-[6px] w-[36vw] overflow-hidden rounded-full bg-white/10">
+            <div
+              className={[
+                "h-full rounded-full transition-[width] duration-200 ease-linear",
+                left <= 5 ? "bg-rose-400" : "bg-accent",
+              ].join(" ")}
+              style={{
+                width: `${(Math.max(0, left) / (state.clock?.seconds ?? 1)) * 100}%`,
+              }}
+            />
+          </div>
+          <span
+            className={[
+              "font-display text-[clamp(1rem,2vw,2.2rem)] tabular-nums",
+              left <= 5 ? "text-rose-300" : "text-moon-dim",
+            ].join(" ")}
+          >
+            {Math.ceil(Math.max(0, left))}s
+          </span>
+        </div>
+      )}
 
       {/* The board just changed hands */}
       <AnimatePresence>
@@ -260,9 +290,17 @@ export function FeudBoard({
 
         <div className="shrink-0 text-right">
           {state.phase === "play" && (
-            <button onClick={onStrike} className="btn-bad px-6 py-3">
-              Strike ✗
-            </button>
+            <div className="flex items-center justify-end gap-2">
+              <button
+                onClick={() => onClock(!state.clock)}
+                className="btn-ghost px-4 py-3 text-sm"
+              >
+                {state.clock ? "Stop clock" : "Start clock"}
+              </button>
+              <button onClick={onStrike} className="btn-bad px-6 py-3">
+                Strike ✗
+              </button>
+            </div>
           )}
           <p className="t-label mt-1 font-display uppercase text-moon-deep">
             Round {state.round + 1}/{state.questions.length}
@@ -272,4 +310,28 @@ export function FeudBoard({
       )}
     </div>
   );
+}
+
+/**
+ * Counts the shot clock down locally from the moment the server stamped it.
+ * Nothing is riding on it — running out doesn't strike anybody — so a second
+ * of drift between the TV and a phone costs nothing, and it means the clock
+ * doesn't need a tick on the wire.
+ */
+function useShotClock(clock: FeudState["clock"]) {
+  const [left, setLeft] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!clock) {
+      setLeft(null);
+      return;
+    }
+    const tick = () =>
+      setLeft(clock.seconds - (Date.now() - clock.startedAt) / 1000);
+    tick();
+    const id = window.setInterval(tick, 200);
+    return () => window.clearInterval(id);
+  }, [clock]);
+
+  return left;
 }
