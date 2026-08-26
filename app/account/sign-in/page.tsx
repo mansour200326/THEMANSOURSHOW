@@ -51,11 +51,22 @@ export default async function SignInPage({
           }}
           className="flex flex-col gap-3"
         >
-          {error && (
+          {/*
+            * A server that's misconfigured and a link that's gone stale are
+            * different problems with different owners, and telling somebody
+            * to "try again" when the server can't sign anybody in is how you
+            * get people trying again for ten minutes.
+            */}
+          {error === "Configuration" ? (
+            <p className="rounded-xl border border-amber-400/40 bg-amber-500/10 px-4 py-3 text-amber-100">
+              Sign-in is misconfigured on the server — nothing you did. The
+              logs will say which setting.
+            </p>
+          ) : error ? (
             <p className="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-rose-200">
               That link didn&apos;t work. Try again — they expire quickly.
             </p>
-          )}
+          ) : null}
           <input
             type="email"
             name="email"

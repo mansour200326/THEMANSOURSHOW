@@ -24,6 +24,26 @@ import { type Plan, effectivePlan } from "@/lib/plan/limits";
 const pool = db();
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  /*
+   * Believe the proxy about what host we're on.
+   *
+   * Auth.js builds every callback and magic-link URL from the incoming
+   * request, and by default it refuses to read the forwarded host — a
+   * sensible default, because trusting that header on a server exposed
+   * directly to the internet lets anyone mint a link pointing at their own
+   * domain. It only auto-trusts on a couple of platforms it recognises, and
+   * Railway isn't one.
+   *
+   * The cost of not setting it is total: every auth route answers 500 with
+   * "a problem with the server configuration", and the links it does build
+   * point at localhost and the internal port. Which is exactly what happened.
+   *
+   * It's safe here because nothing reaches this process except through
+   * Railway's proxy, which sets the forwarded host itself and overwrites
+   * whatever a client claimed. AUTH_URL pins it outright if that ever stops
+   * being true.
+   */
+  trustHost: true,
   // Without Postgres there is nowhere to put a user, so sign-in is simply
   // off — see lib/db for why that's a supported state rather than a failure.
   adapter: pool ? PostgresAdapter(pool) : undefined,
