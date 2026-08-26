@@ -13,6 +13,17 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { connect } from "./connect.mjs";
 
+/*
+ * No database is a supported state — the games all work without one — so this
+ * is a no-op rather than an error. It runs in front of `next start`, and
+ * refusing to start a deployment that never wanted Postgres would be a worse
+ * failure than not migrating.
+ */
+if (!process.env.DATABASE_URL?.trim()) {
+  console.log("[migrate] no DATABASE_URL — nothing to migrate against.");
+  process.exit(0);
+}
+
 const client = await connect();
 await client.query(`
   CREATE TABLE IF NOT EXISTS migrations (
