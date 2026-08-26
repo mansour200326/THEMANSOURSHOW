@@ -3,6 +3,9 @@ import { signIn } from "@/auth";
 import { ShowMark } from "@/components/ShowMark";
 import { hasDatabase } from "@/lib/db";
 
+/** Whether a link can actually reach an inbox. */
+const canEmail = () => Boolean(process.env.AUTH_RESEND_KEY?.trim());
+
 export const dynamic = "force-dynamic";
 
 /**
@@ -76,8 +79,18 @@ export default async function SignInPage({
             className="field py-4 text-center text-lg"
           />
           <button type="submit" className="btn-brand w-full py-4 text-lg">
-            Email me a link
+            {canEmail() ? "Email me a link" : "Make me a link"}
           </button>
+
+          {/* Don't promise an email that nothing is going to send. */}
+          {!canEmail() && (
+            <p className="rounded-xl border border-white/12 bg-white/[0.03] px-4 py-3 text-sm text-moon-dim">
+              No email provider is configured, so the link is printed in the
+              server logs instead of sent. Only somebody with access to this
+              deployment can read it — which is fine for one person and no use
+              for anybody else. Set AUTH_RESEND_KEY to email them properly.
+            </p>
+          )}
         </form>
       )}
 

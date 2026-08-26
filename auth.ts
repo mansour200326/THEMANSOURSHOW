@@ -23,6 +23,39 @@ import { type Plan, effectivePlan } from "@/lib/plan/limits";
 
 const pool = db();
 
+/** Whether there's anything that can actually put an email in an inbox. */
+const hasEmailProvider = Boolean(process.env.AUTH_RESEND_KEY?.trim());
+
+/**
+ * No email provider, so the link goes to the server log instead of an inbox.
+ *
+ * Sending email needs a third party — Railway doesn't do it and neither does
+ * Postgres — and signing up for one shouldn't stand between the owner of a
+ * deployment and their own account. So when no key is configured the link is
+ * printed where only somebody with access to the server can read it.
+ *
+ * This is not a backdoor and it isn't weaker than the real thing. Reading
+ * these logs already means controlling the deployment: anyone who can see
+ * this line could set ADMIN_EMAILS to their own address and redeploy. What it
+ * is, is single-user — nobody else can sign in, because nobody else can read
+ * the log. Configure AUTH_RESEND_KEY the moment a second person needs an
+ * account.
+ */
+async function logTheLinkInstead(params: { identifier: string; url: string }) {
+  console.warn(
+    [
+      "",
+      "  ┌─ No AUTH_RESEND_KEY, so no email was sent.",
+      `  │  Sign-in link for ${params.identifier}:`,
+      "  │",
+      `  │  ${params.url}`,
+      "  │",
+      "  └─ Set AUTH_RESEND_KEY to email these instead.",
+      "",
+    ].join("\n"),
+  );
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   /*
    * Believe the proxy about what host we're on.
@@ -51,8 +84,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: hasDatabase()
     ? [
         Resend({
-          apiKey: process.env.AUTH_RESEND_KEY,
+          // The provider still needs a value here even when we're not using
+          // it; the override below decides whether an email is ever sent.
+          apiKey: process.env.AUTH_RESEND_KEY ?? "not-configured",
           from: process.env.AUTH_EMAIL_FROM ?? "Big Night <hello@bignight.games>",
+          ...(hasEmailProvider
+            ? {}
+            : { sendVerificationRequest: logTheLinkInstead }),
         }),
       ]
     : [],
