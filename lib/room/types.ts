@@ -26,6 +26,8 @@ export type Room = {
   createdAt: number;
   /** Last change of any kind. What decides when a dead room is dropped. */
   touchedAt?: number;
+  /** Phones allowed, fixed by the host's plan when the room was made. */
+  maxPlayers?: number;
   /** Bumped on every mutation so clients can drop stale snapshots. */
   version: number;
 };

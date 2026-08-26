@@ -16,3 +16,6 @@ next-env.d.ts
 
 # Room snapshots, so a restart doesn't end the night
 .bignight/
+
+# Local throwaway Postgres data, if PGlite is ever given a path
+.pglite/

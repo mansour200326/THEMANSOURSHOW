@@ -71,6 +71,39 @@ export const hasApiKey = () => Boolean(process.env.ANTHROPIC_API_KEY);
 
 /* ------------------------------------------------------------------ schema */
 
+/* ----------------------------------------------------------- classification */
+
+/**
+ * Every piece of content is judged, as it's written, on whether it belongs to
+ * anybody but the person who asked for it.
+ *
+ * "Roast Dave", "our trip to Beirut", "people in this room" — content like
+ * that is worthless to a stranger and mortifying if it reaches one, so the
+ * library keeps it and never serves it on. Asking in the same call is the
+ * whole trick: a second classification request would double the latency and
+ * the bill for a single boolean, and the model that just wrote the thing is
+ * the model best placed to say who it's for.
+ */
+const PERSONAL = `Also set isPersonal. It is true when the request is about \
+specific real people or one private group rather than a subject anyone could \
+play: names of the host's friends or family, a roast, an inside joke, "people \
+in this room", a particular wedding, workplace or trip. It is false for any \
+public subject — films, football, history, geography, a decade, a franchise, \
+a country. When you are unsure, say true: keeping something private that \
+didn't need to be costs nothing, and the reverse is a stranger reading a joke \
+about somebody's mother.`;
+
+const isPersonalField = {
+  isPersonal: z
+    .boolean()
+    .describe(
+      "True if this is about specific real people or one private group rather than a subject anyone could play.",
+    ),
+};
+
+/** Content plus the judgement made about it while it was being written. */
+export type Written<T> = { content: T; isPersonal: boolean };
+
 const GeneratedClue = z.object({
   clue: z.string().describe("The clue, written as a statement — never a question."),
   answer: z.string().describe("The answer, as short as possible."),
@@ -90,6 +123,7 @@ const GeneratedBoard = z.object({
   final: GeneratedClue.extend({
     category: z.string().describe("Final Round category title."),
   }),
+  ...isPersonalField,
 });
 
 /* ------------------------------------------------------------------ prompts */
@@ -146,13 +180,13 @@ export async function generateTriviaBoard({
   categories,
   vibe = "",
   difficulty = "medium",
-}: GenerateBoardInput): Promise<GenerateBoardResult> {
+}: GenerateBoardInput): Promise<Written<GenerateBoardResult>> {
   const client = new Anthropic();
 
   const response = await client.messages.parse({
     model: MODELS.board,
     max_tokens: 16000,
-    system: `${SYSTEM}\n\nDifficulty: ${difficultyBrief[difficulty]}`,
+    system: `${SYSTEM}\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL,
     output_config: outputConfig(
       MODELS.board,
       zodOutputFormat(GeneratedBoard),
@@ -190,7 +224,7 @@ export async function generateTriviaBoard({
     })),
   };
 
-  return {
+  const content = {
     board,
     finalClue: {
       category: parsed.final.category.trim().toUpperCase(),
@@ -198,6 +232,7 @@ export async function generateTriviaBoard({
       answer: parsed.final.answer.trim(),
     },
   };
+  return { content, isPersonal: parsed.isPersonal };
 }
 
 /* ------------------------------------------------------- Face-Off packs */
@@ -226,6 +261,7 @@ const GeneratedFeud = z.object({
         .describe("Six answers, most popular first."),
     }),
   ),
+  ...isPersonalField,
 });
 
 const FEUD_SYSTEM = `You write survey rounds for a survey face-off game played by a group
@@ -256,13 +292,13 @@ export async function generateFeudPack({
   themes: string[];
   rounds: number;
   difficulty?: Difficulty;
-}): Promise<FeudQuestion[]> {
+}): Promise<Written<FeudQuestion[]>> {
   const client = new Anthropic();
 
   const response = await client.messages.parse({
     model: MODELS.board,
     max_tokens: 16000,
-    system: `${FEUD_SYSTEM}\n\nDifficulty: ${difficultyBrief[difficulty]}`,
+    system: `${FEUD_SYSTEM}\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL,
     output_config: outputConfig(
       MODELS.board,
       zodOutputFormat(GeneratedFeud),
@@ -293,7 +329,7 @@ export async function generateFeudPack({
   const usable = parsed.questions.filter((q) => q.answers.length >= 4);
   if (!usable.length) throw new Error("The generator came back short.");
 
-  return usable.map((q) => ({
+  const content = usable.map((q) => ({
     question: q.question.trim(),
     // Trust the model for wording, not for ordering.
     answers: [...q.answers]
@@ -308,6 +344,7 @@ export async function generateFeudPack({
           .slice(0, 10),
       })),
   }));
+  return { content, isPersonal: parsed.isPersonal };
 }
 
 /* ------------------------------------------------------ Face-Off judging */
@@ -454,6 +491,7 @@ const GeneratedStanding = z.object({
         .describe("The answer, in as few words as possible — one or two."),
     }),
   ),
+  ...isPersonalField,
 });
 
 /** Last One Standing: short questions with one unarguable answer. */
@@ -465,7 +503,7 @@ export async function generateStandingQuestions({
   themes?: string[];
   count: number;
   difficulty?: Difficulty;
-}): Promise<LiveItem[]> {
+}): Promise<Written<LiveItem[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
     model: MODELS.packs,
@@ -477,7 +515,7 @@ export async function generateStandingQuestions({
       "place. Never a question with several valid answers, and never one that " +
       "needs specialist knowledge. Order them easiest first; they should get " +
       "harder as the field thins out." +
-      `\n\nDifficulty: ${difficultyBrief[difficulty]}`,
+      `\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL,
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedStanding), "low"),
     messages: [
       { role: "user", content: `Write ${count} questions.${themeLine(themes)}` },
@@ -485,10 +523,11 @@ export async function generateStandingQuestions({
   });
   const parsed = response.parsed_output;
   if (!parsed?.questions?.length) throw new Error("Couldn't write those questions.");
-  return parsed.questions
+  const content = parsed.questions
     .filter((q) => q.prompt.trim() && q.answer.trim())
     .map((q) => ({ prompt: q.prompt.trim(), answer: q.answer.trim() }))
     .slice(0, count);
+  return { content, isPersonal: parsed.isPersonal };
 }
 
 const GeneratedTimeline = z.object({
@@ -500,6 +539,7 @@ const GeneratedTimeline = z.object({
         .describe("Exactly five things, ALREADY in the correct order, earliest first."),
     }),
   ),
+  ...isPersonalField,
 });
 
 /** Timeline: five things per round, handed over in their true order. */
@@ -511,7 +551,7 @@ export async function generateTimelineRounds({
   themes?: string[];
   count: number;
   difficulty?: Difficulty;
-}): Promise<LiveItem[]> {
+}): Promise<Written<LiveItem[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
     model: MODELS.board,
@@ -522,7 +562,7 @@ export async function generateTimelineRounds({
       "first — the game shuffles them itself. Every fact must be genuinely " +
       "true and checkable. Space them out: five things from the same decade " +
       "is a coin flip, not a round. Keep each entry to a few words." +
-      `\n\nDifficulty: ${difficultyBrief[difficulty]}`,
+      `\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL,
     output_config: outputConfig(MODELS.board, zodOutputFormat(GeneratedTimeline), "medium"),
     messages: [
       { role: "user", content: `Write ${count} rounds.${themeLine(themes)}` },
@@ -530,13 +570,14 @@ export async function generateTimelineRounds({
   });
   const parsed = response.parsed_output;
   if (!parsed?.rounds?.length) throw new Error("Couldn't write those rounds.");
-  return parsed.rounds
+  const content = parsed.rounds
     .filter((r) => r.events.length >= 4)
     .map((r) => ({
       prompt: r.prompt.trim(),
       events: r.events.slice(0, 5).map((e) => e.trim()),
     }))
     .slice(0, count);
+  return { content, isPersonal: parsed.isPersonal };
 }
 
 const GeneratedSpectrums = z.object({
@@ -546,6 +587,7 @@ const GeneratedSpectrums = z.object({
       right: z.string().describe("The opposite end. One or two words."),
     }),
   ),
+  ...isPersonalField,
 });
 
 /** Dial It In: opposing pairs with plenty of room in the middle. */
@@ -555,7 +597,7 @@ export async function generateSpectrums({
 }: {
   themes?: string[];
   count: number;
-}): Promise<LiveItem[]> {
+}): Promise<Written<LiveItem[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
     model: MODELS.packs,
@@ -565,7 +607,7 @@ export async function generateSpectrums({
       "clue and the rest guess a point on the scale between them. The pair " +
       "must be a genuine spectrum with a debatable middle — 'Cold / Hot' " +
       "works, 'Alive / Dead' doesn't. Keep them everyday and arguable, the " +
-      "sort of thing a room will shout about.",
+      "sort of thing a room will shout about." + PERSONAL,
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedSpectrums), "low"),
     messages: [
       { role: "user", content: `Write ${count} pairs.${themeLine(themes)}` },
@@ -573,7 +615,7 @@ export async function generateSpectrums({
   });
   const parsed = response.parsed_output;
   if (!parsed?.spectrums?.length) throw new Error("Couldn't write those spectrums.");
-  return parsed.spectrums
+  const content = parsed.spectrums
     .filter((s) => s.left.trim() && s.right.trim())
     .map((s) => ({
       prompt: "Where does it sit?",
@@ -581,6 +623,7 @@ export async function generateSpectrums({
       right: s.right.trim(),
     }))
     .slice(0, count);
+  return { content, isPersonal: parsed.isPersonal };
 }
 
 const GeneratedPlaces = z.object({
@@ -592,6 +635,7 @@ const GeneratedPlaces = z.object({
         .describe("Six people you'd find there, each a couple of words."),
     }),
   ),
+  ...isPersonalField,
 });
 
 /** Impostor: places with roles you can bluff about but not too easily. */
@@ -601,7 +645,7 @@ export async function generateImpostorPlaces({
 }: {
   themes?: string[];
   count: number;
-}): Promise<ImpostorPlace[]> {
+}): Promise<Written<ImpostorPlace[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
     model: MODELS.packs,
@@ -611,7 +655,7 @@ export async function generateImpostorPlaces({
       "know where everyone is and has to bluff, so every place needs to be " +
       "somewhere ordinary that anyone could picture, and the roles need to " +
       "be specific enough that a faker gets caught out. Six roles per place. " +
-      "Avoid anywhere so unusual that a vague answer would pass.",
+      "Avoid anywhere so unusual that a vague answer would pass." + PERSONAL,
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedPlaces), "low"),
     messages: [
       { role: "user", content: `Write ${count} places.${themeLine(themes)}` },
@@ -619,17 +663,19 @@ export async function generateImpostorPlaces({
   });
   const parsed = response.parsed_output;
   if (!parsed?.places?.length) throw new Error("Couldn't write those places.");
-  return parsed.places
+  const content = parsed.places
     .filter((p) => p.name.trim() && p.roles.length >= 3)
     .map((p) => ({
       name: p.name.trim(),
       roles: p.roles.map((r) => r.trim()).filter(Boolean).slice(0, 8),
     }))
     .slice(0, count);
+  return { content, isPersonal: parsed.isPersonal };
 }
 
 const GeneratedWords = z.object({
   words: z.array(z.string()).describe("Single words, no punctuation."),
+  ...isPersonalField,
 });
 
 /**
@@ -644,7 +690,7 @@ export async function generateWordPack({
   kind: "grid" | "sketch";
   themes?: string[];
   count: number;
-}): Promise<string[]> {
+}): Promise<Written<string[]>> {
   const client = new Anthropic();
   const brief =
     kind === "grid"
@@ -657,7 +703,7 @@ export async function generateWordPack({
   const response = await client.messages.parse({
     model: MODELS.packs,
     max_tokens: 2000,
-    system: `You write word packs for a party game.\n\n${brief}`,
+    system: `You write word packs for a party game.\n\n${brief}` + PERSONAL,
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedWords), "low"),
     messages: [
       { role: "user", content: `Write ${count} of them.${themeLine(themes)}` },
@@ -665,7 +711,8 @@ export async function generateWordPack({
   });
   const parsed = response.parsed_output;
   if (!parsed?.words?.length) throw new Error("Couldn't write those words.");
-  return parsed.words.map((w) => w.trim()).filter(Boolean).slice(0, count);
+  const content = parsed.words.map((w) => w.trim()).filter(Boolean).slice(0, count);
+  return { content, isPersonal: parsed.isPersonal };
 }
 
 /**
@@ -705,6 +752,7 @@ const GeneratedRiddles = z.object({
       hint: z.enum(RIDDLE_KINDS).describe("What sort of thing the answer is."),
     }),
   ),
+  ...isPersonalField,
 });
 
 /**
@@ -719,7 +767,7 @@ export async function generateEmojiRiddles({
   themes?: string[];
   count: number;
   difficulty?: Difficulty;
-}): Promise<BuzzItem[]> {
+}): Promise<Written<BuzzItem[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
     // The board model rather than the pack one: a bad riddle is worse than no
@@ -748,7 +796,7 @@ export async function generateEmojiRiddles({
       "to be honest. A footballer is a Person, not a Job. An app is a " +
       "Brand, not a Song. If none of the kinds fits, write a different " +
       "riddle instead of mislabelling this one." +
-      `\n\nDifficulty: ${difficultyBrief[difficulty]}`,
+      `\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL,
     output_config: outputConfig(MODELS.board, zodOutputFormat(GeneratedRiddles), "low"),
     messages: [
       {
@@ -768,7 +816,7 @@ export async function generateEmojiRiddles({
   }
   const parsed = response.parsed_output;
   if (!parsed?.riddles?.length) throw new Error("Couldn't write those riddles.");
-  return parsed.riddles
+  const content = parsed.riddles
     // A riddle with letters in it, or a flag next to a country, has given
     // the game away before anyone looked at it.
     .filter(
@@ -785,6 +833,7 @@ export async function generateEmojiRiddles({
       hint: r.hint.trim() || undefined,
     }))
     .slice(0, count);
+  return { content, isPersonal: parsed.isPersonal };
 }
 
 /* -------------------------------------------------------- error presentation */
@@ -827,6 +876,7 @@ export function friendlyAiError(error: unknown): string {
 
 const GeneratedPrompts = z.object({
   prompts: z.array(z.string()).describe("The prompts, one line each."),
+  ...isPersonalField,
 });
 
 export async function generateRapidPrompts({
@@ -840,7 +890,7 @@ export async function generateRapidPrompts({
   /** Spread the prompts across these. Empty means anything goes. */
   themes?: string[];
   difficulty?: Difficulty;
-}): Promise<string[]> {
+}): Promise<Written<string[]>> {
   const client = new Anthropic();
 
   const brief =
@@ -859,7 +909,7 @@ export async function generateRapidPrompts({
       `You write prompts for a fast-talking party game.\n\n${brief}\n\n` +
       "Everything must be answerable by an ordinary adult with no special " +
       "knowledge, and clean enough for a room full of friends.\n\n" +
-      `Difficulty: ${difficultyBrief[difficulty]}`,
+      `Difficulty: ${difficultyBrief[difficulty]}` + PERSONAL,
     output_config: outputConfig(
       MODELS.packs,
       zodOutputFormat(GeneratedPrompts),
@@ -883,5 +933,6 @@ export async function generateRapidPrompts({
   if (!parsed?.prompts?.length) {
     throw new Error("Couldn't write those prompts. Try again.");
   }
-  return parsed.prompts.map((p) => p.trim()).filter(Boolean).slice(0, count);
+  const content = parsed.prompts.map((p) => p.trim()).filter(Boolean).slice(0, count);
+  return { content, isPersonal: parsed.isPersonal };
 }

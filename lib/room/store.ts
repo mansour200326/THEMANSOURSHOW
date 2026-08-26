@@ -62,7 +62,7 @@ function prune() {
   }
 }
 
-export function createRoom(): Room {
+export function createRoom(maxPlayers = 12): Room {
   prune();
   let code = makeRoomCode();
   // Vanishingly unlikely, but a collision would hijack someone else's game.
@@ -75,6 +75,7 @@ export function createRoom(): Room {
     game: null,
     createdAt: Date.now(),
     touchedAt: Date.now(),
+    maxPlayers,
     version: 0,
   };
   rooms.set(code, room);
@@ -215,7 +216,7 @@ function reduceRoom(room: Room, action: Action): Room {
           ),
         };
       }
-      if (room.players.length >= 12) return room;
+      if (room.players.length >= (room.maxPlayers ?? 12)) return room;
 
       const player: Player = {
         id: String(action.payload?.id ?? crypto.randomUUID()),

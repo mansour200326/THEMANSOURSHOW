@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { callerKey, rateLimit } from "@/lib/rateLimit";
+import { serveContent } from "@/lib/library/serve";
+import { currentHost } from "@/lib/plan/host";
+import { GATE_COPY, canPlay } from "@/lib/plan/limits";
 import { z } from "zod";
+import type { Written } from "@/lib/ai";
 import {
   friendlyAiError,
   generateEmojiRiddles,
@@ -46,13 +50,6 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!hasApiKey()) {
-    return NextResponse.json(
-      { error: "No ANTHROPIC_API_KEY on the server." },
-      { status: 503 },
-    );
-  }
-
   let body: unknown;
   try {
     body = await request.json();
@@ -73,37 +70,95 @@ export async function POST(request: Request) {
   const many = (fallback: number) =>
     rounds && rounds > 0 ? Math.min(30, Math.max(3, rounds)) : fallback;
 
+  const host = await currentHost();
+  if (!canPlay(host.plan, gameId)) {
+    return NextResponse.json(
+      { error: GATE_COPY.game.line, gate: "game" },
+      { status: 402 },
+    );
+  }
+
+  /*
+   * Which generator writes this game, and what the result is called on the
+   * way back. The key matters: the client already destructures `items`,
+   * `places` or `words`, and the library shouldn't change that.
+   */
+  const writers: Record<
+    string,
+    { key: "items" | "places" | "words"; write: () => Promise<Written<unknown>> }
+  > = {
+    "last-one-standing": {
+      key: "items",
+      write: () => generateStandingQuestions({ themes, count: many(12), difficulty }),
+    },
+    timeline: {
+      key: "items",
+      write: () => generateTimelineRounds({ themes, count: many(6), difficulty }),
+    },
+    "dial-it-in": {
+      key: "items",
+      write: () => generateSpectrums({ themes, count: many(8) }),
+    },
+    impostor: {
+      key: "places",
+      write: () => generateImpostorPlaces({ themes, count: 10 }),
+    },
+    "code-grid": {
+      key: "words",
+      write: () => generateWordPack({ kind: "grid", themes, count: 30 }),
+    },
+    "sketch-and-guess": {
+      key: "words",
+      write: () => generateWordPack({ kind: "sketch", themes, count: many(12) }),
+    },
+    "emoji-riddles": {
+      key: "items",
+      write: () => generateEmojiRiddles({ themes, count: many(18), difficulty }),
+    },
+  };
+
+  const writer = writers[gameId];
+  if (!writer) {
+    return NextResponse.json({ error: "Unknown game." }, { status: 400 });
+  }
+
   try {
-    switch (gameId) {
-      case "last-one-standing":
-        return NextResponse.json({
-          items: await generateStandingQuestions({ themes, count: many(12), difficulty }),
-        });
-      case "timeline":
-        return NextResponse.json({
-          items: await generateTimelineRounds({ themes, count: many(6), difficulty }),
-        });
-      case "dial-it-in":
-        return NextResponse.json({
-          items: await generateSpectrums({ themes, count: many(8) }),
-        });
-      case "impostor":
-        return NextResponse.json({
-          places: await generateImpostorPlaces({ themes, count: 10 }),
-        });
-      case "code-grid":
-        return NextResponse.json({
-          words: await generateWordPack({ kind: "grid", themes, count: 30 }),
-        });
-      case "sketch-and-guess":
-        return NextResponse.json({
-          words: await generateWordPack({ kind: "sketch", themes, count: many(12) }),
-        });
-      case "emoji-riddles":
-        return NextResponse.json({
-          items: await generateEmojiRiddles({ themes, count: many(18), difficulty }),
-        });
+    // Library first, model only for what isn't already written. The round
+    // count is part of the key by way of the theme: a six-round pack and a
+    // twelve-round one are different content for the same theme, so the
+    // count rides along in the difficulty slot rather than silently serving
+    // somebody the wrong length.
+    const served = await serveContent({
+      gameType: gameId,
+      themes,
+      difficulty: `${difficulty}:${rounds ?? "default"}`,
+      host,
+      canWrite: hasApiKey,
+      write: writer.write,
+    });
+
+    if (!served.ok) {
+      // Out of allowance is a decision the host can act on; nothing to serve
+      // and nothing to write with is a server problem, and they read very
+      // differently to whoever is standing in front of the television.
+      return served.blocked === "plan"
+        ? NextResponse.json(
+            { error: GATE_COPY[served.gate].line, gate: served.gate },
+            { status: 402 },
+          )
+        : NextResponse.json(
+            {
+              error:
+                "Nothing written for that yet, and the writing service isn't configured. Try the bundled pack.",
+            },
+            { status: 503 },
+          );
     }
+
+    return NextResponse.json({
+      [writer.key]: served.content,
+      boardId: served.boardId,
+    });
   } catch (error) {
     console.error(`[content] ${gameId} generation failed:`, error);
     return NextResponse.json({ error: friendlyAiError(error) }, { status: 502 });

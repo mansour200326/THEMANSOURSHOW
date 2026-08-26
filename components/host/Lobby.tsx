@@ -8,6 +8,7 @@ import { familyClass } from "@/lib/games/families";
 import { gameList } from "@/lib/games/registry";
 import type { Room } from "@/lib/room/types";
 import { SCREEN_ONLY } from "@/lib/games/screenOnly";
+import { useEntitlements } from "@/lib/plan/useEntitlements";
 
 type Props = {
   room: Room;
@@ -19,6 +20,8 @@ type Props = {
 
 /** Games that run on this screen alone — no room, no phones. */
 export function Lobby({ room, onStart, onAddBots, onClearBots, onKick }: Props) {
+  const me = useEntitlements();
+  const locked = (id: string) => me.plan !== "pro" && !me.freeGameIds.includes(id);
   const [joinUrl, setJoinUrl] = useState("");
   useEffect(() => setJoinUrl(`${window.location.host}/play`), []);
 
@@ -131,21 +134,32 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick }: Props) 
             key={game.id}
             // Carries the room, so "back" from these lands in the lobby
             // rather than dumping the host out of their own party.
-            href={`${game.href}?room=${room.code}`}
+            href={
+              locked(game.id)
+                ? "/account/upgrade?gate=game"
+                : `${game.href}?room=${room.code}`
+            }
             /* Each card is lit by its own game's colour, so the grid reads as a lineup. */
             className={`group block min-h-0 ${familyClass(game.id)}`}
           >
-            <Card name={game.name} status="No phones needed" ready />
+            <Card
+              name={game.name}
+              status={locked(game.id) ? "Pro" : "No phones needed"}
+              ready={!locked(game.id)}
+            />
           </Link>
         ))}
 
         {gameList.map((game) => {
-          const ready = live.length >= game.minPlayers;
+          const shut = locked(game.id);
+          const ready = !shut && live.length >= game.minPlayers;
           return (
             <button
               key={game.id}
               type="button"
-              disabled={!ready}
+              // A locked card is still tappable — it goes to the screen that
+              // explains why, which is more use than a dead button.
+              disabled={!ready && !shut}
               onClick={() => onStart(game.id)}
               className={`group block min-h-0 text-left disabled:cursor-not-allowed ${familyClass(
                 game.id,
@@ -155,11 +169,13 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick }: Props) 
                 name={game.name}
                 ready={ready}
                 status={
-                  ready
-                    ? "Ready"
-                    : `Needs ${game.minPlayers} ${
-                        game.minPlayers === 1 ? "phone" : "phones"
-                      }`
+                  shut
+                    ? "Pro"
+                    : ready
+                      ? "Ready"
+                      : `Needs ${game.minPlayers} ${
+                          game.minPlayers === 1 ? "phone" : "phones"
+                        }`
                 }
               />
             </button>

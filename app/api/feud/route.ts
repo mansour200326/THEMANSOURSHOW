@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { callerKey, rateLimit } from "@/lib/rateLimit";
+import { serveContent } from "@/lib/library/serve";
+import { currentHost } from "@/lib/plan/host";
+import { GATE_COPY, canPlay } from "@/lib/plan/limits";
 import { z } from "zod";
 import { generateFeudPack, friendlyAiError, hasApiKey } from "@/lib/ai";
 
@@ -21,16 +24,6 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!hasApiKey()) {
-    return NextResponse.json(
-      {
-        error:
-          "No ANTHROPIC_API_KEY on the server. Add it to .env.local and restart — or play the sample pack.",
-      },
-      { status: 503 },
-    );
-  }
-
   let body: unknown;
   try {
     body = await request.json();
@@ -43,12 +36,51 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Bad request." }, { status: 400 });
   }
 
+  const host = await currentHost();
+  if (!canPlay(host.plan, "face-off")) {
+    return NextResponse.json(
+      { error: GATE_COPY.game.line, gate: "game" },
+      { status: 402 },
+    );
+  }
+
+  const themes = parsed.data.themes ?? [];
+  const rounds = parsed.data.rounds ?? 5;
+
   try {
-    const questions = await generateFeudPack({
-      themes: parsed.data.themes ?? [],
-      rounds: parsed.data.rounds ?? 5,
+    const served = await serveContent({
+      gameType: "face-off",
+      themes,
+      // Round count is part of what was asked for — a five-round pack is not
+      // a ten-round one, even about the same subject.
+      difficulty: `survey:${rounds}`,
+      host,
+      canWrite: hasApiKey,
+      write: () => generateFeudPack({ themes, rounds }),
     });
-    return NextResponse.json({ questions });
+
+    if (!served.ok) {
+      // Out of allowance is a decision the host can act on; nothing to serve
+      // and nothing to write with is a server problem, and they read very
+      // differently to whoever is standing in front of the television.
+      return served.blocked === "plan"
+        ? NextResponse.json(
+            { error: GATE_COPY[served.gate].line, gate: served.gate },
+            { status: 402 },
+          )
+        : NextResponse.json(
+            {
+              error:
+                "Nothing written for that yet, and the writing service isn't configured. Try the bundled pack.",
+            },
+            { status: 503 },
+          );
+    }
+
+    return NextResponse.json({
+      questions: served.content,
+      boardId: served.boardId,
+    });
   } catch (error) {
     const message = friendlyAiError(error);
     console.error("[feud] generation failed:", error);

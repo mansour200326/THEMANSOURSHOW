@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { callerKey, rateLimit } from "@/lib/rateLimit";
 import { createRoom } from "@/lib/room/store";
+import { currentHost } from "@/lib/plan/host";
+import { playerLimit } from "@/lib/plan/limits";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,6 +19,12 @@ export async function POST(request: Request) {
     );
   }
 
-  const room = createRoom();
-  return NextResponse.json({ code: room.code });
+  /*
+   * The cap is decided once, here, and stored on the room. Rooms outlive the
+   * request that made them and every later action arrives from a player's
+   * phone, not the host's browser — there is no session to ask by then.
+   */
+  const host = await currentHost();
+  const room = createRoom(playerLimit(host.plan));
+  return NextResponse.json({ code: room.code, maxPlayers: room.maxPlayers });
 }

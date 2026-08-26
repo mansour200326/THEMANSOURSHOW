@@ -1,8 +1,12 @@
 "use client";
 
 import { use } from "react";
+import { useRouter } from "next/navigation";
+import { reportBoard } from "@/lib/library/report";
+import { canPlay } from "@/lib/plan/limits";
+import { useEntitlements } from "@/lib/plan/useEntitlements";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BuzzHost } from "@/components/host/BuzzHost";
 import { GridHost } from "@/components/host/GridHost";
 import { ImpostorHost } from "@/components/host/ImpostorHost";
@@ -35,8 +39,33 @@ export default function HostPage({
   const roomCode = code.toUpperCase();
   const { room, status, send } = useRoom(roomCode);
 
+  const router = useRouter();
+  const me = useEntitlements();
+
   // The screen takes its colour from whatever game is running.
   useAccentFamily(room?.gameId);
+
+  /*
+   * Report how the board did, at the two moments that mean something: the
+   * game reaching its last round, and the game leaving the screen. Watching
+   * the room rather than hooking every quit button means it can't be missed
+   * by the one component somebody forgets to wire up.
+   */
+  const phase = (room?.game as { phase?: string } | null)?.phase;
+  useEffect(() => {
+    if (phase === "done" || phase === "winner") reachedEnd.current = true;
+  }, [phase]);
+
+  const gameId = room?.gameId ?? null;
+  useEffect(() => {
+    if (gameId) return;
+    // The game just left the screen — bank whatever it earned.
+    if (playing.current) {
+      reportBoard(playing.current, reachedEnd.current ? "completed" : "skipped");
+      playing.current = null;
+    }
+    reachedEnd.current = false;
+  }, [gameId]);
 
   // Every game explains itself first; some then ask what they're about.
   const [explaining, setExplaining] = useState<string | null>(null);
@@ -49,6 +78,13 @@ export default function HostPage({
   /** The themes being written from, for the loading screen. */
   const [writingThemes, setWritingThemes] = useState<string[]>([]);
   const writingAbort = useRef<AbortController | null>(null);
+  /*
+   * The library board currently in play, and whether it got to the end.
+   * A board that was played through is one worth serving again; one the host
+   * bailed out of is one to stop offering. Neither asks anybody a question.
+   */
+  const playing = useRef<string | null>(null);
+  const reachedEnd = useRef(false);
   const [setupError, setSetupError] = useState<string | null>(null);
 
   /** Games that ask what they should be about before they start. */
@@ -100,7 +136,13 @@ export default function HostPage({
         ),
       });
       const data = await res.json();
+      if (res.status === 402) {
+        router.push(`/account/upgrade?gate=${data?.gate ?? "ai"}`);
+        return;
+      }
       if (!res.ok) throw new Error(data?.error ?? "Couldn't write that one.");
+      playing.current = data.boardId ?? null;
+      reachedEnd.current = false;
       setSetupFor(null);
       send("game:start", {
         gameId,
@@ -234,7 +276,13 @@ export default function HostPage({
     return (
       <Lobby
         room={room}
-        onStart={(gameId) => setExplaining(gameId)}
+        onStart={(gameId) => {
+          if (!canPlay(me.plan, gameId)) {
+            router.push("/account/upgrade?gate=game");
+            return;
+          }
+          setExplaining(gameId);
+        }}
         onKick={(playerId) => send("player:kick", { id: playerId })}
         onAddBots={() => send("bots:add")}
         onClearBots={() => send("bots:clear")}

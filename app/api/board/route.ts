@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { callerKey, rateLimit } from "@/lib/rateLimit";
 import { z } from "zod";
 import { generateTriviaBoard, friendlyAiError, hasApiKey } from "@/lib/ai";
+import { serveContent } from "@/lib/library/serve";
+import { currentHost } from "@/lib/plan/host";
+import { GATE_COPY, canPlay } from "@/lib/plan/limits";
 
 export const runtime = "nodejs";
 /** Board generation is slow by web standards — give it room on Vercel. */
@@ -20,16 +23,6 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: "That's a lot of writing in one hour. Try again shortly." },
       { status: 429, headers: { "Retry-After": String(limit.retryAfter) } },
-    );
-  }
-
-  if (!hasApiKey()) {
-    return NextResponse.json(
-      {
-        error:
-          "No ANTHROPIC_API_KEY on the server. Add it to .env.local and restart the dev server — or play the sample board.",
-      },
-      { status: 503 },
     );
   }
 
@@ -60,13 +53,52 @@ export async function POST(request: Request) {
     );
   }
 
+  const host = await currentHost();
+  if (!canPlay(host.plan, "trivia-royale")) {
+    return NextResponse.json(
+      { error: GATE_COPY.game.line, gate: "game" },
+      { status: 402 },
+    );
+  }
+
   try {
-    const result = await generateTriviaBoard({
-      categories,
-      vibe: parsed.data.vibe,
-      difficulty: parsed.data.difficulty,
+    // The library answers first; the model only writes what isn't on the
+    // shelf already. See lib/library/serve.ts.
+    const served = await serveContent({
+      gameType: "trivia-royale",
+      themes: categories,
+      difficulty: parsed.data.difficulty ?? "medium",
+      host,
+      canWrite: hasApiKey,
+      write: () =>
+        generateTriviaBoard({
+          categories,
+          vibe: parsed.data.vibe,
+          difficulty: parsed.data.difficulty,
+        }),
     });
-    return NextResponse.json(result);
+
+    if (!served.ok) {
+      // Out of allowance is a decision the host can act on; nothing to serve
+      // and nothing to write with is a server problem, and they read very
+      // differently to whoever is standing in front of the television.
+      return served.blocked === "plan"
+        ? NextResponse.json(
+            { error: GATE_COPY[served.gate].line, gate: served.gate },
+            { status: 402 },
+          )
+        : NextResponse.json(
+            {
+              error:
+                "Nothing written for that yet, and the writing service isn't configured. Try the bundled pack.",
+            },
+            { status: 503 },
+          );
+    }
+
+    // Same shape the client has always received, plus the id it needs to
+    // tell us later whether the board was any good.
+    return NextResponse.json({ ...served.content, boardId: served.boardId });
   } catch (error) {
     const message = friendlyAiError(error);
     console.error("[board] generation failed:", error);

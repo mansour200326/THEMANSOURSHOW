@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { dispatch, getRoom } from "@/lib/room/store";
+import { currentHost } from "@/lib/plan/host";
+import { GATE_COPY, canPlay } from "@/lib/plan/limits";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,6 +29,23 @@ export async function POST(
 
   if (!body?.type) {
     return NextResponse.json({ error: "Missing action type." }, { status: 400 });
+  }
+
+  /*
+   * Games that use no written content never touch the writing routes, so the
+   * only place a free host can be stopped from opening one is here. Checked
+   * on the server because the lobby's disabled button is a courtesy, not a
+   * lock — anyone can POST this endpoint.
+   */
+  if (body.type === "game:start") {
+    const host = await currentHost();
+    const gameId = String(body.payload?.gameId ?? "");
+    if (gameId && !canPlay(host.plan, gameId)) {
+      return NextResponse.json(
+        { error: GATE_COPY.game.line, gate: "game" },
+        { status: 402 },
+      );
+    }
   }
 
   const room = dispatch(code, {
