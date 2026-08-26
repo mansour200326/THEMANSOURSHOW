@@ -9,6 +9,7 @@ import { gameList } from "@/lib/games/registry";
 import type { Room } from "@/lib/room/types";
 import { SCREEN_ONLY } from "@/lib/games/screenOnly";
 import { useEntitlements } from "@/lib/plan/useEntitlements";
+import { AccountLink } from "@/components/account/AccountLink";
 
 type Props = {
   room: Room;
@@ -72,6 +73,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick }: Props) 
                   Clear bots
                 </button>
               )}
+              <AccountLink className="self-center" />
               <button
                 onClick={onAddBots}
                 disabled={bots.length >= 3}

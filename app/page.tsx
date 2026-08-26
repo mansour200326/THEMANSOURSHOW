@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { HeroStage } from "@/components/HeroStage";
 import { IMPACT, ShowMark } from "@/components/ShowMark";
+import { AccountLink } from "@/components/account/AccountLink";
 
 export default function Home() {
   const router = useRouter();
@@ -24,6 +25,8 @@ export default function Home() {
 
   return (
     <main className="relative">
+      {/* The only entrance to an account, and the only one there should be. */}
+      <AccountLink className="absolute right-5 top-5 z-20" />
       {/*
        * The middle of the stage is the wordmark and two buttons, nothing else.
        * The explanation used to sit between them, where the floating tiles ran
