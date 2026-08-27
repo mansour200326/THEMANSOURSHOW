@@ -3,6 +3,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import { auth } from "@/auth";
 import { hasDatabase, query } from "@/lib/db";
+import { plansEnforced } from "@/lib/plan/enforcement";
 import { ANON_COOKIE } from "@/middleware";
 import {
   type Entitlements,
@@ -24,37 +25,37 @@ export type Host = {
   anonId: string | null;
   plan: Plan;
   entitlements: Entitlements;
-  /** True when there's no database, so nothing can be enforced or remembered. */
+  /**
+   * Nothing is being enforced — either because there's no database to hold an
+   * account, or because plans are switched off. The screens read this to know
+   * not to mention tiers at all.
+   */
   open: boolean;
 };
 
 export async function currentHost(): Promise<Host> {
   /*
-   * With no database there are no accounts, so there is nobody who *could* be
-   * Pro. Enforcing the free tier here would lock every existing host out of a
-   * product that has been fully open since it was written — so gating is off
-   * until Postgres is attached, and lib/db says so at boot.
+   * Two reasons nothing gets enforced. No database means there is nobody who
+   * *could* be Pro, and locking every host out of a product that has been
+   * open since it was written would be a strange way to introduce accounts.
+   * Plans being off is the deliberate one — see lib/plan/enforcement.ts.
+   *
+   * Identity is still resolved either way, because the library needs to know
+   * who it has already served even when nobody is paying for anything.
    */
-  if (!hasDatabase()) {
-    return {
-      userId: null,
-      anonId: null,
-      plan: "pro",
-      entitlements: entitlementsFor("pro"),
-      open: true,
-    };
-  }
+  const enforcing = hasDatabase() && plansEnforced();
 
-  const session = await auth();
+  const session = hasDatabase() ? await auth() : null;
   const anonId = (await cookies()).get(ANON_COOKIE)?.value ?? null;
-  const plan = session?.user?.plan ?? "free";
+  const stored = session?.user?.plan ?? "free";
+  const plan: Plan = enforcing ? stored : "pro";
 
   return {
     userId: session?.user?.id ?? null,
     anonId: session?.user?.id ? null : anonId,
     plan,
     entitlements: entitlementsFor(plan),
-    open: false,
+    open: !enforcing,
   };
 }
 
@@ -71,7 +72,6 @@ export const hostKey = (host: Host) => ({
  * is the one people have the strongest incentive to reset by refreshing.
  */
 export async function generationsTonight(host: Host): Promise<number> {
-  if (host.open) return 0;
   const since = new Date(Date.now() - NIGHT_MS);
   const { userId, anonId } = hostKey(host);
   if (!userId && !anonId) return 0;
@@ -93,7 +93,6 @@ export async function mayGenerate(host: Host): Promise<boolean> {
 }
 
 export async function recordGeneration(host: Host, gameType: string) {
-  if (host.open) return;
   const { userId, anonId } = hostKey(host);
   if (!userId && !anonId) return;
   await query(

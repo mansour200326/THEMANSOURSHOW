@@ -58,7 +58,7 @@ export async function findUnseen<T>(
   themes: string[],
   difficulty = "medium",
 ): Promise<StoredBoard<T> | null> {
-  if (!hasDatabase() || host.open) return null;
+  if (!hasDatabase()) return null;
   const theme = normalizeTheme(themes);
   if (!theme) return null;
 
@@ -110,7 +110,7 @@ export async function store(
   content: unknown,
   isPersonal: boolean,
 ): Promise<string | null> {
-  if (!hasDatabase() || host.open) return null;
+  if (!hasDatabase()) return null;
   const theme = normalizeTheme(themes);
   if (!theme) return null;
 
