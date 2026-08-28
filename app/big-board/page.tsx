@@ -293,6 +293,7 @@ function BigBoardStage() {
                 category={activeCategory}
                 clue={active.clue}
                 answer={active.answer}
+                image={active.image}
                 value={activeValue(state)}
                 isDaily={state.activeIsDaily}
                 teams={state.teams}

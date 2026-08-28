@@ -4,7 +4,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 // The SDK's Zod helper is built against the v4 API, which ships inside zod 3.25.
 import { z } from "zod/v4";
-import type { Board, FinalClue } from "@/lib/board/types";
+import type { Board, Clue, FinalClue } from "@/lib/board/types";
+import { findPicture } from "@/lib/images/commons";
 import type { FeudQuestion } from "@/lib/feud/types";
 import type { ImpostorPlace } from "@/lib/games/impostor";
 import type { BuzzItem } from "@/lib/games/buzzEngine";
@@ -107,6 +108,17 @@ export type Written<T> = { content: T; isPersonal: boolean };
 const GeneratedClue = z.object({
   clue: z.string().describe("The clue, written as a statement — never a question."),
   answer: z.string().describe("The answer, as short as possible."),
+  /*
+   * What a photograph of this clue would be *of*. The model can't hand over
+   * an image — ask one for a URL and it invents a plausible address that
+   * 404s — so it names the subject and the server goes and finds a real
+   * picture of it. Empty for clues that don't want one.
+   */
+  picture: z
+    .string()
+    .describe(
+      "For a clue best shown as a photograph, the exact real-world subject to picture — usually the answer. Empty string for every other clue.",
+    ),
 });
 
 const GeneratedCategory = z.object({
@@ -149,6 +161,23 @@ Rules:
 - Vary the shape of the clues: definitions, quotes, numbers, "this person did X",
   visual descriptions. Never open every clue the same way.
 - Keep it clean enough for a living room with everyone's friends in it.
+
+PICTURE CLUES. Some clues are far better looked at than read out. For those,
+set "picture" to the exact real-world subject a photograph should show — almost
+always the answer itself — and write the clue as something that makes sense
+next to a photograph: "This landmark…", "This artist painted…". Aim for roughly
+one clue in five.
+
+Only ask for a picture of something a free photograph plausibly exists of: real
+people, places, landmarks, buildings, animals, plants, food, flags, artworks,
+vehicles, objects. Do NOT ask for one of a character from a film, cartoon,
+comic or game — those images are not freely licensed, and what comes back is a
+mural or a costume rather than the thing itself. Leave "picture" empty for
+every clue where the words are the point: dates, quotes, wordplay, statistics,
+plots, anything abstract.
+
+Write every clue so it still works with no picture at all. A picture may turn
+out not to exist, and the clue will be played as text.
 
 Also write one Final Round clue: harder than anything on the board, drawn from
 one of the requested topics, still answerable by a group thinking out loud.`;
@@ -224,6 +253,13 @@ export async function generateTriviaBoard({
     })),
   };
 
+  /*
+   * Go and find the pictures the model asked for. Every lookup can fail and
+   * failing is fine — the clue was written to work as text either way — so
+   * this can never throw and never blocks the board on a slow image search.
+   */
+  await attachPictures(board, usable);
+
   const content = {
     board,
     finalClue: {
@@ -233,6 +269,54 @@ export async function generateTriviaBoard({
     },
   };
   return { content, isPersonal: parsed.isPersonal };
+}
+
+/**
+ * Turn "picture: Eiffel Tower" into an actual photograph, where one exists.
+ *
+ * Every clue that asked for one is looked up at the same time rather than in
+ * turn — a board can want six of these and doing them one after another would
+ * add most of a minute to a wait that is already long enough.
+ */
+async function attachPictures(
+  board: Board,
+  source: Array<{ clues: Array<{ picture?: string }> }>,
+): Promise<void> {
+  const wanted: Array<{ clue: Clue; subject: string }> = [];
+
+  /*
+   * Two per category, no matter how many the model asked for.
+   *
+   * Told to aim for one clue in five it cheerfully returned two in three,
+   * because for a category like "world landmarks" every single clue genuinely
+   * is better as a photograph. It's still wrong: five picture clues in a row
+   * is one joke told five times, and the category stops having any shape. A
+   * ceiling in code holds whatever the prompt does, and it halves the number
+   * of lookups a board waits on.
+   */
+  const PICTURES_PER_CATEGORY = 2;
+
+  board.categories.forEach((cat, c) => {
+    let used = 0;
+    cat.clues.forEach((clue, r) => {
+      if (used >= PICTURES_PER_CATEGORY) return;
+      const subject = source[c]?.clues?.[r]?.picture?.trim();
+      if (!subject) return;
+      wanted.push({ clue, subject });
+      used++;
+    });
+  });
+  if (!wanted.length) return;
+
+  const found = await Promise.all(
+    wanted.map(({ subject }) => findPicture(subject).catch(() => null)),
+  );
+  found.forEach((image, i) => {
+    if (image) wanted[i].clue.image = image;
+  });
+
+  const hits = found.filter(Boolean).length;
+  console.log(`[board] ${hits}/${wanted.length} picture clues found an image`);
 }
 
 /* ------------------------------------------------------- Face-Off packs */

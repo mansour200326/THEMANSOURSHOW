@@ -3,12 +3,15 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CountdownRing } from "@/components/bigboard/CountdownRing";
+import type { ClueImage } from "@/lib/board/types";
 import type { Rules, Team } from "@/lib/bigboard/types";
 
 type Props = {
   category: string;
   clue: string;
   answer: string;
+  /** Present only on picture clues — see lib/images/commons.ts. */
+  image?: ClueImage;
   /** Points at stake — clue value, or the wager on a daily double. */
   value: number;
   isDaily: boolean;
@@ -24,6 +27,7 @@ export function ClueStage({
   category,
   clue,
   answer,
+  image,
   value,
   isDaily,
   teams,
@@ -97,13 +101,41 @@ export function ClueStage({
       </div>
 
       {/* Clue */}
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[3vmin] px-[4vw] text-center">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[2.5vmin] px-[4vw] text-center">
+        {/*
+          * The picture is the clue on a picture clue, so it gets the room and
+          * the words shrink to a caption underneath. No credit here: Commons
+          * filenames and photographers routinely name the subject, and a
+          * caption reading "Eiffel Tower by Gabriel Loppé" under the question
+          * "which landmark is this?" would be a strange way to ask it. The
+          * credit appears with the answer instead.
+          */}
+        {image && (
+          // The wrapper takes the space and the image fills it. Sizing the
+          // image alone left it at whatever the flex row would spare, which
+          // on a television was a postage stamp.
+          <div className="flex min-h-0 flex-1 items-center justify-center">
+            <motion.img
+              key={image.url}
+              src={image.url}
+              alt=""
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="max-h-full max-w-full rounded-2xl border border-white/12 object-contain shadow-tile"
+            />
+          </div>
+        )}
+
         <motion.p
           key={clue}
           initial={{ opacity: 0, y: 24, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="t-clue text-balance font-display uppercase tracking-wide text-moon"
+          className={[
+            "text-balance font-display uppercase tracking-wide text-moon",
+            image ? "text-[clamp(1rem,2.2vw,2.4rem)]" : "t-clue",
+          ].join(" ")}
         >
           {clue}
         </motion.p>
@@ -123,6 +155,11 @@ export function ClueStage({
               <p className="accent-text t-answer text-balance font-display font-semibold uppercase">
                 {answer}
               </p>
+              {image && (
+                <p className="t-label text-moon-deep/70">
+                  {image.credit} · {image.licence} · Wikimedia Commons
+                </p>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

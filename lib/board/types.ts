@@ -4,10 +4,24 @@
  * Keep this file free of game-specific / team-specific concepts.
  */
 
+/**
+ * A picture clue's picture. Absent on most clues — a board is still a board
+ * without any, and a picture is only ever added when a real, correctly
+ * identified, properly licensed one was found. See lib/images/commons.ts.
+ */
+export type ClueImage = {
+  url: string;
+  /** Author and licence, shown alongside the answer rather than the clue. */
+  credit: string;
+  licence: string;
+  sourceUrl: string;
+};
+
 export type Clue = {
   value: number;
   clue: string;
   answer: string;
+  image?: ClueImage;
 };
 
 export type Category = {
