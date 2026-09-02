@@ -51,6 +51,7 @@ export type Action =
   | { type: "SHOW_FINAL_JUDGING" }
   | { type: "JUDGE_FINAL"; teamId: string; correct: boolean }
   | { type: "FINISH_FINAL" }
+  | { type: "ADJUST"; teamId: string; delta: number }
   | { type: "UNDO" }
   | { type: "REMATCH" }
   | { type: "RESET" }
@@ -273,6 +274,22 @@ export function reducer(state: GameState, action: Action): GameState {
 
     case "FINISH_FINAL":
       return { ...state, phase: "winner" };
+
+    /**
+     * The host correcting the score by hand — a cheat, a bad call, a round
+     * counted twice. Undo only reaches the last thing that happened.
+     */
+    case "ADJUST": {
+      const delta = Math.round(action.delta);
+      if (!Number.isFinite(delta) || delta === 0) return state;
+      return {
+        ...state,
+        past: snapshot(state),
+        teams: state.teams.map((t) =>
+          t.id === action.teamId ? { ...t, score: t.score + delta } : t,
+        ),
+      };
+    }
 
     case "UNDO": {
       const [prev, ...rest] = state.past;

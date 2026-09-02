@@ -47,6 +47,7 @@ export type FeudAction =
   | { type: "STRIKE" }
   | { type: "CLOCK"; run: boolean }
   | { type: "NEXT_ROUND" }
+  | { type: "ADJUST"; teamIndex: number; delta: number }
   | { type: "UNDO" }
   | { type: "RESET" }
   | { type: "HYDRATE"; state: FeudState };
@@ -237,6 +238,22 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
         clock: null,
         // Loser of the last round starts the next one.
         control: otherTeam(state),
+      };
+    }
+
+    /**
+     * The host correcting the score by hand — a cheat, a bad call, a round
+     * counted twice. Undo only reaches the last thing that happened.
+     */
+    case "ADJUST": {
+      const delta = Math.round(action.delta);
+      if (!Number.isFinite(delta) || delta === 0) return state;
+      return {
+        ...state,
+        past: snapshot(state),
+        teams: state.teams.map((t, i) =>
+          i === action.teamIndex ? { ...t, score: t.score + delta } : t,
+        ),
       };
     }
 

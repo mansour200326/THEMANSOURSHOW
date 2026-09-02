@@ -16,6 +16,7 @@ import { ThemeList, usableThemes } from "@/components/setup/ThemeList";
 import type { Difficulty } from "@/lib/difficulty";
 import { emptyRapid, rapidReducer, rapidStandings, rapidWinners } from "@/lib/rapid/engine";
 import { drawPrompts } from "@/lib/rapid/packs";
+import { ScoreFixer } from "@/components/ScoreAdjuster";
 import { backHref } from "@/lib/backHref";
 import {
   type RapidMode,
@@ -295,6 +296,15 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
           >
             Undo
           </button>
+          <ScoreFixer
+            entries={state.teams.map((t, i) => ({
+              id: String(i),
+              name: t.name,
+              score: t.score,
+            }))}
+            step={1}
+            onAdjust={(id, delta) => dispatch({ type: "ADJUST", teamIndex: Number(id), delta })}
+          />
           <button onClick={quit} className="btn-ghost px-3 py-1.5 text-xs">
             Quit
           </button>

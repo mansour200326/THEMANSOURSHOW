@@ -323,6 +323,29 @@ function reduceRoom(room: Room, action: Action): Room {
     case "bots:clear":
       return { ...room, players: room.players.filter((p) => !p.bot) };
 
+    /**
+     * The host putting the score right by hand.
+     *
+     * Somebody cheated, an answer was judged too harshly, a round got counted
+     * twice. Undo only walks back the last thing that happened, which is no
+     * use ten minutes later, and starting again costs everyone the night.
+     */
+    case "score:adjust": {
+      const id = String(action.payload?.id ?? "");
+      const delta = Math.round(Number(action.payload?.delta));
+      if (!id || !Number.isFinite(delta) || delta === 0) return room;
+      return {
+        ...room,
+        players: room.players.map((p) =>
+          // Below zero is allowed. A host docking points for cheating may
+          // well mean it, and the other three games have always permitted it
+          // — one rule for the room games and another for the rest would be
+          // the surprising thing.
+          p.id === id ? { ...p, score: p.score + delta } : p,
+        ),
+      };
+    }
+
     case "scores:reset":
       return { ...room, players: room.players.map((p) => ({ ...p, score: 0 })) };
 

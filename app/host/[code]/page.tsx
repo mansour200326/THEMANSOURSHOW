@@ -14,6 +14,8 @@ import { LiveHost } from "@/components/host/LiveHost";
 import { SketchHost } from "@/components/host/SketchHost";
 import { GameSetup } from "@/components/host/GameSetup";
 import { RoomCodeChip } from "@/components/host/RoomCodeChip";
+import { ScoreFixer } from "@/components/ScoreAdjuster";
+import { connectedPlayers } from "@/lib/room/types";
 import { Generating } from "@/components/Generating";
 import { HowToPlay } from "@/components/HowToPlay";
 import { PackWorkshop } from "@/components/packs/PackWorkshop";
@@ -375,11 +377,24 @@ export default function HostPage({
     );
   })();
 
-  // The code used to vanish the moment a game started, so a phone that died
-  // mid-night had no way back into the room.
+  /*
+   * The code and the score fixer live out here rather than in each game's
+   * screen: there are twelve of those, they share no layout, and a control
+   * that only exists in eleven of them is worse than one that exists in none.
+   */
   return (
     <>
       {inGame}
+      <div className="fixed bottom-3 right-3 z-40">
+        <ScoreFixer
+          entries={connectedPlayers(room).map((p) => ({
+            id: p.id,
+            name: `${p.emoji} ${p.name}`,
+            score: p.score,
+          }))}
+          onAdjust={(id, delta) => send("score:adjust", { id, delta })}
+        />
+      </div>
       <RoomCodeChip code={roomCode} />
     </>
   );

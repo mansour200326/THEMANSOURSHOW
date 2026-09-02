@@ -31,6 +31,7 @@ export type RapidAction =
   | { type: "GO" }
   | { type: "TIME_UP" }
   | { type: "SCORE"; points: number }
+  | { type: "ADJUST"; teamIndex: number; delta: number }
   | { type: "UNDO" }
   | { type: "RESET" }
   | { type: "HYDRATE"; state: RapidState };
@@ -130,6 +131,22 @@ export function rapidReducer(state: RapidState, action: RapidAction): RapidState
         lastCount: count,
         lastMade: true,
         phase: finished ? "winner" : "ready",
+      };
+    }
+
+    /**
+     * The host correcting the score by hand — a cheat, a bad call, a round
+     * counted twice. Undo only reaches the last thing that happened.
+     */
+    case "ADJUST": {
+      const delta = Math.round(action.delta);
+      if (!Number.isFinite(delta) || delta === 0) return state;
+      return {
+        ...state,
+        past: snapshot(state),
+        teams: state.teams.map((t, i) =>
+          i === action.teamIndex ? { ...t, score: t.score + delta } : t,
+        ),
       };
     }
 

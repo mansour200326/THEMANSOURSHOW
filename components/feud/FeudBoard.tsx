@@ -216,17 +216,24 @@ export function FeudBoard({
         </motion.div>
       )}
 
-      {/* Answer box + pot */}
+      {/*
+        * On a television this is one row: pot, answer box, controls. On a
+        * phone it can't be — the pot and the controls were both shrink-0, so
+        * the box between them got squeezed to a sliver and the buttons
+        * overlapped each other. It wraps now: pot and controls share the top
+        * line and the box gets the full width underneath, which is the one
+        * thing on this screen that has to be typed into.
+        */}
       {!over && (
-      <div className="flex shrink-0 items-end gap-[1.5vw] px-[2vw]">
-        <div className="shrink-0 text-left">
+      <div className="flex shrink-0 flex-wrap items-end gap-3 px-[2vw] sm:flex-nowrap sm:gap-[1.5vw]">
+        <div className="order-1 shrink-0 text-left">
           <p className="t-label font-display uppercase text-moon-deep">Pot</p>
           <p className="accent-text font-display text-[clamp(1.6rem,3vw,3.6rem)] font-bold tabular-nums">
             {state.pot}
           </p>
         </div>
 
-        <div className="min-w-0 flex-1">
+        <div className="order-3 w-full min-w-0 basis-full sm:order-2 sm:w-auto sm:flex-1 sm:basis-auto">
           <div className="flex gap-2">
             <input
               ref={box}
@@ -241,7 +248,7 @@ export function FeudBoard({
             <button
               onClick={submit}
               disabled={checking}
-              className="btn-accent px-8 text-lg"
+              className="btn-accent shrink-0 px-5 text-base sm:px-8 sm:text-lg"
             >
               {checking ? "…" : "Enter"}
             </button>
@@ -288,7 +295,7 @@ export function FeudBoard({
           </div>
         </div>
 
-        <div className="shrink-0 text-right">
+        <div className="order-2 ml-auto shrink-0 text-right sm:order-3 sm:ml-0">
           {state.phase === "play" && (
             <div className="flex items-center justify-end gap-2">
               <button
