@@ -20,7 +20,7 @@ import { resolveGuess } from "@/lib/feud/judge";
 import { sampleFeudPack } from "@/lib/feud/samplePack";
 import { type FeudQuestion, type FeudState, otherTeam } from "@/lib/feud/types";
 import { backHref } from "@/lib/backHref";
-import { ScoreFixer } from "@/components/ScoreAdjuster";
+import { ScoreNudge } from "@/components/ScoreNudge";
 
 const KEY = "bignight:feud:v1";
 
@@ -217,15 +217,6 @@ function FaceOffStage() {
           >
             Undo
           </button>
-          <ScoreFixer
-            entries={state.teams.map((t, i) => ({
-              id: String(i),
-              name: t.name,
-              score: t.score,
-            }))}
-            step={10}
-            onAdjust={(id, delta) => dispatch({ type: "ADJUST", teamIndex: Number(id), delta })}
-          />
           <button onClick={quit} className="btn-ghost px-3 py-1.5 text-xs">
             Quit
           </button>
@@ -342,9 +333,16 @@ function FaceOffStage() {
                 >
                   {team.name}
                 </span>
-                <span className="font-display text-[clamp(1.4rem,2.2vw,3rem)] font-bold tabular-nums text-moon">
-                  {team.score}
-                </span>
+                <ScoreNudge
+                  step={10}
+                  onAdjust={(delta) =>
+                    dispatch({ type: "ADJUST", teamIndex: i, delta })
+                  }
+                >
+                  <span className="font-display text-[clamp(1.4rem,2.2vw,3rem)] font-bold tabular-nums text-moon">
+                    {team.score}
+                  </span>
+                </ScoreNudge>
               </div>
             );
           })}

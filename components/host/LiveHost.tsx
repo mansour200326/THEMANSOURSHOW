@@ -10,8 +10,11 @@ import {
   liveShuffledEvents,
 } from "@/lib/games/liveEngine";
 import { type Room, connectedPlayers } from "@/lib/room/types";
+import { ScoreNudge } from "@/components/ScoreNudge";
 
 type Props = {
+  /** Host putting a score right by hand. */
+  onAdjust: (playerId: string, delta: number) => void;
   room: Room;
   state: LiveState;
   onForce: () => void;
@@ -28,7 +31,7 @@ const TITLES: Record<LiveState["variant"], string> = {
   dial: "Dial It In",
 };
 
-export function LiveHost({ room, state, onForce, onNext, onQuit }: Props) {
+export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Props) {
   const item = liveCurrent(state);
   const players = connectedPlayers(room);
   const byId = (id: string) => players.find((p) => p.id === id);
@@ -329,7 +332,14 @@ export function LiveHost({ room, state, onForce, onNext, onQuit }: Props) {
             key={p.id}
             className="rounded-full border border-white/10 bg-white/[0.02] px-3 py-1 font-display text-xs uppercase tracking-wide text-moon-dim"
           >
-            {p.emoji} {p.name} · <Tally value={p.score} />
+            {p.emoji} {p.name} ·{" "}
+            <ScoreNudge
+              step={100}
+              size="small"
+              onAdjust={(delta) => onAdjust(p.id, delta)}
+            >
+              <Tally value={p.score} />
+            </ScoreNudge>
             {state.lastScores[p.id] ? (
               <span className="ml-1 text-emerald-300">
                 +{state.lastScores[p.id]}

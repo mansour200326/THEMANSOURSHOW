@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { ScoreNudge } from "@/components/ScoreNudge";
 import { Tally } from "@/components/Tally";
 import type { Team } from "@/lib/bigboard/types";
 
@@ -9,9 +10,18 @@ type Props = {
   /** Index of the team whose turn it is, or null when nobody is "up". */
   activeIndex?: number | null;
   compact?: boolean;
+  /** Present wherever the host can put a score right by hand. */
+  onAdjust?: (teamId: string, delta: number) => void;
+  step?: number;
 };
 
-export function ScoreBar({ teams, activeIndex = null, compact }: Props) {
+export function ScoreBar({
+  teams,
+  activeIndex = null,
+  compact,
+  onAdjust,
+  step = 100,
+}: Props) {
   return (
     <div
       className="grid gap-[0.6vmin]"
@@ -46,16 +56,34 @@ export function ScoreBar({ teams, activeIndex = null, compact }: Props) {
             >
               {team.name}
             </span>
-            <span
-              className={[
-                "font-display font-bold tabular-nums",
-                compact ? "text-2xl" : "t-score",
-                team.score < 0 ? "text-rose-400" : "text-moon",
-              ].join(" ")}
-            >
-              {team.score < 0 ? "−" : ""}
-              <Tally value={Math.abs(team.score)} />
-            </span>
+            {(() => {
+              const score = (
+                <span
+                  className={[
+                    "font-display font-bold tabular-nums",
+                    compact ? "text-2xl" : "t-score",
+                    team.score < 0 ? "text-rose-400" : "text-moon",
+                  ].join(" ")}
+                >
+                  {team.score < 0 ? "−" : ""}
+                  <Tally value={Math.abs(team.score)} />
+                </span>
+              );
+              // Wrapped only where the host is actually running the game —
+              // the winner screen shows the same bar and has nothing left to
+              // adjust.
+              return onAdjust ? (
+                <ScoreNudge
+                  step={step}
+                  size={compact ? "small" : "normal"}
+                  onAdjust={(delta) => onAdjust(team.id, delta)}
+                >
+                  {score}
+                </ScoreNudge>
+              ) : (
+                score
+              );
+            })()}
           </motion.div>
         );
       })}

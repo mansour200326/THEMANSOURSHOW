@@ -29,7 +29,6 @@ import { clearGame, loadGame, saveGame } from "@/lib/bigboard/storage";
 import type { GameState } from "@/lib/bigboard/types";
 import type { Board, FinalClue } from "@/lib/board/types";
 import { backHref } from "@/lib/backHref";
-import { ScoreFixer } from "@/components/ScoreAdjuster";
 
 /**
  * Big Board keeps no record of how the host called an answer, so the cue is
@@ -237,14 +236,6 @@ function BigBoardStage() {
           >
             Undo
           </button>
-          <ScoreFixer
-            entries={state.teams.map((t) => ({
-              id: t.id,
-              name: t.name,
-              score: t.score,
-            }))}
-            onAdjust={(teamId, delta) => dispatch({ type: "ADJUST", teamId, delta })}
-          />
           <button
             onClick={toggleFullscreen}
             className="btn-ghost px-3 py-1.5 text-xs"
@@ -358,6 +349,7 @@ function BigBoardStage() {
           <ScoreBar
             teams={state.teams}
             activeIndex={state.phase === "board" ? state.turn : null}
+            onAdjust={(teamId, delta) => dispatch({ type: "ADJUST", teamId, delta })}
           />
         </div>
       )}

@@ -7,14 +7,17 @@ import { useCue, useCueWhen } from "@/components/useCue";
 import { Tally } from "@/components/Tally";
 import { type BuzzState, buzzArmed, buzzCurrent } from "@/lib/games/buzzEngine";
 import { type Room, connectedPlayers, playerById } from "@/lib/room/types";
+import { ScoreNudge } from "@/components/ScoreNudge";
 
 type Props = {
+  /** Host putting a score right by hand. */
+  onAdjust: (playerId: string, delta: number) => void;
   room: Room;
   state: BuzzState;
   send: (type: string, payload?: Record<string, unknown>) => void;
 };
 
-export function BuzzHost({ room, state, send }: Props) {
+export function BuzzHost({ room, state, send, onAdjust }: Props) {
   const item = buzzCurrent(state);
   const buzzer = playerById(room, state.buzzedBy ?? undefined);
 
@@ -256,14 +259,20 @@ export function BuzzHost({ room, state, send }: Props) {
             <span className="font-display text-sm uppercase tracking-wide text-moon/75">
               {p.name}
             </span>
-            <span
-              className={[
-                "font-display text-sm font-bold tabular-nums",
-                p.score < 0 ? "text-rose-400" : "text-accent",
-              ].join(" ")}
+            <ScoreNudge
+              step={100}
+              size="small"
+              onAdjust={(delta) => onAdjust(p.id, delta)}
             >
-              <Tally value={p.score} />
-            </span>
+              <span
+                className={[
+                  "font-display text-sm font-bold tabular-nums",
+                  p.score < 0 ? "text-rose-400" : "text-accent",
+                ].join(" ")}
+              >
+                <Tally value={p.score} />
+              </span>
+            </ScoreNudge>
           </div>
         ))}
       </div>

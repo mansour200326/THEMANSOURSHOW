@@ -9,8 +9,11 @@ import {
   impostorPlace,
 } from "@/lib/games/impostor";
 import { type Room, connectedPlayers } from "@/lib/room/types";
+import { ScoreNudge } from "@/components/ScoreNudge";
 
 type Props = {
+  /** Host putting a score right by hand. */
+  onAdjust: (playerId: string, delta: number) => void;
   room: Room;
   state: ImpostorState;
   onStart: () => void;
@@ -21,6 +24,7 @@ type Props = {
 };
 
 export function ImpostorHost({
+  onAdjust,
   room,
   state,
   onStart,
@@ -231,7 +235,14 @@ export function ImpostorHost({
             key={p.id}
             className="rounded-full border border-white/10 bg-white/[0.02] px-3 py-1 font-display text-xs uppercase tracking-wide text-moon-dim"
           >
-            {p.emoji} {p.name} · <Tally value={p.score} />
+            {p.emoji} {p.name} ·{" "}
+            <ScoreNudge
+              step={100}
+              size="small"
+              onAdjust={(delta) => onAdjust(p.id, delta)}
+            >
+              <Tally value={p.score} />
+            </ScoreNudge>
           </span>
         ))}
       </div>

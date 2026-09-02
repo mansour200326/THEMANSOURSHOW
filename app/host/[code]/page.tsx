@@ -303,6 +303,7 @@ export default function HostPage({
           room={room}
           state={state}
           send={(type, payload) => send(type, payload)}
+          onAdjust={(id, delta) => send("score:adjust", { id, delta })}
         />
       );
     }
@@ -313,6 +314,7 @@ export default function HostPage({
           room={room}
           state={state}
           onForce={() => send("force")}
+          onAdjust={(id, delta) => send("score:adjust", { id, delta })}
           onNext={() => send("next")}
           onQuit={() => send("game:end")}
         />
@@ -326,6 +328,7 @@ export default function HostPage({
           state={state}
           onStart={() => send("start")}
           onForce={() => send("force")}
+            onAdjust={(id, delta) => send("score:adjust", { id, delta })}
           onTimeUp={() => send("timeup")}
           onNext={() => send("next")}
           onQuit={() => send("game:end")}
@@ -362,6 +365,7 @@ export default function HostPage({
           room={room}
           state={state}
           onForce={() => send("force")}
+          onAdjust={(id, delta) => send("score:adjust", { id, delta })}
           onNext={() => send("next")}
           onQuit={() => send("game:end")}
         />
@@ -392,7 +396,7 @@ export default function HostPage({
             name: `${p.emoji} ${p.name}`,
             score: p.score,
           }))}
-          onAdjust={(id, delta) => send("score:adjust", { id, delta })}
+            onAdjust={(id, delta) => send("score:adjust", { id, delta })}
         />
       </div>
       <RoomCodeChip code={roomCode} />

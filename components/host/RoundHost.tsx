@@ -7,8 +7,11 @@ import { Tally } from "@/components/Tally";
 import { useCue, useCueWhen } from "@/components/useCue";
 import type { RoundState } from "@/lib/games/roundEngine";
 import { type Room, connectedPlayers, playerById } from "@/lib/room/types";
+import { ScoreNudge } from "@/components/ScoreNudge";
 
 type Props = {
+  /** Host putting a score right by hand. */
+  onAdjust: (playerId: string, delta: number) => void;
   room: Room;
   state: RoundState;
   onForce: () => void;
@@ -25,7 +28,7 @@ const barColour = (i: number) =>
     i % 5
   ];
 
-export function RoundHost({ room, state, onForce, onNext, onQuit }: Props) {
+export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Props) {
   const prompt = state.prompts[state.round];
   const live = connectedPlayers(room);
   const isBluff = room.gameId === "bluff-trivia";
@@ -219,7 +222,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit }: Props) {
           )}
         </div>
 
-        <ScoreStrip room={room} state={state} />
+        <ScoreStrip room={room} state={state} onAdjust={onAdjust} />
       </div>
     </main>
   );
@@ -302,7 +305,15 @@ function Standings({ room }: { room: Room }) {
   );
 }
 
-function ScoreStrip({ room, state }: { room: Room; state: RoundState }) {
+function ScoreStrip({
+  room,
+  state,
+  onAdjust,
+}: {
+  room: Room;
+  state: RoundState;
+  onAdjust: (playerId: string, delta: number) => void;
+}) {
   return (
     <div className="flex flex-wrap justify-center gap-[0.6vmin]">
       {connectedPlayers(room).map((p) => {
@@ -316,9 +327,15 @@ function ScoreStrip({ room, state }: { room: Room; state: RoundState }) {
             <span className="font-display text-sm uppercase tracking-wide text-moon/75">
               {p.name}
             </span>
-            <span className="font-display text-sm font-bold tabular-nums text-accent">
-              <Tally value={p.score} />
-            </span>
+            <ScoreNudge
+              step={100}
+              size="small"
+              onAdjust={(delta) => onAdjust(p.id, delta)}
+            >
+              <span className="font-display text-sm font-bold tabular-nums text-accent">
+                <Tally value={p.score} />
+              </span>
+            </ScoreNudge>
             <AnimatePresence>
               {gained ? (
                 <motion.span
