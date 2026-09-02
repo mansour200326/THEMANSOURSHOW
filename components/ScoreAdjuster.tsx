@@ -83,20 +83,24 @@ export function ScoreAdjuster({
         </div>
 
         <div className="mt-4">
-          <label className="t-label font-display uppercase text-moon-deep">
-            How much
+          <label
+            htmlFor="score-amount"
+            className="t-label font-display uppercase text-moon-deep"
+          >
+            Points per tap
           </label>
-          <div className="mt-2 flex items-center gap-2">
+          <div className="mt-2 flex items-center gap-3">
             <input
+              id="score-amount"
               type="number"
               inputMode="numeric"
               value={custom}
               onChange={(e) => setCustom(e.target.value)}
               placeholder={String(step)}
-              className="field w-32 py-3 text-center text-lg tabular-nums"
+              className="field w-32 py-3 text-center text-xl tabular-nums"
             />
             <span className="text-sm text-moon-deep">
-              per tap — leave blank for {step}
+              Type any number — {amount.toLocaleString()} right now.
             </span>
           </div>
         </div>
@@ -105,27 +109,27 @@ export function ScoreAdjuster({
           {entries.map((entry) => (
             <div
               key={entry.id}
-              className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3"
+              className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 sm:flex-nowrap sm:gap-3"
             >
               <span className="min-w-0 flex-1 truncate font-display uppercase tracking-wide text-moon">
                 {entry.name}
               </span>
-              <span className="w-24 shrink-0 text-right font-display text-lg tabular-nums text-moon-dim">
+              <span className="shrink-0 font-display text-lg tabular-nums text-moon-dim sm:w-20 sm:text-right">
                 {entry.score.toLocaleString()}
               </span>
               <button
                 onClick={() => onAdjust(entry.id, -amount)}
                 aria-label={`Take ${amount} from ${entry.name}`}
-                className="h-11 w-11 shrink-0 rounded-full border border-rose-500/40 font-display text-xl text-rose-300 transition-colors hover:bg-rose-500/15"
+                className="h-12 shrink-0 rounded-xl border border-rose-400/60 bg-rose-500/25 px-4 font-display text-lg tabular-nums text-rose-100 transition-colors hover:bg-rose-500/45"
               >
-                −
+                −{amount.toLocaleString()}
               </button>
               <button
                 onClick={() => onAdjust(entry.id, amount)}
                 aria-label={`Give ${amount} to ${entry.name}`}
-                className="h-11 w-11 shrink-0 rounded-full border border-emerald-400/40 font-display text-xl text-emerald-300 transition-colors hover:bg-emerald-500/15"
+                className="h-12 shrink-0 rounded-xl border border-emerald-400/60 bg-emerald-500/25 px-4 font-display text-lg tabular-nums text-emerald-100 transition-colors hover:bg-emerald-500/45"
               >
-                +
+                +{amount.toLocaleString()}
               </button>
             </div>
           ))}
