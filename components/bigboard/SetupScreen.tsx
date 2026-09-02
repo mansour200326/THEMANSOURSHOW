@@ -155,6 +155,7 @@ export function SetupScreen({
         {/* Categories + teams */}
         <section className="space-y-8">
           <ThemeList
+          gameId={"big-board"}
             title="Categories"
             hint="You pick the topics — anything from Game of Thrones to roasting your friends. We write five clues for each."
             themes={categories}

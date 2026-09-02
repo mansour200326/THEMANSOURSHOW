@@ -92,6 +92,7 @@ export function FeudSetup({
         <TeamsField names={names} onChange={setNames} />
 
         <ThemeList
+        gameId={"face-off"}
           title="Survey themes"
           hint="What the questions should be about. Add a few and the rounds spread across them — we write the survey and rank the answers."
           themes={themes}

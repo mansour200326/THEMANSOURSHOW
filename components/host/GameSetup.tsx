@@ -4,9 +4,12 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { DifficultyBar } from "@/components/DifficultyBar";
 import type { Difficulty } from "@/lib/difficulty";
+import { suggestionsFor } from "@/lib/games/themeSuggestions";
 
 type Props = {
   gameName: string;
+  /** Which game, so the suggested topics suit it. */
+  gameId: string;
   /**
    * Trivia Royale needs a full board and can't start without one; every other
    * game has a bundled pack and treats generating as optional.
@@ -39,6 +42,7 @@ const SLOTS = 4;
  */
 export function GameSetup({
   gameName,
+  gameId,
   needsBoard = false,
   lengths,
   onCancel,
@@ -50,6 +54,8 @@ export function GameSetup({
   const [categories, setCategories] = useState<string[]>(Array(SLOTS).fill(""));
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [suggesting, setSuggesting] = useState(false);
+  // Topics chosen for this particular game — see lib/games/themeSuggestions.
+  const picks = suggestionsFor(gameId);
   const [minutes, setMinutes] = useState(lengths?.[Math.floor(lengths.length / 2)]);
 
   const filled = categories.map((c) => c.trim()).filter(Boolean);
@@ -103,11 +109,44 @@ export function GameSetup({
               onChange={(e) =>
                 setCategories((c) => c.map((v, idx) => (idx === i ? e.target.value : v)))
               }
-              placeholder={needsBoard ? `Category ${i + 1}` : `Theme ${i + 1}`}
+              placeholder={picks[i % picks.length]}
               maxLength={40}
               className="field"
             />
           ))}
+        </div>
+      </div>
+
+      <div>
+        <p className="t-label font-display uppercase text-moon-deep">Or tap one</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {picks.map((topic) => {
+            const taken = categories.some(
+              (c) => c.trim().toLowerCase() === topic.toLowerCase(),
+            );
+            return (
+              <button
+                key={topic}
+                type="button"
+                disabled={taken}
+                onClick={() =>
+                  setCategories((c) => {
+                    const slot = c.findIndex((v) => !v.trim());
+                    if (slot < 0) return c;
+                    return c.map((v, i) => (i === slot ? topic : v));
+                  })
+                }
+                className={[
+                  "rounded-full border px-4 py-1.5 text-sm transition-colors",
+                  taken
+                    ? "border-accent/50 bg-accent/10 text-accent-bright"
+                    : "border-white/12 text-moon/75 hover:border-accent/40 hover:text-moon",
+                ].join(" ")}
+              >
+                {topic}
+              </button>
+            );
+          })}
         </div>
       </div>
 

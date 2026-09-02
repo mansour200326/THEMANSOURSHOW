@@ -205,6 +205,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
           <TeamsField names={names} onChange={setNames} />
 
           <ThemeList
+            gameId={mode}
             title="Themes"
             hint="What the prompts should lean towards. Add a few and they'll be spread across them."
             themes={themes}

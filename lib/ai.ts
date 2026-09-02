@@ -397,11 +397,14 @@ export async function generateFeudPack({
   themes,
   rounds,
   difficulty = "medium",
+  avoid = [],
 }: {
   /** Spread the rounds across these. Empty means anything goes. */
   themes: string[];
   rounds: number;
   difficulty?: Difficulty;
+  /** Answers this host has already been served. Off-limits. */
+  avoid?: string[];
 }): Promise<Written<FeudQuestion[]>> {
   const client = new Anthropic();
 
@@ -423,7 +426,7 @@ export async function generateFeudPack({
                 .map((t) => `- ${t}`)
                 .join("\n")}`
             : ""
-        }.`,
+        }.` + alreadyAsked(avoid),
       },
     ],
   });
@@ -609,10 +612,13 @@ export async function generateStandingQuestions({
   themes = [],
   count,
   difficulty = "medium",
+  avoid = [],
 }: {
   themes?: string[];
   count: number;
   difficulty?: Difficulty;
+  /** Answers this host has already been served. Off-limits. */
+  avoid?: string[];
 }): Promise<Written<LiveItem[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
@@ -628,7 +634,7 @@ export async function generateStandingQuestions({
       `\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL,
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedStanding), "low"),
     messages: [
-      { role: "user", content: `Write ${count} questions.${themeLine(themes)}` },
+      { role: "user", content: `Write ${count} questions.${themeLine(themes)}` + alreadyAsked(avoid) },
     ],
   });
   const parsed = response.parsed_output;
@@ -657,10 +663,13 @@ export async function generateTimelineRounds({
   themes = [],
   count,
   difficulty = "medium",
+  avoid = [],
 }: {
   themes?: string[];
   count: number;
   difficulty?: Difficulty;
+  /** Answers this host has already been served. Off-limits. */
+  avoid?: string[];
 }): Promise<Written<LiveItem[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
@@ -675,7 +684,7 @@ export async function generateTimelineRounds({
       `\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL,
     output_config: outputConfig(MODELS.board, zodOutputFormat(GeneratedTimeline), "medium"),
     messages: [
-      { role: "user", content: `Write ${count} rounds.${themeLine(themes)}` },
+      { role: "user", content: `Write ${count} rounds.${themeLine(themes)}` + alreadyAsked(avoid) },
     ],
   });
   const parsed = response.parsed_output;
@@ -704,9 +713,12 @@ const GeneratedSpectrums = z.object({
 export async function generateSpectrums({
   themes = [],
   count,
+  avoid = [],
 }: {
   themes?: string[];
   count: number;
+  /** Answers this host has already been served. Off-limits. */
+  avoid?: string[];
 }): Promise<Written<LiveItem[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
@@ -720,7 +732,7 @@ export async function generateSpectrums({
       "sort of thing a room will shout about." + PERSONAL,
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedSpectrums), "low"),
     messages: [
-      { role: "user", content: `Write ${count} pairs.${themeLine(themes)}` },
+      { role: "user", content: `Write ${count} pairs.${themeLine(themes)}` + alreadyAsked(avoid) },
     ],
   });
   const parsed = response.parsed_output;
@@ -752,9 +764,12 @@ const GeneratedPlaces = z.object({
 export async function generateImpostorPlaces({
   themes = [],
   count,
+  avoid = [],
 }: {
   themes?: string[];
   count: number;
+  /** Answers this host has already been served. Off-limits. */
+  avoid?: string[];
 }): Promise<Written<ImpostorPlace[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
@@ -768,7 +783,7 @@ export async function generateImpostorPlaces({
       "Avoid anywhere so unusual that a vague answer would pass." + PERSONAL,
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedPlaces), "low"),
     messages: [
-      { role: "user", content: `Write ${count} places.${themeLine(themes)}` },
+      { role: "user", content: `Write ${count} places.${themeLine(themes)}` + alreadyAsked(avoid) },
     ],
   });
   const parsed = response.parsed_output;
@@ -796,10 +811,13 @@ export async function generateWordPack({
   kind,
   themes = [],
   count,
+  avoid = [],
 }: {
   kind: "grid" | "sketch";
   themes?: string[];
   count: number;
+  /** Answers this host has already been served. Off-limits. */
+  avoid?: string[];
 }): Promise<Written<string[]>> {
   const client = new Anthropic();
   const brief =
@@ -816,7 +834,7 @@ export async function generateWordPack({
     system: `You write word packs for a party game.\n\n${brief}` + PERSONAL,
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedWords), "low"),
     messages: [
-      { role: "user", content: `Write ${count} of them.${themeLine(themes)}` },
+      { role: "user", content: `Write ${count} of them.${themeLine(themes)}` + alreadyAsked(avoid) },
     ],
   });
   const parsed = response.parsed_output;
@@ -873,10 +891,13 @@ export async function generateEmojiRiddles({
   themes = [],
   count,
   difficulty = "medium",
+  avoid = [],
 }: {
   themes?: string[];
   count: number;
   difficulty?: Difficulty;
+  /** Answers this host has already been served. Off-limits. */
+  avoid?: string[];
 }): Promise<Written<BuzzItem[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
@@ -917,7 +938,7 @@ export async function generateEmojiRiddles({
                 .map((t) => `- ${t}`)
                 .join("\n")}`
             : ""
-        }`,
+        }` + alreadyAsked(avoid),
       },
     ],
   });
@@ -994,12 +1015,15 @@ export async function generateRapidPrompts({
   count,
   themes = [],
   difficulty = "medium",
+  avoid = [],
 }: {
   mode: "categories" | "three-in-five";
   count: number;
   /** Spread the prompts across these. Empty means anything goes. */
   themes?: string[];
   difficulty?: Difficulty;
+  /** Answers this host has already been served. Off-limits. */
+  avoid?: string[];
 }): Promise<Written<string[]>> {
   const client = new Anthropic();
 
@@ -1034,7 +1058,7 @@ export async function generateRapidPrompts({
                 .map((t) => `- ${t}`)
                 .join("\n")}`
             : ""
-        }.`,
+        }.` + alreadyAsked(avoid),
       },
     ],
   });

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { callerKey, rateLimit } from "@/lib/rateLimit";
+import { answersAlreadySeen } from "@/lib/library/history";
 import { serveContent } from "@/lib/library/serve";
 import { currentHost } from "@/lib/plan/host";
 import { GATE_COPY, canPlay } from "@/lib/plan/limits";
@@ -89,33 +90,37 @@ export async function POST(request: Request) {
   > = {
     "last-one-standing": {
       key: "items",
-      write: () => generateStandingQuestions({ themes, count: many(12), difficulty }),
+      write: () => generateStandingQuestions({ themes, avoid, count: many(12), difficulty }),
     },
     timeline: {
       key: "items",
-      write: () => generateTimelineRounds({ themes, count: many(6), difficulty }),
+      write: () => generateTimelineRounds({ themes, avoid, count: many(6), difficulty }),
     },
     "dial-it-in": {
       key: "items",
-      write: () => generateSpectrums({ themes, count: many(8) }),
+      write: () => generateSpectrums({ themes, avoid, count: many(8) }),
     },
     impostor: {
       key: "places",
-      write: () => generateImpostorPlaces({ themes, count: 10 }),
+      write: () => generateImpostorPlaces({ themes, avoid, count: 10 }),
     },
     "code-grid": {
       key: "words",
-      write: () => generateWordPack({ kind: "grid", themes, count: 30 }),
+      write: () => generateWordPack({ kind: "grid", themes, avoid, count: 30 }),
     },
     "sketch-and-guess": {
       key: "words",
-      write: () => generateWordPack({ kind: "sketch", themes, count: many(12) }),
+      write: () => generateWordPack({ kind: "sketch", themes, avoid, count: many(12) }),
     },
     "emoji-riddles": {
       key: "items",
-      write: () => generateEmojiRiddles({ themes, count: many(18), difficulty }),
+      write: () => generateEmojiRiddles({ themes, avoid, count: many(18), difficulty }),
     },
   };
+
+  // Everything this host has already been asked for this game, so none of
+  // it comes round again. See lib/library/history.ts.
+  const avoid = await answersAlreadySeen(host, gameId);
 
   const writer = writers[gameId];
   if (!writer) {

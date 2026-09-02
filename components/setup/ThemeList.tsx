@@ -2,24 +2,10 @@
 
 import { useState } from "react";
 import type { Difficulty } from "@/lib/difficulty";
+import { suggestionsFor } from "@/lib/games/themeSuggestions";
 
 export const MIN_THEMES = 1;
 export const MAX_THEMES = 6;
-
-const SUGGESTIONS = [
-  "Game of Thrones",
-  "Football",
-  "2000s Movies",
-  "Roast the group",
-  "Anime",
-  "Cars",
-  "Rap Lyrics",
-  "Geography",
-  "Food",
-  "Video Games",
-  "History",
-  "Science",
-];
 
 type Props = {
   title: string;
@@ -33,6 +19,11 @@ type Props = {
   max?: number;
   /** Word for one entry, used on the add button and the labels. */
   noun?: string;
+  /**
+   * Which game is being set up. The suggestions are chosen for it — "Rap
+   * Lyrics" is a fine quiz category and a hopeless thing to draw.
+   */
+  gameId?: string;
 };
 
 /**
@@ -50,7 +41,9 @@ export function ThemeList({
   min = MIN_THEMES,
   max = MAX_THEMES,
   noun = "theme",
+  gameId,
 }: Props) {
+  const SUGGESTIONS = suggestionsFor(gameId);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

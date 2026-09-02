@@ -256,6 +256,7 @@ export default function HostPage({
     return (
       <GameSetup
         gameName={NEEDS_SETUP[setupFor]}
+        gameId={setupFor}
         needsBoard={setupFor === "trivia-royale"}
         lengths={setupFor === "impostor" ? [4, 6, 8, 10] : undefined}
         busy={busy}
