@@ -182,6 +182,27 @@ out not to exist, and the clue will be played as text.
 Also write one Final Round clue: harder than anything on the board, drawn from
 one of the requested topics, still answerable by a group thinking out loud.`;
 
+/**
+ * The list of answers this host has already had, as a rule rather than a hint.
+ *
+ * Goes in the user turn, not the system prompt: it changes on every call and
+ * putting it in the system prompt would wreck the cache for the rules that
+ * don't change. Framed as a hard constraint because the softer version of
+ * this — "try to be varied" — is already in the prompt and demonstrably loses
+ * to the model's own sense of what the best clue for a topic is.
+ */
+function alreadyAsked(avoid: string[]): string {
+  if (!avoid.length) return "";
+  return (
+    "\n\nALREADY USED — this host has been asked these before. Not one of " +
+    "them may be an answer on this board, and do not write a clue whose " +
+    "answer is a near-synonym of one either. If a category's most obvious " +
+    "clue is on this list, that category needs a different clue, not a " +
+    "reworded one:\n" +
+    avoid.map((a) => `- ${a}`).join("\n")
+  );
+}
+
 function buildPrompt(categories: string[], vibe: string): string {
   const list = categories.map((c, i) => `${i + 1}. ${c}`).join("\n");
   const extra = vibe.trim()
@@ -198,6 +219,8 @@ export type GenerateBoardInput = {
   categories: string[];
   vibe?: string;
   difficulty?: Difficulty;
+  /** Answers this host has already been served. Off-limits. */
+  avoid?: string[];
 };
 
 export type GenerateBoardResult = {
@@ -209,6 +232,7 @@ export async function generateTriviaBoard({
   categories,
   vibe = "",
   difficulty = "medium",
+  avoid = [],
 }: GenerateBoardInput): Promise<Written<GenerateBoardResult>> {
   const client = new Anthropic();
 
@@ -221,7 +245,9 @@ export async function generateTriviaBoard({
       zodOutputFormat(GeneratedBoard),
       "medium",
     ),
-    messages: [{ role: "user", content: buildPrompt(categories, vibe) }],
+    messages: [
+      { role: "user", content: buildPrompt(categories, vibe) + alreadyAsked(avoid) },
+    ],
   });
 
   if (response.stop_reason === "refusal") {
