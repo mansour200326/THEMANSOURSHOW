@@ -2,7 +2,7 @@ import {
   type FeudQuestion,
   type FeudState,
   type FeudTeam,
-  FEUD_CLOCK_SECONDS,
+  FEUD_CLOCK_DEFAULT,
   STRIKES_ALLOWED,
   allRevealed,
   currentQuestion,
@@ -27,12 +27,20 @@ export const emptyFeud = (): FeudState => ({
   struckOut: [],
   handoverAt: null,
   clock: null,
+  clockSeconds: FEUD_CLOCK_DEFAULT,
   lastGuess: null,
   past: [],
 });
 
 export type FeudAction =
-  | { type: "START"; teamNames: string[]; theme: string; questions: FeudQuestion[] }
+  | {
+      type: "START";
+      teamNames: string[];
+      theme: string;
+      questions: FeudQuestion[];
+      /** Seconds per answer; 0 for no clock. Defaults when absent. */
+      clockSeconds?: number;
+    }
   | { type: "SET_CONTROL"; team: number }
   | { type: "GUESS"; text: string; matched: number | null; repeat?: boolean }
   | { type: "REVEAL"; index: number }
@@ -42,6 +50,20 @@ export type FeudAction =
   | { type: "UNDO" }
   | { type: "RESET" }
   | { type: "HYDRATE"; state: FeudState };
+
+/**
+ * A fresh clock, or none.
+ *
+ * Zero and absent mean opposite things and both turn up. Zero is the host
+ * choosing to play without a clock, so it must produce nothing. Absent is a
+ * game saved to this browser before think time was a setting — those are
+ * mid-night in somebody's living room right now, and reading a missing field
+ * as zero would silently take their clock away with no way to get it back.
+ */
+const startClock = (s: FeudState): FeudState["clock"] => {
+  const seconds = s.clockSeconds ?? FEUD_CLOCK_DEFAULT;
+  return seconds > 0 ? { startedAt: Date.now(), seconds } : null;
+};
 
 const snapshot = (s: FeudState): FeudState[] =>
   [{ ...s, past: [] }, ...s.past].slice(0, UNDO_DEPTH);
@@ -78,6 +100,7 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
         teams: action.teamNames.map(makeTeam),
         questions: action.questions,
         contributions: action.teamNames.map(() => 0),
+        clockSeconds: action.clockSeconds ?? FEUD_CLOCK_DEFAULT,
       };
 
     case "SET_CONTROL": {
@@ -86,7 +109,7 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
         ...state,
         control: action.team,
         phase: "play",
-        clock: { startedAt: Date.now(), seconds: FEUD_CLOCK_SECONDS },
+        clock: startClock(state),
       };
     }
 
@@ -98,9 +121,7 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
       if (state.phase !== "play") return state;
       return {
         ...state,
-        clock: action.run
-          ? { startedAt: Date.now(), seconds: FEUD_CLOCK_SECONDS }
-          : null,
+        clock: action.run ? startClock(state) : null,
       };
 
     /**
@@ -186,7 +207,7 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
           control: heir,
           strikes: 0,
           handoverAt: Date.now(),
-          clock: { startedAt: Date.now(), seconds: FEUD_CLOCK_SECONDS },
+          clock: startClock(state),
         };
       }
 

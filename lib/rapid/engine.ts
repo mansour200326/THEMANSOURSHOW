@@ -78,14 +78,20 @@ export function rapidReducer(state: RapidState, action: RapidAction): RapidState
 
       if (RAPID_BIDS(state.mode)) {
         /*
-         * They either reach what they claimed or they don't. Making it pays
-         * everything they named; falling short hands the bid to the other
-         * side, which is what stops the bidding running away.
+         * They either reach what they claimed or they don't, and the round is
+         * worth one point either way.
+         *
+         * It used to pay out however many things they named, which quietly
+         * made the bidding pointless: a team that bid four and named nine
+         * scored nine, so the winning move was always to bid low and just
+         * name a lot. Everything interesting about the auction — claiming
+         * more than you're sure of to take the category off the other side —
+         * only matters when the category itself is the prize.
          */
         const made = count >= state.bid;
         const other = (state.turn + 1) % state.teams.length;
         const winner = made ? state.turn : other;
-        const points = made ? count : state.bid;
+        const points = 1;
         const teams = state.teams.map((t, i) =>
           i === winner ? { ...t, score: t.score + points } : t,
         );

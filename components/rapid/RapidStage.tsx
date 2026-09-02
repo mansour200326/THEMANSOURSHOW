@@ -141,9 +141,9 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
               {state.teams[bidTeam]?.name} takes it at {bid}
             </button>
             <p className="max-w-[60ch] text-[clamp(0.75rem,1.1vw,1rem)] text-moon-deep">
-              Whoever bids highest plays the category alone. Reach the number and
-              you score everything you named; fall short and the other side takes
-              the bid.
+              Whoever bids highest plays the category alone. Reach the number
+              and you win the category; fall short and the other side takes it.
+              One point either way.
             </p>
           </motion.div>
         )}

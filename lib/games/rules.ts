@@ -119,10 +119,10 @@ export const RULES: Record<string, GameRules> = {
       "You count what they managed and tap it in.",
     ],
     scoring:
-      "Reach your bid and you score everything you named. Fall short and the other team takes the number you bid — which is what stops anyone bidding twenty.",
+      "One point for the category. Reach your bid and it's yours; fall short and the other team takes it — which is what stops anyone bidding twenty.",
     needs: "This screen only.",
     example:
-      "The category is “Countries in Africa”. One team says seven, the other says nine, the first says eleven and the second gives up. The first team now has thirty seconds to name eleven. Ten and they get nothing and hand over eleven points.",
+      "The category is “Countries in Africa”. One team says seven, the other says nine, the first says eleven and the second gives up. The first team now has thirty seconds to name eleven. Ten of them, and the point goes to the other side.",
   },
   "three-in-five": {
     summary: "Name three things. Five seconds. Go.",

@@ -37,21 +37,22 @@ check("clock running", s.phase, "running");
 s = rapidReducer(s, { type: "TIME_UP" });
 check("judging", s.phase, "judge");
 
-// Made the bid: they score everything they named, not just the bid.
+// The category is the prize, and it's worth one point however many they named.
 let made = rapidReducer(s, { type: "SCORE", points: 11 });
-check("making the bid pays what they named", scores(made), [0, 11]);
+check("making the bid wins the category", scores(made), [0, 1]);
+check("naming extra doesn't pay extra", rapidReducer(s, { type: "SCORE", points: 40 }).teams[1].score, 1);
 check("made flag", made.lastMade, true);
 check("only one team plays a category", made.round, 1);
 check("straight back to bidding", made.phase, "bidding");
 
 // Missed it: the other team takes the bid.
 let missed = rapidReducer(s, { type: "SCORE", points: 8 });
-check("falling short hands the bid over", scores(missed), [9, 0]);
+check("falling short hands the category over", scores(missed), [1, 0]);
 check("missed flag", missed.lastMade, false);
 
 // Exactly on the bid counts as making it.
 check("exactly the bid is made", rapidReducer(s, { type: "SCORE", points: 9 }).lastMade, true);
-check("exactly the bid pays the bidder", scores(rapidReducer(s, { type: "SCORE", points: 9 })), [0, 9]);
+check("exactly the bid wins it", scores(rapidReducer(s, { type: "SCORE", points: 9 })), [0, 1]);
 
 // A category is a whole round, so three prompts is three categories.
 let run = start("categories");
@@ -62,7 +63,8 @@ for (let i = 0; i < 3; i++) {
   run = rapidReducer(run, { type: "SCORE", points: 5 });
 }
 check("three categories ends the game", run.phase, "winner");
-check("each team played the ones it won", scores(run), [10, 5]);
+// Three categories, one point each: two to the team that bid first, one to the other.
+check("a point per category", scores(run), [2, 1]);
 
 // Undo walks a category back.
 let undone = rapidReducer(made, { type: "UNDO" });

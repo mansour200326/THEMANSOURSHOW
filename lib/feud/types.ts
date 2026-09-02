@@ -59,6 +59,8 @@ export type FeudState = {
    * goes on for two minutes, and the host still calls it.
    */
   clock: { startedAt: number; seconds: number } | null;
+  /** Seconds a team gets per answer. 0 means no clock at all. */
+  clockSeconds: number;
   /** What the host last typed, and whether it landed. */
   lastGuess: {
     text: string;
@@ -72,8 +74,18 @@ export type FeudState = {
 
 export const STRIKES_ALLOWED = 3;
 
-/** Long enough to think, short enough that you can hear it. */
-export const FEUD_CLOCK_SECONDS = 20;
+/**
+ * Think time per answer, chosen at setup.
+ *
+ * Twenty seconds was hardcoded and it's too fast for most rooms — a team
+ * huddles, argues, and the number is at zero before anyone has said anything
+ * out loud. How long a team should get is a fact about the people playing,
+ * not about the game, so the host picks. Off is a real choice too: the clock
+ * was added to stop a huddle running for two minutes, and some rooms would
+ * rather it did.
+ */
+export const FEUD_CLOCK_CHOICES = [0, 20, 30, 45, 60] as const;
+export const FEUD_CLOCK_DEFAULT = 30;
 
 export const currentQuestion = (state: FeudState): FeudQuestion | undefined =>
   state.questions[state.round];

@@ -68,6 +68,7 @@ function FaceOffStage() {
       teamNames: config.teamNames,
       theme: config.themes.join(" · "),
       questions,
+      clockSeconds: config.clockSeconds,
     });
   };
 

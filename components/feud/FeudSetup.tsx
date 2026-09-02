@@ -7,11 +7,14 @@ import { ShowMark } from "@/components/ShowMark";
 import { TeamsField, cleanTeamNames, startingTeams } from "@/components/setup/TeamsField";
 import { ThemeList, usableThemes } from "@/components/setup/ThemeList";
 import { backHref } from "@/lib/backHref";
+import { FEUD_CLOCK_CHOICES, FEUD_CLOCK_DEFAULT } from "@/lib/feud/types";
 
 export type FeudConfig = {
   teamNames: string[];
   themes: string[];
   rounds: number;
+  /** Seconds a team gets per answer; 0 for no clock. */
+  clockSeconds: number;
   source: "ai" | "sample" | "mine";
 };
 
@@ -35,11 +38,13 @@ export function FeudSetup({
   const [names, setNames] = useState(startingTeams);
   const [themes, setThemes] = useState<string[]>([""]);
   const [rounds, setRounds] = useState(5);
+  const [clockSeconds, setClockSeconds] = useState<number>(FEUD_CLOCK_DEFAULT);
 
   const config = (source: FeudConfig["source"]): FeudConfig => ({
     teamNames: cleanTeamNames(names),
     themes: usableThemes(themes),
     rounds,
+    clockSeconds,
     source,
   });
 
@@ -111,6 +116,33 @@ export function FeudSetup({
                 ].join(" ")}
               >
                 {n}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
+            Think time
+          </h2>
+          <p className="mt-1 text-sm text-moon-deep">
+            How long a team gets per answer. Nothing is enforced — it runs out
+            and you decide.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {FEUD_CLOCK_CHOICES.map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setClockSeconds(n)}
+                className={[
+                  "rounded-full border px-5 py-2 font-display tabular-nums transition-colors",
+                  clockSeconds === n
+                    ? "border-accent/60 bg-accent/15 text-accent-bright"
+                    : "border-white/10 bg-white/[0.03] text-moon/75 hover:border-accent/40",
+                ].join(" ")}
+              >
+                {n === 0 ? "No clock" : `${n}s`}
               </button>
             ))}
           </div>
