@@ -1,6 +1,5 @@
 import type { GameModule } from "@/lib/games/types";
 import {
-  bluffTrivia,
   guessWhoSaidIt,
   herdMentality,
   mostLikelyTo,
@@ -12,6 +11,7 @@ import { impostorPack } from "@/lib/games/impostorPack";
 import { createCodeGrid } from "@/lib/games/codegrid";
 import { createSketchGame } from "@/lib/games/sketch";
 import { GRID_WORDS, SKETCH_WORDS } from "@/lib/games/wordPacks";
+import { oddOneOut } from "@/lib/games/oddOne";
 
 const impostor = createImpostorGame(impostorPack);
 const codeGrid = createCodeGrid(GRID_WORDS);
@@ -26,7 +26,7 @@ export const games: Record<string, GameModule> = {
   [triviaRoyale.id]: triviaRoyale,
   [mostLikelyTo.id]: mostLikelyTo,
   [guessWhoSaidIt.id]: guessWhoSaidIt,
-  [bluffTrivia.id]: bluffTrivia,
+  [oddOneOut.id]: oddOneOut,
   [herdMentality.id]: herdMentality,
   [emojiRiddles.id]: emojiRiddles,
   [lastOneStanding.id]: lastOneStanding,

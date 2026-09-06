@@ -57,15 +57,17 @@ export const RULES: Record<string, GameRules> = {
     needs: "A phone each.",
   },
   "bluff-trivia": {
-    summary: "Lie convincingly, and spot everyone else lying.",
+    summary: "Everyone gets the same question. One of you doesn't. Blend in.",
     how: [
-      "An obscure question goes up. Nobody knows the answer.",
-      "Everyone types a fake answer that sounds plausible.",
-      "All the fakes go up with the real one. Vote for the truth.",
+      "A question lands on every phone — except one phone, which gets a slightly different question. Nobody is told which they have.",
+      "Everyone types an answer. The TV shows nothing until the answers are in.",
+      "All the answers go up with names on. Work out whose answer was answering something else, and vote for them.",
     ],
     scoring:
-      "Points for finding the real answer, and more for every person your lie fooled.",
+      "Catch them and everyone who voted right scores. If the vote misses or splits, the odd one out scores for getting away with it.",
     needs: "Three phones or more.",
+    example:
+      "Everyone's asked “What's the best pizza topping?” and one person is asked “What's the worst?”. Four answers say pepperoni, mushroom, olives, and one says pineapple. The room argues. Was that a joke, or the decoy?",
   },
   "most-likely-to": {
     summary: "Vote for the friend who'd absolutely do it.",

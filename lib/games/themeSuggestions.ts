@@ -31,7 +31,16 @@ export const THEME_SUGGESTIONS: Record<string, string[]> = {
   /* --- boards and surveys: anything you can ask a question about --- */
   "big-board": TRIVIA,
   "trivia-royale": TRIVIA,
-  "bluff-trivia": TRIVIA,
+  "bluff-trivia": [
+    "Food and drink",
+    "Holidays and travel",
+    "Films and TV",
+    "Everyday life",
+    "Pets and animals",
+    "Work and school",
+    "Music",
+    "Growing up",
+  ],
 
   /* --- Face-Off: things a hundred people would give different answers to --- */
   "face-off": [

@@ -4,12 +4,14 @@ import { use, useEffect, useState } from "react";
 import { BuzzPlayer } from "@/components/play/BuzzPlayer";
 import { GridPlayer } from "@/components/play/GridPlayer";
 import { ImpostorPlayer } from "@/components/play/ImpostorPlayer";
+import { OddPlayer } from "@/components/play/OddPlayer";
 import { LivePlayer } from "@/components/play/LivePlayer";
 import { SketchPlayer } from "@/components/play/SketchPlayer";
 import { RoundPlayer } from "@/components/play/RoundPlayer";
 import type { BuzzState } from "@/lib/games/buzzEngine";
 import type { CodeGridState } from "@/lib/games/codegrid";
 import type { ImpostorState } from "@/lib/games/impostor";
+import type { OddState } from "@/lib/games/oddOne";
 import type { LiveState } from "@/lib/games/liveEngine";
 import type { RoundState } from "@/lib/games/roundEngine";
 import type { SketchState } from "@/lib/games/sketch";
@@ -135,7 +137,7 @@ export default function PlayPage({
         | RoundState
         | BuzzState
         | LiveState
-        | ImpostorState
+        | ImpostorState | OddState
         | CodeGridState
         | SketchState
       ) &
@@ -166,6 +168,21 @@ export default function PlayPage({
           me={me}
           onSubmit={(text) => send("submit", { text }, me.id)}
           onClue={(text) => send("clue", { text }, me.id)}
+        />
+      </>
+    );
+  }
+
+  if (room.gameId && state?.kind === "odd") {
+    return (
+      <>
+        <LeaveButton onLeave={leave} />
+        <OddPlayer
+          room={room}
+          state={state}
+          me={me}
+          onAnswer={(text) => send("answer", { text }, me.id)}
+          onVote={(playerId) => send("vote", { playerId }, me.id)}
         />
       </>
     );

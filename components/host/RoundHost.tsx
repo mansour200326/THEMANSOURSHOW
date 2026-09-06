@@ -1,7 +1,6 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { BLUFF_REAL_ID } from "@/lib/games/roundGames";
 import { normalise } from "@/lib/feud/match";
 import { Tally } from "@/components/Tally";
 import { useCue, useCueWhen } from "@/components/useCue";
@@ -31,7 +30,6 @@ const barColour = (i: number) =>
 export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Props) {
   const prompt = state.prompts[state.round];
   const live = connectedPlayers(room);
-  const isBluff = room.gameId === "bluff-trivia";
   const isHerd = room.gameId === "groupthink";
 
   /*
@@ -123,7 +121,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
               state.options.map((option, i) => {
                 const count = voteCounts[option.id] ?? 0;
                 const revealed = state.phase === "reveal";
-                const isTruth = isBluff && option.id === BLUFF_REAL_ID;
+                const isTruth = false;
                 const author = playerById(room, option.authorId);
 
                 return (

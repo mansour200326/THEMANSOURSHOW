@@ -1,5 +1,6 @@
 import type { CodeGridState, GridOwner } from "@/lib/games/codegrid";
 import type { ImpostorState } from "@/lib/games/impostor";
+import type { OddState } from "@/lib/games/oddOne";
 import type { SketchState } from "@/lib/games/sketch";
 import type { Room } from "@/lib/room/types";
 
@@ -29,6 +30,9 @@ export type ViewerExtras = {
   youAreSpymaster?: boolean;
   /** Sketch & Guess: the word, for whoever is drawing it. */
   yourWord?: string;
+  /** Bluff Trivia: the question this phone was asked — the decoy, for one of them. */
+  yourQuestion?: string;
+  youAreOdd?: boolean;
   /**
    * Counts that are public in the real game but get destroyed by the
    * redaction, so they're recomputed from the unredacted state and put back.
@@ -151,7 +155,33 @@ export function redactFor(room: Room, viewerId: string | null): Room {
       return { ...room, game: redactGrid(game as CodeGridState, viewerId) };
     case "sketch":
       return { ...room, game: redactSketch(game as SketchState, viewerId) };
+    case "odd":
+      return { ...room, game: redactOdd(game as OddState, viewerId) };
     default:
       return room;
   }
+}
+
+/**
+ * Bluff Trivia. Two things must not reach the wrong screen: who has the
+ * decoy, and — until the reveal — the questions themselves, because the odd
+ * one out is sitting in front of the television and would simply read the
+ * real one off it. Each phone gets its own question and nothing about
+ * anyone else's; the TV gets no question at all until it's time.
+ */
+function redactOdd(s: OddState, viewerId: string | null): OddState & ViewerExtras {
+  if (OPEN_PHASES.includes(s.phase)) return s;
+
+  const pair = s.pairs[s.round];
+  const isOdd = viewerId !== null && s.oddId === viewerId;
+  const asked = viewerId === null ? undefined : isOdd ? pair?.decoy : pair?.question;
+
+  return {
+    ...s,
+    oddId: null,
+    // The whole pack is on the wire otherwise; the TV would have every decoy.
+    pairs: s.pairs.map(() => ({ question: "", decoy: "" })),
+    ...(asked !== undefined ? { yourQuestion: asked } : {}),
+    ...(isOdd ? { youAreOdd: true } : {}),
+  };
 }

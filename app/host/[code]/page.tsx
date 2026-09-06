@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { BuzzHost } from "@/components/host/BuzzHost";
 import { GridHost } from "@/components/host/GridHost";
 import { ImpostorHost } from "@/components/host/ImpostorHost";
+import { OddHost } from "@/components/host/OddHost";
 import { LiveHost } from "@/components/host/LiveHost";
 import { SketchHost } from "@/components/host/SketchHost";
 import { GameSetup } from "@/components/host/GameSetup";
@@ -26,6 +27,7 @@ import { RoundHost } from "@/components/host/RoundHost";
 import type { BuzzState } from "@/lib/games/buzzEngine";
 import type { CodeGridState } from "@/lib/games/codegrid";
 import type { ImpostorState } from "@/lib/games/impostor";
+import type { OddState } from "@/lib/games/oddOne";
 import type { LiveState } from "@/lib/games/liveEngine";
 import type { RoundState } from "@/lib/games/roundEngine";
 import type { SketchState } from "@/lib/games/sketch";
@@ -101,6 +103,7 @@ export default function HostPage({
     "code-grid": "Code Grid",
     "sketch-and-guess": "Sketch & Guess",
     "emoji-riddles": "Emoji Riddles",
+    "bluff-trivia": "Bluff Trivia",
   };
 
   const launch = async (
@@ -154,6 +157,7 @@ export default function HostPage({
         items: data.items,
         places: data.places,
         words: data.words,
+        pairs: data.pairs,
         seconds,
         rounds,
       });
@@ -307,7 +311,7 @@ export default function HostPage({
   }
 
   const state = room.game as
-    | (RoundState | BuzzState | LiveState | ImpostorState | CodeGridState | SketchState)
+    | (RoundState | BuzzState | LiveState | ImpostorState | CodeGridState | SketchState | OddState)
     | null;
 
   const inGame = (() => {
@@ -331,6 +335,19 @@ export default function HostPage({
           onAdjust={(id, delta) => send("score:adjust", { id, delta })}
           onNext={() => send("next")}
           onQuit={() => send("game:end")}
+        />
+      );
+    }
+
+    if (state?.kind === "odd") {
+      return (
+        <OddHost
+          room={room}
+          state={state}
+          onForce={() => send("force")}
+          onNext={() => send("next")}
+          onQuit={() => send("game:end")}
+          onAdjust={(id, delta) => send("score:adjust", { id, delta })}
         />
       );
     }

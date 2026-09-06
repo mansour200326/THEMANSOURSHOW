@@ -42,19 +42,6 @@ const GUESS_WHO: Prompt[] = [
   { text: "What's the worst haircut you've ever had?" },
 ];
 
-const BLUFF_TRIVIA: Prompt[] = [
-  { text: "A group of flamingos is officially called this.", answer: "A flamboyance" },
-  { text: "This is the only food that never spoils.", answer: "Honey" },
-  { text: "Bananas are berries, but this common 'berry' is not one.", answer: "The strawberry" },
-  { text: "The word 'algebra' comes from a book written in this century.", answer: "The 9th century" },
-  { text: "An octopus has this many hearts.", answer: "Three" },
-  { text: "The shortest war in recorded history lasted roughly this long.", answer: "38 minutes" },
-  { text: "This is the only mammal capable of true sustained flight.", answer: "The bat" },
-  { text: "Venus is unusual among planets because it does this.", answer: "Rotates backwards" },
-  { text: "The dot over a lowercase 'i' has this name.", answer: "A tittle" },
-  { text: "A snail can sleep for up to this long at a stretch.", answer: "Three years" },
-];
-
 const HERD_MENTALITY: Prompt[] = [
   { text: "Name a colour." },
   { text: "Name something you'd find in a living room." },
@@ -132,46 +119,7 @@ export const guessWhoSaidIt = createRoundGame(
   GUESS_WHO,
 );
 
-/* --------------------------------------------------------------- 3. Bluff Trivia */
 
-const REAL = "__real__";
-
-export const bluffTrivia = createRoundGame(
-  {
-    id: "bluff-trivia",
-    name: "Bluff Trivia",
-    minPlayers: 3,
-    collect: { prompt: "Invent a convincing answer", maxLength: 60 },
-    rounds: 6,
-    allowSelfVote: false,
-    buildOptions: (room, s) => {
-      const truth: VoteOption = {
-        id: REAL,
-        label: s.prompts[s.round]?.answer ?? "—",
-      };
-      const fakes: VoteOption[] = Object.entries(s.submissions).map(
-        ([playerId, text]) => ({ id: playerId, label: text, authorId: playerId }),
-      );
-      return shuffle([truth, ...fakes]);
-    },
-    score: (room, s) => {
-      const points: Record<string, number> = {};
-      Object.entries(s.votes).forEach(([voterId, choice]) => {
-        if (choice === REAL) {
-          points[voterId] = (points[voterId] ?? 0) + 1000;
-        } else {
-          // Whoever wrote that lie just fooled someone.
-          const author = s.options.find((o) => o.id === choice)?.authorId;
-          if (author) points[author] = (points[author] ?? 0) + 500;
-        }
-      });
-      return points;
-    },
-  },
-  BLUFF_TRIVIA,
-);
-
-export const BLUFF_REAL_ID = REAL;
 
 /* ------------------------------------------------------------ 4. Groupthink */
 
@@ -217,6 +165,5 @@ export const herdMentality = createRoundGame(
 export const roundGamePacks = {
   "most-likely-to": MOST_LIKELY_TO,
   "who-said-it": GUESS_WHO,
-  "bluff-trivia": BLUFF_TRIVIA,
   "groupthink": HERD_MENTALITY,
 };

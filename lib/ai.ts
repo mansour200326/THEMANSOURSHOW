@@ -405,6 +405,60 @@ async function attachPictures(
   console.log(`[board] ${hits}/${wanted.length} picture clues found an image`);
 }
 
+/* ------------------------------------------------ Bluff Trivia pairs */
+
+const GeneratedPairs = z.object({
+  pairs: z.array(
+    z.object({
+      question: z.string().describe("The question everyone is asked. Opinion or preference, one line."),
+      decoy: z
+        .string()
+        .describe(
+          "The same question with one thing turned, for one player only: best→worst, take→leave, love→hate, kitchen→garage. Must produce an answer of the same kind that is slightly wrong.",
+        ),
+    }),
+  ),
+  ...isPersonalField,
+});
+
+export async function generateQuestionPairs({
+  themes,
+  count,
+  avoid = [],
+}: {
+  themes: string[];
+  count: number;
+  /** Answers this host has already been served. Off-limits. */
+  avoid?: string[];
+}): Promise<Written<Array<{ question: string; decoy: string }>>> {
+  const client = new Anthropic();
+  const response = await client.messages.parse({
+    model: MODELS.packs,
+    max_tokens: 3000,
+    system:
+      "You write question pairs for a party game where everyone answers the same " +
+      "question except one player, who secretly gets a decoy and has to blend in.\n\n" +
+      "The craft is in the decoy. It is the SAME question with exactly one thing " +
+      "turned — best to worst, would to wouldn't, kitchen to garage, dog to boat — so " +
+      "the odd answer is the right KIND of thing and only slightly off. A decoy on a " +
+      "different subject produces an obviously wrong answer and no game. Questions " +
+      "are opinions and preferences, never facts with one right answer, so every " +
+      "answer is plausible. One line each. Clean enough for a living room." + PERSONAL,
+    output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedPairs), "low"),
+    messages: [
+      { role: "user", content: `Write ${overAsk(count, avoid)} pairs.${themeLine(themes)}` + alreadyAsked(avoid) },
+    ],
+  });
+  const parsed = response.parsed_output;
+  if (!parsed) throw new Error("Couldn't write those questions.");
+  const drafted = parsed.pairs
+    .map((p) => ({ question: p.question.trim(), decoy: p.decoy.trim() }))
+    .filter((p) => p.question && p.decoy && p.question !== p.decoy);
+  // Anything on the avoid list is dropped here, whatever the model did.
+  const content = enforceAvoid(drafted, avoid, (p) => [p.question, p.decoy]).slice(0, count);
+  return { content, isPersonal: parsed.isPersonal };
+}
+
 /* ------------------------------------------------------- Face-Off packs */
 
 const GeneratedFeud = z.object({

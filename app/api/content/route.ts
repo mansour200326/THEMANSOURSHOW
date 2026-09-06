@@ -10,6 +10,7 @@ import type { Written } from "@/lib/ai";
 import {
   friendlyAiError,
   generateEmojiRiddles,
+  generateQuestionPairs,
   generateImpostorPlaces,
   generateSpectrums,
   generateStandingQuestions,
@@ -30,6 +31,7 @@ const RequestSchema = z.object({
     "code-grid",
     "sketch-and-guess",
     "emoji-riddles",
+    "bluff-trivia",
   ]),
   themes: z.array(z.string().max(80)).max(6).optional(),
   difficulty: z.enum(["easy", "medium", "hard"]).optional(),
@@ -87,7 +89,7 @@ export async function POST(request: Request) {
    */
   const writers: Record<
     string,
-    { key: "items" | "places" | "words"; write: () => Promise<Written<unknown>> }
+    { key: "items" | "places" | "words" | "pairs"; write: () => Promise<Written<unknown>> }
   > = {
     "last-one-standing": {
       key: "items",
@@ -112,6 +114,10 @@ export async function POST(request: Request) {
     "sketch-and-guess": {
       key: "words",
       write: () => generateWordPack({ kind: "sketch", themes: spread, avoid, count: many(12) }),
+    },
+    "bluff-trivia": {
+      key: "pairs",
+      write: () => generateQuestionPairs({ themes: spread, avoid, count: many(6) }),
     },
     "emoji-riddles": {
       key: "items",

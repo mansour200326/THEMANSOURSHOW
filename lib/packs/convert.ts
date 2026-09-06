@@ -78,10 +78,11 @@ export function packToQuestions(rows: QA[]): LiveItem[] {
 }
 
 /** Bluff Trivia rides the round engine, which wants a prompt and its truth. */
-export function packToBluff(rows: QA[]) {
+/** A row is everyone's question and the decoy, in that order. */
+export function packToPairs(rows: QA[]): Array<{ question: string; decoy: string }> {
   return rows
-    .filter((q) => filled(q.prompt) && filled(q.answer))
-    .map((q) => ({ text: clean(q.prompt), answer: clean(q.answer) }));
+    .map((r) => ({ question: r.prompt.trim(), decoy: r.answer.trim() }))
+    .filter((r) => r.question && r.decoy);
 }
 
 export function packToTimeline(rounds: TimelineRound[]): LiveItem[] {
@@ -171,7 +172,9 @@ export function packToStartPayload(
     case "sketch-and-guess":
       return { words: packToWords(data as string[]) };
     case "bluff-trivia":
-      return { prompts: packToBluff(data as QA[]) };
+      // The "qa" editor's two columns are everyone's question and the odd
+      // one's question. Same shape, different meaning; see lib/games/oddOne.
+      return { pairs: packToPairs(data as QA[]) };
     case "most-likely-to":
     case "who-said-it":
     case "groupthink":
