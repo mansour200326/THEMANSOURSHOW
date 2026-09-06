@@ -18,7 +18,6 @@ import { AnimatePresence, motion } from "framer-motion";
  * the real colours and stays true to the real screen.
  */
 const SEEN_KEY = "bignight:onboarded";
-const BEAT_MS = 3200;
 
 const BEATS = [
   {
@@ -56,11 +55,15 @@ export function useFirstVisit(): [boolean, () => void] {
 }
 
 export function Onboarding({ onDone }: { onDone: () => void }) {
+  /*
+   * Advances on a tap, not a timer. It used to roll through on its own,
+   * which meant reading at the animation's pace rather than yours — and
+   * anyone who looked away for a moment came back to a different step with
+   * no way to go back. Now it waits, and the last step's button is the one
+   * that closes it.
+   */
   const [beat, setBeat] = useState(0);
-  useEffect(() => {
-    const id = window.setInterval(() => setBeat((b) => (b + 1) % BEATS.length), BEAT_MS);
-    return () => window.clearInterval(id);
-  }, []);
+  const last = beat === BEATS.length - 1;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-midnight/95 p-4 backdrop-blur">
@@ -105,9 +108,19 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
               />
             ))}
           </div>
-          <button onClick={onDone} className="btn-brand px-8 py-3">
-            Got it
-          </button>
+          <div className="flex items-center gap-2">
+            {beat > 0 && (
+              <button onClick={() => setBeat(beat - 1)} className="btn-ghost px-5 py-3">
+                Back
+              </button>
+            )}
+            <button
+              onClick={() => (last ? onDone() : setBeat(beat + 1))}
+              className="btn-brand px-8 py-3"
+            >
+              {last ? "Got it" : "Next"}
+            </button>
+          </div>
         </div>
       </motion.div>
     </div>

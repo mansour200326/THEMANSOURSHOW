@@ -44,11 +44,16 @@ export default function Home() {
     <main className="relative">
       {/* The only entrance to an account, and the only one there should be. */}
       <AccountLink className="absolute right-5 top-5 z-20" />
+      {/*
+        * A button, not a footnote. Set in the same grey as the legal line it
+        * looked like exactly that, and a first-time host is the one person
+        * who most needs to notice it.
+        */}
       <button
         onClick={() => setShowHow(true)}
-        className="absolute left-5 top-5 z-20 font-display text-xs uppercase tracking-[0.25em] text-moon-deep transition-colors hover:text-moon"
+        className="btn-accent absolute left-5 top-5 z-20 px-5 py-2.5 text-sm"
       >
-        How it works
+        ▶ How it works
       </button>
       {((firstVisit && introDone) || showHow) && (
         <Onboarding
