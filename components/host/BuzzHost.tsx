@@ -58,7 +58,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
   useEffect(() => setPeek(false), [item?.prompt]);
 
   return (
-    <main className="flex h-dvh flex-col gap-[1.2vmin] overflow-hidden p-[1.6vmin]">
+    <main className="flex min-h-dvh lg:h-dvh flex-col gap-[1.2vmin] lg:overflow-hidden p-[1.6vmin] pb-16 lg:pb-[1.6vmin]">
       <header className="flex shrink-0 items-center justify-between">
         <span className="font-display text-xs uppercase tracking-[0.25em] text-moon-deep">
           {state.mode === "sequence"
@@ -90,8 +90,16 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
             </div>
           </div>
         ) : (
-          <div className="flex w-full flex-col items-center gap-[3vmin] px-[4vw] text-center">
-            {/* The prompt — emoji get huge, clues stay readable */}
+          <div className="flex max-h-full w-full min-h-0 flex-col items-center justify-center gap-[2vmin] overflow-hidden px-[4vw] text-center">
+            {/*
+              * Everything in this column has to fit the box it's given. It was
+              * centred in a flex-1 area with nothing stopping it growing, so a
+              * long clue plus the hint plus "Buzz in" plus a revealed answer
+              * outgrew the box and — being centred — spilled both ways, over
+              * the header above and the buttons and names below. Now the
+              * column can't exceed its box, and the clue steps down once the
+              * answer is up.
+              */}
             {/* What sort of thing it is — without this a country is a coin flip. */}
             {item?.hint && (
               <motion.p
@@ -110,8 +118,12 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
               animate={{ opacity: 1, scale: 1 }}
               className={
                 state.mode === "sequence"
-                  ? "text-[clamp(4rem,16vw,16rem)] leading-none"
-                  : "t-clue text-balance font-display uppercase tracking-wide text-moon"
+                  ? state.revealed
+                    ? "text-[clamp(3rem,11vw,11rem)] leading-none"
+                    : "text-[clamp(4rem,16vw,16rem)] leading-none"
+                  : state.revealed
+                    ? "text-balance font-display text-[clamp(1rem,2.4vw,2.6rem)] uppercase tracking-wide text-moon/80"
+                    : "t-clue text-balance font-display uppercase tracking-wide text-moon"
               }
             >
               {item?.prompt}
@@ -247,7 +259,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
           <div
             key={p.id}
             className={[
-              "flex items-center gap-2 rounded-lg border px-3 py-1.5 transition-colors",
+              "flex items-center gap-3 rounded-xl border px-4 py-[0.9vmin] transition-colors",
               state.buzzedBy === p.id
                 ? "border-accent/70 bg-accent/15"
                 : state.lockedOut.includes(p.id)
@@ -255,8 +267,8 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
                   : "border-white/10 bg-white/[0.03]",
             ].join(" ")}
           >
-            <span className="text-lg">{p.emoji}</span>
-            <span className="font-display text-sm uppercase tracking-wide text-moon/75">
+            <span className="text-[clamp(1.3rem,2.3vw,2.6rem)]">{p.emoji}</span>
+            <span className="font-display text-[clamp(0.9rem,1.6vw,1.7rem)] uppercase tracking-wide text-moon/85">
               {p.name}
             </span>
             <ScoreNudge
@@ -266,7 +278,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
             >
               <span
                 className={[
-                  "font-display text-sm font-bold tabular-nums",
+                  "font-display text-[clamp(1rem,1.9vw,2.1rem)] font-bold tabular-nums",
                   p.score < 0 ? "text-rose-400" : "text-accent",
                 ].join(" ")}
               >

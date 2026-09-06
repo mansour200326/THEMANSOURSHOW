@@ -234,7 +234,7 @@ function BigBoardStage() {
     : "";
 
   return (
-    <main className="flex h-dvh flex-col gap-[1.2vmin] overflow-hidden p-[1.4vmin]">
+    <main className="flex min-h-dvh lg:h-dvh flex-col gap-[1.2vmin] lg:overflow-hidden p-[1.4vmin]">
       {/* Chrome */}
       <header className="flex shrink-0 items-center justify-between gap-4 px-1">
         <div className="flex items-center gap-4">

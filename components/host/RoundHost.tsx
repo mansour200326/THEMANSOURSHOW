@@ -61,7 +61,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
   const mostVotes = Math.max(1, ...Object.values(voteCounts));
 
   return (
-    <main className="flex h-dvh flex-col gap-[1.5vmin] overflow-hidden p-[2vmin]">
+    <main className="flex min-h-dvh lg:h-dvh flex-col gap-[1.5vmin] lg:overflow-hidden p-[2vmin] pb-16 lg:pb-[1.6vmin]">
       <header className="flex shrink-0 items-center justify-between">
         <span className="font-display text-xs uppercase tracking-[0.25em] text-moon-deep">
           Round {state.round + 1} of {state.prompts.length}
@@ -319,10 +319,10 @@ function ScoreStrip({
         return (
           <div
             key={p.id}
-            className="relative flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5"
+            className="relative flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-[0.9vmin]"
           >
-            <span className="text-lg">{p.emoji}</span>
-            <span className="font-display text-sm uppercase tracking-wide text-moon/75">
+            <span className="text-[clamp(1.3rem,2.3vw,2.6rem)]">{p.emoji}</span>
+            <span className="font-display text-[clamp(0.9rem,1.6vw,1.7rem)] uppercase tracking-wide text-moon/85">
               {p.name}
             </span>
             <ScoreNudge
@@ -330,7 +330,7 @@ function ScoreStrip({
               size="small"
               onAdjust={(delta) => onAdjust(p.id, delta)}
             >
-              <span className="font-display text-sm font-bold tabular-nums text-accent">
+              <span className="font-display text-[clamp(1rem,1.9vw,2.1rem)] font-bold tabular-nums text-accent">
                 <Tally value={p.score} />
               </span>
             </ScoreNudge>

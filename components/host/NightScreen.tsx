@@ -66,7 +66,7 @@ export function NightScreen({
   const top = rows[0]?.total ?? 0;
 
   return (
-    <main className="flex h-dvh flex-col gap-[2vmin] p-[3vmin]">
+    <main className="flex min-h-dvh lg:h-dvh flex-col gap-[2vmin] p-[3vmin]">
       <header className="flex shrink-0 items-baseline justify-between">
         <div>
           <p className="t-label font-display uppercase text-moon-deep">Tonight</p>

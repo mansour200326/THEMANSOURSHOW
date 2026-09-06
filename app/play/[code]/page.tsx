@@ -16,6 +16,7 @@ import type { LiveState } from "@/lib/games/liveEngine";
 import type { RoundState } from "@/lib/games/roundEngine";
 import type { SketchState } from "@/lib/games/sketch";
 import type { ViewerExtras } from "@/lib/room/redact";
+import { AVATARS } from "@/lib/room/types";
 import { useAccentFamily } from "@/components/useAccentFamily";
 import { useRoom } from "@/lib/room/useRoom";
 
@@ -31,6 +32,7 @@ export default function PlayPage({
   const roomCode = code.toUpperCase();
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [name, setName] = useState("");
+  const [emoji, setEmoji] = useState("");
 
   useEffect(() => {
     setPlayerId(window.localStorage.getItem(idKey(roomCode)));
@@ -48,10 +50,17 @@ export default function PlayPage({
     if (playerId && room && status === "open") {
       const known = room.players.find((p) => p.id === playerId);
       if (known && !known.connected) {
-        send("player:join", { id: playerId, name: known.name });
+        send("player:join", { id: playerId, name: known.name, emoji: known.emoji });
       }
     }
   }, [playerId, room, status, send]);
+
+  // The first face nobody in the room is wearing. Preselected on the join
+  // screen and sent if the player doesn't pick another — deterministic, so
+  // the button and the server agree on what "Join" means.
+  const firstFree =
+    AVATARS.find((a) => !room?.players.some((p) => p.emoji === a && p.connected)) ??
+    AVATARS[0];
 
   const join = () => {
     const trimmed = name.trim();
@@ -59,7 +68,7 @@ export default function PlayPage({
     const id = crypto.randomUUID();
     window.localStorage.setItem(idKey(roomCode), id);
     setPlayerId(id);
-    send("player:join", { id, name: trimmed });
+    send("player:join", { id, name: trimmed, emoji: emoji || firstFree });
   };
 
   if (status === "missing") {
@@ -107,12 +116,51 @@ export default function PlayPage({
           autoFocus
           className="field text-center text-2xl"
         />
+
+        {/*
+          * Pick your own face. It used to be dealt at random, which meant
+          * arriving as a camel with no say in it. The first free one is
+          * preselected so joining is still one tap — and it's preselected,
+          * not random, so it's the same every time you look.
+          */}
+        <div>
+          <p className="t-label mb-2 text-center font-display uppercase text-moon-deep">
+            Pick your emoji
+          </p>
+          <div className="grid grid-cols-8 gap-2">
+            {AVATARS.map((a) => {
+              const taken = room.players.some((p) => p.emoji === a && p.connected);
+              const chosen = (emoji || firstFree) === a;
+              return (
+                <button
+                  key={a}
+                  type="button"
+                  disabled={taken}
+                  onClick={() => setEmoji(a)}
+                  aria-label={taken ? `${a} taken` : a}
+                  aria-pressed={chosen}
+                  className={[
+                    "flex aspect-square items-center justify-center rounded-xl border text-2xl transition-transform",
+                    chosen
+                      ? "scale-110 border-accent bg-accent/20 shadow-glow"
+                      : taken
+                        ? "border-white/5 opacity-25"
+                        : "border-white/12 active:scale-95",
+                  ].join(" ")}
+                >
+                  {a}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <button
           onClick={join}
           disabled={!name.trim()}
           className="btn-accent w-full py-6 text-2xl"
         >
-          Join
+          Join as {emoji || firstFree}
         </button>
       </div>
     );

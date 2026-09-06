@@ -38,7 +38,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
      * crushes sixteen cards into a fixed height, so below lg it becomes an
      * ordinary scrolling page with cards big enough to read.
      */
-    <main className="flex min-h-dvh flex-col gap-3 p-3 lg:h-dvh lg:gap-[1.4vmin] lg:overflow-hidden lg:p-[1.8vmin]">
+    <main className="flex min-min-h-dvh lg:h-dvh flex-col gap-3 p-3 lg:h-dvh lg:gap-[1.4vmin] lg:lg:overflow-hidden lg:p-[1.8vmin] pb-16 lg:pb-[1.6vmin]">
       {/* One compact band: brand, join details, who's here. */}
       <header className="flex shrink-0 flex-col items-stretch gap-3 lg:h-[15vmin] lg:min-h-[104px] lg:flex-row lg:gap-[1.4vmin]">
         <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-3 lg:gap-5 lg:px-6 lg:py-[1.4vmin]">
@@ -110,14 +110,14 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   className={[
-                    "flex items-center gap-2 rounded-full border py-1 pl-3 pr-1",
+                    "flex items-center gap-2 rounded-full border py-1.5 pl-4 pr-1.5",
                     p.bot
                       ? "border-white/10 bg-white/[0.03] text-moon-deep"
                       : "border-accent/30 bg-accent/[0.07] text-moon",
                   ].join(" ")}
                 >
-                  <span className="text-base">{p.emoji}</span>
-                  <span className="font-display text-sm uppercase tracking-wide">
+                  <span className="text-[clamp(1.3rem,2.3vw,2.6rem)]">{p.emoji}</span>
+                  <span className="font-display text-[clamp(0.9rem,1.6vw,1.7rem)] uppercase tracking-wide">
                     {p.name}
                   </span>
                   {/* Somebody who went home shouldn't hold the room up. */}

@@ -66,7 +66,7 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
   if (state.phase === "done") {
     const ranked = [...players].sort((a, b) => b.score - a.score);
     return (
-      <main className="flex h-dvh flex-col items-center justify-center gap-[3vmin] p-[4vmin] text-center">
+      <main className="flex min-h-dvh lg:h-dvh flex-col items-center justify-center gap-[3vmin] p-[4vmin] text-center pb-16 lg:pb-[1.6vmin]">
         <p className="t-label font-display uppercase text-moon-deep">That&apos;s the game</p>
         <h2 className="brand-text t-hero font-display font-bold uppercase tracking-tight">
           {ranked[0]?.name ?? "Nobody"} wins
@@ -80,7 +80,7 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
   }
 
   return (
-    <main className="flex h-dvh flex-col gap-[2vmin] p-[2.5vmin]">
+    <main className="flex min-h-dvh lg:h-dvh flex-col gap-[2vmin] p-[2.5vmin] pb-16 lg:pb-[1.6vmin]">
       <header className="flex shrink-0 items-center justify-between">
         <span className="font-display text-[clamp(0.8rem,1.4vw,1.4rem)] uppercase tracking-[0.25em] text-moon-deep">
           Bluff Trivia · round {state.round + 1} of {state.pairs.length}

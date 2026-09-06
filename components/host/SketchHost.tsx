@@ -50,7 +50,7 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
   if (state.phase === "done") {
     const standings = [...players].sort((a, b) => b.score - a.score);
     return (
-      <main className="flex h-dvh flex-col items-center justify-center gap-[3vmin] p-[3vmin] text-center">
+      <main className="flex min-h-dvh lg:h-dvh flex-col items-center justify-center gap-[3vmin] p-[3vmin] text-center pb-16 lg:pb-[1.6vmin]">
         <p className="t-label font-display uppercase text-moon-deep">
           Sketch &amp; Guess — pens down
         </p>
@@ -67,7 +67,7 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
   const guessing = players.filter((p) => p.id !== state.drawerId);
 
   return (
-    <main className="flex h-dvh gap-[2vmin] p-[2vmin]">
+    <main className="flex min-h-dvh lg:h-dvh gap-[2vmin] p-[2vmin] pb-16 lg:pb-[1.6vmin]">
       <section className="flex min-w-0 flex-1 flex-col items-center justify-center gap-[1.5vmin]">
         <SketchCanvas
           strokes={state.strokes}

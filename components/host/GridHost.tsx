@@ -50,7 +50,7 @@ export function GridHost({ room, state, onBegin, onQuit }: Props) {
   if (state.phase === "teams") {
     const ready = state.teams.every((t) => t.spymaster);
     return (
-      <main className="flex h-dvh flex-col gap-[3vmin] p-[4vmin]">
+      <main className="flex min-h-dvh lg:h-dvh flex-col gap-[3vmin] p-[4vmin] pb-16 lg:pb-[1.6vmin]">
         <h2 className="shrink-0 text-center font-display t-title uppercase tracking-tight text-moon">
           Pick your sides
         </h2>
@@ -111,7 +111,7 @@ export function GridHost({ room, state, onBegin, onQuit }: Props) {
 
   if (state.phase === "done") {
     return (
-      <main className="flex h-dvh flex-col items-center justify-center gap-[3vmin] p-[3vmin] text-center">
+      <main className="flex min-h-dvh lg:h-dvh flex-col items-center justify-center gap-[3vmin] p-[3vmin] text-center pb-16 lg:pb-[1.6vmin]">
         <p className="t-label font-display uppercase text-moon-deep">
           {state.struckAssassin ? "The assassin" : "All their words"}
         </p>
@@ -129,7 +129,7 @@ export function GridHost({ room, state, onBegin, onQuit }: Props) {
   }
 
   return (
-    <main className="flex h-dvh flex-col gap-[1.5vmin] p-[1.8vmin]">
+    <main className="flex min-h-dvh lg:h-dvh flex-col gap-[1.5vmin] p-[1.8vmin] pb-16 lg:pb-[1.6vmin]">
       <header className="flex shrink-0 items-center justify-between px-2">
         <span className="font-display text-sm uppercase tracking-[0.2em] text-moon-deep">
           Code Grid

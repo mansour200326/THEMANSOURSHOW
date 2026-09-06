@@ -107,7 +107,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
     const standings = [...players].sort((a, b) => b.score - a.score);
     const survivors = players.filter((p) => !state.benched.includes(p.id));
     return (
-      <main className="flex h-dvh flex-col items-center justify-center gap-[3vmin] p-[3vmin] text-center">
+      <main className="flex min-h-dvh lg:h-dvh flex-col items-center justify-center gap-[3vmin] p-[3vmin] text-center pb-16 lg:pb-[1.6vmin]">
         <p className="t-label font-display uppercase text-moon-deep">
           {TITLES[state.variant]} — that&apos;s the lot
         </p>
@@ -134,7 +134,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
   }
 
   return (
-    <main className="flex h-dvh flex-col gap-[2vmin] p-[2vmin]">
+    <main className="flex min-h-dvh lg:h-dvh flex-col gap-[2vmin] p-[2vmin] pb-16 lg:pb-[1.6vmin]">
       <header className="flex shrink-0 items-center justify-between px-2">
         <span className="font-display text-sm uppercase tracking-[0.2em] text-moon-deep">
           {TITLES[state.variant]} · Round {state.round + 1}/{state.items.length}
@@ -330,7 +330,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
         {players.map((p) => (
           <span
             key={p.id}
-            className="rounded-full border border-white/10 bg-white/[0.02] px-3 py-1 font-display text-xs uppercase tracking-wide text-moon-dim"
+            className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-[0.7vmin] font-display text-[clamp(0.9rem,1.6vw,1.7rem)] uppercase tracking-wide text-moon/85"
           >
             {p.emoji} {p.name} ·{" "}
             <ScoreNudge

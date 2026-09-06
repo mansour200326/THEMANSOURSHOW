@@ -215,15 +215,26 @@ function reduceRoom(room: Room, action: Action): Room {
       const name = String(action.payload?.name ?? "").trim().slice(0, 14);
       if (!name) return room;
 
+      /*
+       * The emoji is chosen, not dealt. It has to be one of ours and not
+       * already somebody else's — two lions on one scoreboard is a real
+       * argument — and anything else falls back to the old deal.
+       */
+      const wanted = String(action.payload?.emoji ?? "");
+      const free = (emoji: string, exceptId?: string) =>
+        AVATARS.includes(emoji) &&
+        !room.players.some((p) => p.emoji === emoji && p.id !== exceptId);
+
       // Same name = same person coming back (refresh, dropped Wi-Fi).
       const existing = room.players.find(
         (p) => p.name.toLowerCase() === name.toLowerCase(),
       );
       if (existing) {
+        const emoji = free(wanted, existing.id) ? wanted : existing.emoji;
         return {
           ...room,
           players: room.players.map((p) =>
-            p.id === existing.id ? { ...p, connected: true } : p,
+            p.id === existing.id ? { ...p, connected: true, emoji } : p,
           ),
         };
       }
@@ -232,7 +243,7 @@ function reduceRoom(room: Room, action: Action): Room {
       const player: Player = {
         id: String(action.payload?.id ?? crypto.randomUUID()),
         name,
-        emoji: nextAvatar(room),
+        emoji: free(wanted) ? wanted : nextAvatar(room),
         score: 0,
         connected: true,
         joinedAt: Date.now(),

@@ -176,7 +176,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
 
   if (state.phase === "setup") {
     return (
-      <main className="mx-auto min-h-dvh w-full max-w-3xl px-6 py-10">
+      <main className="mx-auto min-min-h-dvh lg:h-dvh w-full max-w-3xl px-6 py-10">
         <header className="flex items-center justify-between">
           <Link href={backHref()} className="opacity-80 transition hover:opacity-100">
             <ShowMark size="sm" />
@@ -298,7 +298,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
 
   /* -------------------------------------------------------------- play */
   return (
-    <main className="flex h-dvh flex-col gap-[1.2vmin] overflow-hidden p-[1.4vmin]">
+    <main className="flex min-h-dvh lg:h-dvh flex-col gap-[1.2vmin] lg:overflow-hidden p-[1.4vmin]">
       <header className="flex shrink-0 items-center justify-between px-1">
         <div className="flex items-center gap-4">
           <ShowMark size="sm" />

@@ -80,7 +80,7 @@ export function GameSetup({
   };
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-3xl flex-col justify-center gap-6 px-6 py-10">
+    <main className="mx-auto flex min-min-h-dvh lg:h-dvh w-full max-w-3xl flex-col justify-center gap-6 px-6 py-10">
       <div className="text-center">
         <p className="t-label font-display uppercase text-moon-deep">Setting up</p>
         <h1 className="accent-text font-display text-4xl font-bold uppercase tracking-tight sm:text-6xl">
