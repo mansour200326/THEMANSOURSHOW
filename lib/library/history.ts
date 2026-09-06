@@ -2,6 +2,7 @@ import "server-only";
 
 import { hasDatabase, query } from "@/lib/db";
 import { type Host, hostKey } from "@/lib/plan/host";
+import { normalizeTheme } from "@/lib/library/theme";
 
 /**
  * What this host has already been asked.
@@ -43,7 +44,7 @@ const MAX_ANSWERS = 250;
  */
 const ANSWER_KEYS = new Set(["answer", "name", "text", "prompt"]);
 
-function harvest(
+export function harvest(
   value: unknown,
   into: Set<string>,
   key = "",
@@ -73,6 +74,60 @@ function harvest(
       harvest(v, into, k, depth + 1);
     }
   }
+}
+
+/**
+ * Everything already on the shelf for this theme, whoever it was written for.
+ *
+ * The per-host list stops a host meeting their own questions again. It does
+ * nothing about the shelf: two "general knowledge" boards written a week
+ * apart for two different people never knew about each other, so they share
+ * half their questions, and the next host to ask gets one and then the
+ * other. The shelf has to be diverse *as a whole*, which means each new board
+ * is written against everything already stored under that theme.
+ */
+export async function answersOnShelf(
+  gameType: string,
+  themes: string[],
+): Promise<string[]> {
+  if (!hasDatabase()) return [];
+  const theme = normalizeTheme(themes);
+  if (!theme) return [];
+
+  const rows = await query<{ content_json: unknown }>(
+    `SELECT content_json
+       FROM boards
+      WHERE game_type = $1 AND theme_normalized = $2 AND is_personal = false
+      ORDER BY created_at DESC
+      LIMIT ${BOARDS_BACK}`,
+    [gameType, theme],
+  );
+  const found = new Set<string>();
+  for (const row of rows) harvest(row.content_json, found);
+  return [...found].slice(0, MAX_ANSWERS);
+}
+
+/**
+ * The full exclusion list for writing something new: what this host has
+ * seen anywhere in this game, plus what anyone has already been written
+ * under this theme. Capped, with the host's own history taking priority —
+ * it's the repetition they'd actually notice.
+ */
+export async function everythingToAvoid(
+  host: Host,
+  gameType: string,
+  themes: string[],
+): Promise<string[]> {
+  const [mine, shelf] = await Promise.all([
+    answersAlreadySeen(host, gameType),
+    answersOnShelf(gameType, themes),
+  ]);
+  const merged = new Set(mine);
+  for (const a of shelf) {
+    if (merged.size >= MAX_ANSWERS) break;
+    merged.add(a);
+  }
+  return [...merged];
 }
 
 /**

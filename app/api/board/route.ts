@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { callerKey, rateLimit } from "@/lib/rateLimit";
 import { z } from "zod";
 import { generateTriviaBoard, friendlyAiError, hasApiKey } from "@/lib/ai";
-import { answersAlreadySeen } from "@/lib/library/history";
+import { everythingToAvoid } from "@/lib/library/history";
+import { broaden } from "@/lib/library/theme";
 import { serveContent } from "@/lib/library/serve";
 import { currentHost } from "@/lib/plan/host";
 import { GATE_COPY, canPlay } from "@/lib/plan/limits";
@@ -73,12 +74,11 @@ export async function POST(request: Request) {
       canWrite: hasApiKey,
       write: async () =>
         generateTriviaBoard({
-          categories,
+          categories: broaden(categories),
           vibe: parsed.data.vibe,
           difficulty: parsed.data.difficulty,
-          // Everything this host has already been asked, so none of it
-          // comes round again.
-          avoid: await answersAlreadySeen(host, "trivia-royale"),
+          // This host's past plus the whole shelf for these categories.
+          avoid: await everythingToAvoid(host, "trivia-royale", categories),
         }),
     });
 

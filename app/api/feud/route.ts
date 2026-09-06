@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { callerKey, rateLimit } from "@/lib/rateLimit";
-import { answersAlreadySeen } from "@/lib/library/history";
+import { everythingToAvoid } from "@/lib/library/history";
+import { broaden } from "@/lib/library/theme";
 import { serveContent } from "@/lib/library/serve";
 import { currentHost } from "@/lib/plan/host";
 import { GATE_COPY, canPlay } from "@/lib/plan/limits";
@@ -59,9 +60,9 @@ export async function POST(request: Request) {
       canWrite: hasApiKey,
       write: async () =>
         generateFeudPack({
-          themes,
+          themes: broaden(themes),
           rounds,
-          avoid: await answersAlreadySeen(host, "face-off"),
+          avoid: await everythingToAvoid(host, "face-off", themes),
         }),
     });
 

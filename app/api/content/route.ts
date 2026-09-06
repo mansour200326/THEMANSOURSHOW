@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { callerKey, rateLimit } from "@/lib/rateLimit";
-import { answersAlreadySeen } from "@/lib/library/history";
+import { everythingToAvoid } from "@/lib/library/history";
+import { broaden } from "@/lib/library/theme";
 import { serveContent } from "@/lib/library/serve";
 import { currentHost } from "@/lib/plan/host";
 import { GATE_COPY, canPlay } from "@/lib/plan/limits";
@@ -90,37 +91,41 @@ export async function POST(request: Request) {
   > = {
     "last-one-standing": {
       key: "items",
-      write: () => generateStandingQuestions({ themes, avoid, count: many(12), difficulty }),
+      write: () => generateStandingQuestions({ themes: spread, avoid, count: many(12), difficulty }),
     },
     timeline: {
       key: "items",
-      write: () => generateTimelineRounds({ themes, avoid, count: many(6), difficulty }),
+      write: () => generateTimelineRounds({ themes: spread, avoid, count: many(6), difficulty }),
     },
     "dial-it-in": {
       key: "items",
-      write: () => generateSpectrums({ themes, avoid, count: many(8) }),
+      write: () => generateSpectrums({ themes: spread, avoid, count: many(8) }),
     },
     impostor: {
       key: "places",
-      write: () => generateImpostorPlaces({ themes, avoid, count: 10 }),
+      write: () => generateImpostorPlaces({ themes: spread, avoid, count: 10 }),
     },
     "code-grid": {
       key: "words",
-      write: () => generateWordPack({ kind: "grid", themes, avoid, count: 30 }),
+      write: () => generateWordPack({ kind: "grid", themes: spread, avoid, count: 30 }),
     },
     "sketch-and-guess": {
       key: "words",
-      write: () => generateWordPack({ kind: "sketch", themes, avoid, count: many(12) }),
+      write: () => generateWordPack({ kind: "sketch", themes: spread, avoid, count: many(12) }),
     },
     "emoji-riddles": {
       key: "items",
-      write: () => generateEmojiRiddles({ themes, avoid, count: many(18), difficulty }),
+      write: () => generateEmojiRiddles({ themes: spread, avoid, count: many(18), difficulty }),
     },
   };
 
-  // Everything this host has already been asked for this game, so none of
-  // it comes round again. See lib/library/history.ts.
-  const avoid = await answersAlreadySeen(host, gameId);
+  // Everything this host has been asked in this game, plus everything
+  // already written under this theme for anyone — so new boards are
+  // different from each other, not just from this host's own past.
+  const avoid = await everythingToAvoid(host, gameId, themes);
+  // Broad themes get sent into a different corner each time. The library
+  // still keys on the plain theme, so the shelf isn't fragmented.
+  const spread = broaden(themes);
 
   const writer = writers[gameId];
   if (!writer) {

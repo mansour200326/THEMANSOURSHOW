@@ -11,6 +11,7 @@ import type { ImpostorPlace } from "@/lib/games/impostor";
 import type { BuzzItem } from "@/lib/games/buzzEngine";
 import type { LiveItem } from "@/lib/games/liveEngine";
 import { type Difficulty, difficultyBrief, varietyBrief } from "@/lib/difficulty";
+import { normalise as normaliseAnswer } from "@/lib/feud/match";
 
 /**
  * Server-side AI content generation. Every generator here returns the same
@@ -202,6 +203,39 @@ function alreadyAsked(avoid: string[]): string {
     avoid.map((a) => `- ${a}`).join("\n")
   );
 }
+
+/**
+ * Throw away anything the model wrote that it was told not to.
+ *
+ * The exclusion list in the prompt is necessary and not sufficient. Given
+ * sixty answers to avoid, the smaller model reliably avoids fifty-six of
+ * them; the four it forgets are the four the host notices. So the list is
+ * enforced after the fact as well: any item whose answer is on it is
+ * dropped. The prompt asks for more than it needs to cover the loss.
+ *
+ * Exact and number-aware — "4" and "four" are the same answer, as are
+ * "the Nile" and "Nile". Near-synonyms are the model's job; exact repeats
+ * are this function's.
+ */
+function enforceAvoid<T>(
+  items: T[],
+  avoid: string[],
+  keyOf: (item: T) => string | string[],
+): T[] {
+  if (!avoid.length) return items;
+  const banned = new Set(avoid.map(normaliseAnswer));
+  const kept = items.filter((item) => {
+    const keys = keyOf(item);
+    return ![keys].flat().some((k) => banned.has(normaliseAnswer(k)));
+  });
+  const dropped = items.length - kept.length;
+  if (dropped) console.log(`[ai] dropped ${dropped} item(s) the model was told to avoid`);
+  return kept;
+}
+
+/** How many to ask for, so that dropping the repeats still leaves enough. */
+const overAsk = (count: number, avoid: string[]) =>
+  avoid.length ? Math.ceil(count * 1.4) + 2 : count;
 
 function buildPrompt(categories: string[], vibe: string): string {
   const list = categories.map((c, i) => `${i + 1}. ${c}`).join("\n");
@@ -420,7 +454,7 @@ export async function generateFeudPack({
     messages: [
       {
         role: "user",
-        content: `Write ${rounds} survey rounds${
+        content: `Write ${overAsk(rounds, avoid)} survey rounds${
           themes.length
             ? `, spread across these themes so each one gets a turn:\n${themes
                 .map((t) => `- ${t}`)
@@ -442,7 +476,7 @@ export async function generateFeudPack({
   const usable = parsed.questions.filter((q) => q.answers.length >= 4);
   if (!usable.length) throw new Error("The generator came back short.");
 
-  const content = usable.map((q) => ({
+  const drafted = usable.map((q) => ({
     question: q.question.trim(),
     // Trust the model for wording, not for ordering.
     answers: [...q.answers]
@@ -457,6 +491,8 @@ export async function generateFeudPack({
           .slice(0, 10),
       })),
   }));
+  // Anything on the avoid list is dropped here, whatever the model did.
+  const content = enforceAvoid(drafted, avoid, (q) => q.question).slice(0, rounds);
   return { content, isPersonal: parsed.isPersonal };
 }
 
@@ -634,15 +670,17 @@ export async function generateStandingQuestions({
       `\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL,
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedStanding), "low"),
     messages: [
-      { role: "user", content: `Write ${count} questions.${themeLine(themes)}` + alreadyAsked(avoid) },
+      { role: "user", content: `Write ${overAsk(count, avoid)} questions.${themeLine(themes)}` + alreadyAsked(avoid) },
     ],
   });
   const parsed = response.parsed_output;
   if (!parsed?.questions?.length) throw new Error("Couldn't write those questions.");
-  const content = parsed.questions
+  const drafted = parsed.questions
     .filter((q) => q.prompt.trim() && q.answer.trim())
     .map((q) => ({ prompt: q.prompt.trim(), answer: q.answer.trim() }))
-    .slice(0, count);
+    ;
+  // Anything on the avoid list is dropped here, whatever the model did.
+  const content = enforceAvoid(drafted, avoid, (q) => [q.prompt, q.answer]).slice(0, count);
   return { content, isPersonal: parsed.isPersonal };
 }
 
@@ -684,18 +722,20 @@ export async function generateTimelineRounds({
       `\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL,
     output_config: outputConfig(MODELS.board, zodOutputFormat(GeneratedTimeline), "medium"),
     messages: [
-      { role: "user", content: `Write ${count} rounds.${themeLine(themes)}` + alreadyAsked(avoid) },
+      { role: "user", content: `Write ${overAsk(count, avoid)} rounds.${themeLine(themes)}` + alreadyAsked(avoid) },
     ],
   });
   const parsed = response.parsed_output;
   if (!parsed?.rounds?.length) throw new Error("Couldn't write those rounds.");
-  const content = parsed.rounds
+  const drafted = parsed.rounds
     .filter((r) => r.events.length >= 4)
     .map((r) => ({
       prompt: r.prompt.trim(),
       events: r.events.slice(0, 5).map((e) => e.trim()),
     }))
-    .slice(0, count);
+    ;
+  // Anything on the avoid list is dropped here, whatever the model did.
+  const content = enforceAvoid(drafted, avoid, (r) => r.prompt).slice(0, count);
   return { content, isPersonal: parsed.isPersonal };
 }
 
@@ -732,19 +772,21 @@ export async function generateSpectrums({
       "sort of thing a room will shout about." + PERSONAL,
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedSpectrums), "low"),
     messages: [
-      { role: "user", content: `Write ${count} pairs.${themeLine(themes)}` + alreadyAsked(avoid) },
+      { role: "user", content: `Write ${overAsk(count, avoid)} pairs.${themeLine(themes)}` + alreadyAsked(avoid) },
     ],
   });
   const parsed = response.parsed_output;
   if (!parsed?.spectrums?.length) throw new Error("Couldn't write those spectrums.");
-  const content = parsed.spectrums
+  const drafted = parsed.spectrums
     .filter((s) => s.left.trim() && s.right.trim())
     .map((s) => ({
       prompt: "Where does it sit?",
       left: s.left.trim(),
       right: s.right.trim(),
     }))
-    .slice(0, count);
+    ;
+  // Anything on the avoid list is dropped here, whatever the model did.
+  const content = enforceAvoid(drafted, avoid, (s) => [s.left, s.right]).slice(0, count);
   return { content, isPersonal: parsed.isPersonal };
 }
 
@@ -783,18 +825,20 @@ export async function generateImpostorPlaces({
       "Avoid anywhere so unusual that a vague answer would pass." + PERSONAL,
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedPlaces), "low"),
     messages: [
-      { role: "user", content: `Write ${count} places.${themeLine(themes)}` + alreadyAsked(avoid) },
+      { role: "user", content: `Write ${overAsk(count, avoid)} places.${themeLine(themes)}` + alreadyAsked(avoid) },
     ],
   });
   const parsed = response.parsed_output;
   if (!parsed?.places?.length) throw new Error("Couldn't write those places.");
-  const content = parsed.places
+  const drafted = parsed.places
     .filter((p) => p.name.trim() && p.roles.length >= 3)
     .map((p) => ({
       name: p.name.trim(),
       roles: p.roles.map((r) => r.trim()).filter(Boolean).slice(0, 8),
     }))
-    .slice(0, count);
+    ;
+  // Anything on the avoid list is dropped here, whatever the model did.
+  const content = enforceAvoid(drafted, avoid, (p) => p.name).slice(0, count);
   return { content, isPersonal: parsed.isPersonal };
 }
 
@@ -834,12 +878,14 @@ export async function generateWordPack({
     system: `You write word packs for a party game.\n\n${brief}` + PERSONAL,
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedWords), "low"),
     messages: [
-      { role: "user", content: `Write ${count} of them.${themeLine(themes)}` + alreadyAsked(avoid) },
+      { role: "user", content: `Write ${overAsk(count, avoid)} of them.${themeLine(themes)}` + alreadyAsked(avoid) },
     ],
   });
   const parsed = response.parsed_output;
   if (!parsed?.words?.length) throw new Error("Couldn't write those words.");
-  const content = parsed.words.map((w) => w.trim()).filter(Boolean).slice(0, count);
+  const drafted = parsed.words.map((w) => w.trim()).filter(Boolean);
+  // Anything on the avoid list is dropped here, whatever the model did.
+  const content = enforceAvoid(drafted, avoid, (w) => w).slice(0, count);
   return { content, isPersonal: parsed.isPersonal };
 }
 
@@ -932,7 +978,7 @@ export async function generateEmojiRiddles({
     messages: [
       {
         role: "user",
-        content: `Write ${count} riddles.${
+        content: `Write ${overAsk(count, avoid)} riddles.${
           themes.length
             ? ` Lean them towards these, while still mixing up the sort of thing the answer is:\n${themes
                 .map((t) => `- ${t}`)
@@ -947,7 +993,7 @@ export async function generateEmojiRiddles({
   }
   const parsed = response.parsed_output;
   if (!parsed?.riddles?.length) throw new Error("Couldn't write those riddles.");
-  const content = parsed.riddles
+  const drafted = parsed.riddles
     // A riddle with letters in it, or a flag next to a country, has given
     // the game away before anyone looked at it.
     .filter(
@@ -963,7 +1009,9 @@ export async function generateEmojiRiddles({
       value: 500,
       hint: r.hint.trim() || undefined,
     }))
-    .slice(0, count);
+    ;
+  // Anything on the avoid list is dropped here, whatever the model did.
+  const content = enforceAvoid(drafted, avoid, (r) => r.answer).slice(0, count);
   return { content, isPersonal: parsed.isPersonal };
 }
 
@@ -1052,7 +1100,7 @@ export async function generateRapidPrompts({
     messages: [
       {
         role: "user",
-        content: `Write exactly ${count} prompts${
+        content: `Write exactly ${overAsk(count, avoid)} prompts${
           themes.length
             ? `, spread evenly across these themes:\n${themes
                 .map((t) => `- ${t}`)
@@ -1067,6 +1115,8 @@ export async function generateRapidPrompts({
   if (!parsed?.prompts?.length) {
     throw new Error("Couldn't write those prompts. Try again.");
   }
-  const content = parsed.prompts.map((p) => p.trim()).filter(Boolean).slice(0, count);
+  const drafted = parsed.prompts.map((p) => p.trim()).filter(Boolean);
+  // Anything on the avoid list is dropped here, whatever the model did.
+  const content = enforceAvoid(drafted, avoid, (p) => p).slice(0, count);
   return { content, isPersonal: parsed.isPersonal };
 }

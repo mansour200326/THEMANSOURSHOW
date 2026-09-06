@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { callerKey, rateLimit } from "@/lib/rateLimit";
-import { answersAlreadySeen } from "@/lib/library/history";
+import { everythingToAvoid } from "@/lib/library/history";
+import { broaden } from "@/lib/library/theme";
 import { serveContent } from "@/lib/library/serve";
 import { currentHost } from "@/lib/plan/host";
 import { GATE_COPY, canPlay } from "@/lib/plan/limits";
@@ -55,7 +56,8 @@ export async function POST(request: Request) {
       write: async () =>
         generateRapidPrompts({
           ...parsed.data,
-          avoid: await answersAlreadySeen(host, parsed.data.mode),
+          themes: broaden(parsed.data.themes ?? []),
+          avoid: await everythingToAvoid(host, parsed.data.mode, parsed.data.themes ?? []),
         }),
     });
 

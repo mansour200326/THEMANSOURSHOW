@@ -60,3 +60,43 @@ export function normalizeTheme(themes: string[]): string {
 /** What the host typed, kept intact for display. */
 export const originalTheme = (themes: string[]): string =>
   themes.map((t) => t.trim()).filter(Boolean).join(", ");
+
+/**
+ * Corners of a broad subject, for the model to be sent into.
+ *
+ * "General knowledge" is enormous and the model treats it as about forty
+ * facts: capital of France, strings on a violin, planets from the sun. Even
+ * with every previous answer excluded it keeps reaching for the same shelf,
+ * because that shelf is what "general knowledge quiz" means to it. The
+ * exclusion list stops the exact repeats; this stops the *kind* of repeat, by
+ * naming a different handful of sub-domains each time and telling it to draw
+ * from those.
+ */
+const CORNERS = [
+  "astronomy", "chemistry", "human anatomy", "world cuisine", "etymology",
+  "architecture", "classical music", "ocean life", "aviation", "ancient Egypt",
+  "board games", "textiles and fashion", "mathematics", "mythology", "weather",
+  "engineering", "the Ottoman Empire", "gemstones", "African geography",
+  "opera", "the human eye", "railways", "currency", "philosophy", "insects",
+  "the Silk Road", "photography", "typography", "volcanoes", "cartography",
+  "Islamic golden age science", "Olympic history", "languages of Asia",
+  "cinema before 1960", "birds", "bridges", "the periodic table", "tea and coffee",
+];
+
+const BROAD = /\b(general knowledge|general trivia|trivia|anything|everything|mixed|random|all sorts|miscellaneous|pot luck|potluck)\b/i;
+
+/**
+ * The themes as the writer should see them. The library key uses the
+ * originals, so "General knowledge" stays one shelf; the writer gets the
+ * same theme plus a different set of corners each time.
+ */
+export function broaden(themes: string[]): string[] {
+  return themes.map((theme) => {
+    if (!BROAD.test(theme)) return theme;
+    const picked = [...CORNERS]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 5)
+      .join(", ");
+    return `${theme} — this time draw from: ${picked}. Not the usual first-thoughts.`;
+  });
+}

@@ -2,6 +2,7 @@ import "server-only";
 
 import { hasDatabase, query } from "@/lib/db";
 import { type Host, hostKey } from "@/lib/plan/host";
+import { answersAlreadySeen, harvest } from "@/lib/library/history";
 import { normalizeTheme, originalTheme } from "@/lib/library/theme";
 
 /**
@@ -38,6 +39,9 @@ export type StoredBoard<T = unknown> = {
  */
 const RETIRE_AFTER_SERVES = 5;
 const RETIRE_SKIP_RATIO = 0.5;
+
+/** A stored board this much made of questions the host has seen is not new. */
+const FAMILIAR_LIMIT = 0.25;
 
 type Row = {
   id: string;
@@ -86,19 +90,61 @@ export async function findUnseen<T>(
              )
         )
       ORDER BY b.times_served ASC, b.created_at ASC
-      LIMIT 1`,
+      LIMIT 6`,
     [gameType, theme, difficulty, userId, anonId],
   );
+  if (!rows.length) return null;
 
-  const found = rows[0];
+  /*
+   * "Unseen" isn't enough. A board this host has never been handed can
+   * still be one they've effectively played, because boards on the shelf
+   * for the same theme were written by different people at different times
+   * and overlap heavily. So each candidate is checked against what this
+   * host has already been asked, and one that's mostly familiar is skipped.
+   * If every candidate is familiar, nothing is served and something new
+   * gets written — which is the right outcome, not a failure.
+   */
+  const seen = new Set(
+    (await answersAlreadySeen(host, gameType)).map((a) => a.toLowerCase()),
+  );
+  const fresh = (row: Row): boolean => {
+    if (!seen.size) return true;
+    const answers = new Set<string>();
+    harvest(row.content_json, answers);
+    if (!answers.size) return true;
+    let familiar = 0;
+    for (const a of answers) if (seen.has(a.toLowerCase())) familiar++;
+    return familiar / answers.size <= FAMILIAR_LIMIT;
+  };
+
+  const found = rows.find(fresh);
   if (!found) return null;
 
+  /*
+   * A pack is a list, and a list can be trimmed. Anything in it this host
+   * has already been asked is taken out before it's served — so a stored
+   * pack that's one-twelfth familiar arrives eleven-twelfths long with no
+   * repeat in it, rather than twelve long with one. Boards are structured
+   * (five clues to a category) and can't be trimmed without breaking, so
+   * they rely on the familiarity check above.
+   */
+  const content = trimSeen(found.content_json, seen) as T;
+
   await markServed(host, found.id);
-  return {
-    id: found.id,
-    content: found.content_json as T,
-    isPersonal: found.is_personal,
-  };
+  return { id: found.id, content, isPersonal: found.is_personal };
+}
+
+/** Drop list items whose identifying strings this host has already seen. */
+function trimSeen(content: unknown, seen: Set<string>): unknown {
+  if (!Array.isArray(content) || !seen.size) return content;
+  const kept = content.filter((item) => {
+    const keys = new Set<string>();
+    harvest(item, keys);
+    for (const k of keys) if (seen.has(k.toLowerCase())) return false;
+    return true;
+  });
+  // Trimming to nothing is worse than a repeat; keep the original then.
+  return kept.length >= Math.max(3, Math.ceil(content.length * 0.6)) ? kept : content;
 }
 
 /** Keep what the model just wrote, so the next host doesn't pay for it. */
