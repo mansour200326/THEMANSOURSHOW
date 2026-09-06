@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -27,6 +27,19 @@ export default function Home() {
   const [firstVisit, dismissOnboarding] = useFirstVisit();
   const [showHow, setShowHow] = useState(false);
 
+  /*
+   * The first-visit explainer waits for the intro. The logo blast is the
+   * first thing anybody sees of Big Night and it was being covered by a
+   * dialog at frame one — the one moment the product gets to make an
+   * entrance, spent behind a modal. Now the blast lands, the buttons settle,
+   * and then the scene comes in.
+   */
+  const [introDone, setIntroDone] = useState(false);
+  useEffect(() => {
+    const id = window.setTimeout(() => setIntroDone(true), (IMPACT + 1.6) * 1000);
+    return () => window.clearTimeout(id);
+  }, []);
+
   return (
     <main className="relative">
       {/* The only entrance to an account, and the only one there should be. */}
@@ -37,7 +50,7 @@ export default function Home() {
       >
         How it works
       </button>
-      {(firstVisit || showHow) && (
+      {((firstVisit && introDone) || showHow) && (
         <Onboarding
           onDone={() => {
             dismissOnboarding();

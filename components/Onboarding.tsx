@@ -65,8 +65,9 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-midnight/95 p-4 backdrop-blur">
       <motion.div
-        initial={{ opacity: 0, y: 16, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
+        initial={{ y: 14, scale: 0.985 }}
+        animate={{ y: 0, scale: 1 }}
+        transition={{ type: "spring", stiffness: 300, damping: 26 }}
         className="w-full max-w-3xl rounded-3xl border border-white/12 bg-dusk p-6 shadow-tile sm:p-8"
       >
         <p className="t-label font-display uppercase text-moon-deep">How it works</p>

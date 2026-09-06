@@ -12,6 +12,29 @@ import type { NightEntry } from "@/lib/room/types";
  * result. The room doesn't need a leaderboard between rounds; it needs one
  * at one in the morning when somebody claims they won.
  */
+/**
+ * Placement points: 3 for first, 2 for second, 1 for third, per game.
+ *
+ * Adding raw scores made Big Board decide every night it was played — it
+ * scores in thousands where Categories scores in ones. Points for where you
+ * finished make each game worth the same, which is what "who won the night"
+ * ought to mean. Ties share the place: two teams level at the top both take
+ * three, and the next takes one, since two people are ahead of them.
+ */
+const PLACEMENT = [3, 2, 1];
+
+function placementsFor(scores: Array<{ name: string; points: number }>) {
+  const ranked = [...scores].sort((a, b) => b.points - a.points);
+  const out = new Map<string, number>();
+  ranked.forEach((entry, i) => {
+    // Standard competition ranking: your place is 1 + the number of people
+    // strictly ahead of you.
+    const ahead = ranked.filter((other) => other.points > entry.points).length;
+    out.set(entry.name, PLACEMENT[ahead] ?? 0);
+  });
+  return out;
+}
+
 export function NightScreen({
   night,
   onBack,
@@ -21,11 +44,13 @@ export function NightScreen({
   onBack: () => void;
   onClear: () => void;
 }) {
-  const names = new Map<string, number[]>();
+  type Cell = { place: number; raw: number } | null;
+  const names = new Map<string, Cell[]>();
   night.forEach((game, g) => {
+    const places = placementsFor(game.scores);
     game.scores.forEach(({ name, points }) => {
-      const row = names.get(name) ?? Array(night.length).fill(NaN);
-      row[g] = (Number.isNaN(row[g]) ? 0 : row[g]) + points;
+      const row = names.get(name) ?? Array<Cell>(night.length).fill(null);
+      row[g] = { place: places.get(name) ?? 0, raw: points };
       names.set(name, row);
     });
   });
@@ -34,7 +59,7 @@ export function NightScreen({
     .map(([name, per]) => ({
       name,
       per,
-      total: per.reduce((sum, n) => sum + (Number.isNaN(n) ? 0 : n), 0),
+      total: per.reduce((sum, c) => sum + (c?.place ?? 0), 0),
     }))
     .sort((a, b) => b.total - a.total);
 
@@ -87,6 +112,13 @@ export function NightScreen({
                   Night
                 </th>
               </tr>
+              <tr className="text-moon-deep/70">
+                <th className="px-5 pb-2 text-[0.65rem] font-normal normal-case tracking-normal">
+                  3 · 2 · 1 for first, second, third in each game. Small number is the score in that game.
+                </th>
+                {night.map((_, i) => <th key={i} />)}
+                <th />
+              </tr>
             </thead>
             <tbody>
               {/*
@@ -106,12 +138,20 @@ export function NightScreen({
                   <td className="px-5 py-3 font-display text-[clamp(1rem,2vw,1.8rem)] uppercase tracking-wide text-moon">
                     {row.name}
                   </td>
-                  {row.per.map((n, j) => (
-                    <td
-                      key={j}
-                      className="px-4 py-3 text-right font-display tabular-nums text-moon-dim"
-                    >
-                      {Number.isNaN(n) ? "—" : n.toLocaleString()}
+                  {row.per.map((cell, j) => (
+                    <td key={j} className="px-4 py-3 text-right">
+                      {cell ? (
+                        <>
+                          <span className="font-display text-[clamp(1rem,1.8vw,1.6rem)] tabular-nums text-moon">
+                            {cell.place}
+                          </span>
+                          <span className="ml-2 font-display text-xs tabular-nums text-moon-deep">
+                            {cell.raw.toLocaleString()}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-moon-deep">—</span>
+                      )}
                     </td>
                   ))}
                   <td className="px-5 py-3 text-right font-display text-[clamp(1.1rem,2.2vw,2rem)] font-bold tabular-nums text-accent-bright">
