@@ -18,9 +18,9 @@ type Props = {
 const KEY_FACE: Record<string, string> = {
   a: "border-fuchsia-400/80 bg-fuchsia-500/35 text-fuchsia-50",
   b: "border-amber-400/70 bg-amber-500/30 text-amber-100",
-  neutral: "border-white/15 bg-white/[0.05] text-moon-deep",
+  neutral: "border-line/15 bg-line/[0.05] text-moon-deep",
   assassin: "border-rose-500 bg-rose-900 text-rose-200",
-  hidden: "border-white/12 bg-white/[0.03] text-moon/75",
+  hidden: "border-line/12 bg-line/[0.03] text-moon/75",
 };
 
 export function GridPlayer({ state, me, onClue, onTap, onPass, onAssign }: Props) {
@@ -63,7 +63,7 @@ export function GridPlayer({ state, me, onClue, onTap, onPass, onAssign }: Props
                   ? i === 0
                     ? "border-fuchsia-400/70 bg-fuchsia-500/10"
                     : "border-amber-400/70 bg-amber-500/10"
-                  : "border-white/12 bg-white/[0.03]",
+                  : "border-line/12 bg-line/[0.03]",
               ].join(" ")}
             >
               <p className="font-display text-lg uppercase tracking-wide text-moon">
@@ -77,7 +77,7 @@ export function GridPlayer({ state, me, onClue, onTap, onPass, onAssign }: Props
                     "flex-1 rounded-xl border py-3 font-display text-sm uppercase tracking-wide",
                     mine && !keyCard
                       ? "border-accent bg-accent/20 text-accent-bright"
-                      : "border-white/15 text-moon/75",
+                      : "border-line/15 text-moon/75",
                   ].join(" ")}
                 >
                   {mine && !keyCard ? "You're guessing" : "Guess"}
@@ -89,7 +89,7 @@ export function GridPlayer({ state, me, onClue, onTap, onPass, onAssign }: Props
                     "flex-1 rounded-xl border py-3 font-display text-sm uppercase tracking-wide",
                     keyCard
                       ? "border-accent bg-accent/20 text-accent-bright"
-                      : "border-white/15 text-moon/75",
+                      : "border-line/15 text-moon/75",
                   ].join(" ")}
                 >
                   {keyCard ? "You hold the key" : "Take the key"}
@@ -157,7 +157,7 @@ export function GridPlayer({ state, me, onClue, onTap, onPass, onAssign }: Props
                     "h-12 w-12 rounded-full border font-display text-lg tabular-nums",
                     count === n
                       ? "border-accent bg-accent/20 text-accent-bright"
-                      : "border-white/12 text-moon/75",
+                      : "border-line/12 text-moon/75",
                   ].join(" ")}
                 >
                   {n}
@@ -203,10 +203,10 @@ export function GridPlayer({ state, me, onClue, onTap, onPass, onAssign }: Props
               className={[
                 "flex aspect-square items-center justify-center rounded-lg border px-0.5 text-center text-[0.6rem] font-medium leading-tight transition-colors",
                 open
-                  ? "border-white/10 bg-white/[0.02] text-moon-deep/40 line-through"
+                  ? "border-line/10 bg-line/[0.02] text-moon-deep/40 line-through"
                   : myTurn && state.phase === "guess"
-                    ? "border-white/15 bg-white/[0.05] text-moon active:border-accent active:bg-accent/20"
-                    : "border-white/10 bg-white/[0.02] text-moon-deep",
+                    ? "border-line/15 bg-line/[0.05] text-moon active:border-accent active:bg-accent/20"
+                    : "border-line/10 bg-line/[0.02] text-moon-deep",
               ].join(" ")}
             >
               {w}

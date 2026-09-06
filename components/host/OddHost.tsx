@@ -175,7 +175,7 @@ function Clock({ left, seconds }: { left: number; seconds: number }) {
   const urgent = left <= 5;
   return (
     <div className="flex w-full max-w-2xl items-center gap-4">
-      <div className="h-[1.2vmin] min-h-[6px] flex-1 overflow-hidden rounded-full bg-white/10">
+      <div className="h-[1.2vmin] min-h-[6px] flex-1 overflow-hidden rounded-full bg-line/10">
         <div
           className={["h-full rounded-full transition-[width] duration-200 ease-linear", urgent ? "bg-rose-400" : "bg-accent"].join(" ")}
           style={{ width: `${fraction * 100}%` }}
@@ -190,7 +190,7 @@ function Clock({ left, seconds }: { left: number; seconds: number }) {
 
 function Question({ label, text, odd }: { label: string; text: string; odd?: boolean }) {
   return (
-    <div className={["rounded-2xl border p-[2vmin] text-left", odd ? "border-rose-400/50 bg-rose-500/10" : "border-white/12 bg-white/[0.03]"].join(" ")}>
+    <div className={["rounded-2xl border p-[2vmin] text-left", odd ? "border-rose-400/50 bg-rose-500/10" : "border-line/12 bg-line/[0.03]"].join(" ")}>
       <p className={["t-label font-display uppercase", odd ? "text-rose-300" : "text-moon-deep"].join(" ")}>{label}</p>
       <p className="mt-1 text-[clamp(1rem,2vw,2rem)] leading-snug text-moon">{text}</p>
     </div>
@@ -210,7 +210,7 @@ function Answers({ state, room, revealOdd }: { state: OddState; room: Room; reve
           return (
             <div
               key={id}
-              className={["flex items-center gap-4 rounded-xl border px-5 py-[1.4vmin] text-left", isOdd ? "border-rose-400/70 bg-rose-500/15" : "border-white/10 bg-white/[0.03]"].join(" ")}
+              className={["flex items-center gap-4 rounded-xl border px-5 py-[1.4vmin] text-left", isOdd ? "border-rose-400/70 bg-rose-500/15" : "border-line/10 bg-line/[0.03]"].join(" ")}
             >
               <span className="text-[clamp(1.4rem,2.6vw,2.8rem)]">{p?.emoji}</span>
               <div className="min-w-0 flex-1">
@@ -233,7 +233,7 @@ function Standings({ room, onAdjust, compact }: { room: Room; onAdjust: (id: str
   return (
     <div className="flex flex-wrap justify-center gap-[0.8vmin]">
       {ranked.map((p) => (
-        <div key={p.id} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2">
+        <div key={p.id} className="flex items-center gap-3 rounded-xl border border-line/10 bg-line/[0.03] px-4 py-2">
           <span className={compact ? "text-[clamp(1rem,1.8vw,1.8rem)]" : "text-[clamp(1.4rem,2.6vw,2.6rem)]"}>{p.emoji}</span>
           <span className={["font-display uppercase tracking-wide text-moon", compact ? "text-[clamp(0.8rem,1.3vw,1.3rem)]" : "text-[clamp(1rem,1.8vw,1.8rem)]"].join(" ")}>{p.name}</span>
           <ScoreNudge step={100} size="small" onAdjust={(d) => onAdjust(p.id, d)}>

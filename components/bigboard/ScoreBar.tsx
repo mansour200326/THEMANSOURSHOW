@@ -39,7 +39,7 @@ export function ScoreBar({
               compact ? "px-3 py-2" : "px-4 py-[1.4vmin]",
               active
                 ? "border-accent/70 bg-gradient-to-b from-accent/15 to-transparent shadow-[0_0_40px_rgb(var(--accent-rgb)/0.2)]"
-                : "border-white/10 bg-white/[0.03]",
+                : "border-line/10 bg-line/[0.03]",
             ].join(" ")}
           >
             {active && (

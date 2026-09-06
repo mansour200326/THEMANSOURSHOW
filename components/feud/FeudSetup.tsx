@@ -113,7 +113,7 @@ export function FeudSetup({
                   "rounded-full border px-5 py-2 font-display tabular-nums transition-colors",
                   rounds === n
                     ? "border-accent/60 bg-accent/15 text-accent-bright"
-                    : "border-white/10 bg-white/[0.03] text-moon/75 hover:border-accent/40",
+                    : "border-line/10 bg-line/[0.03] text-moon/75 hover:border-accent/40",
                 ].join(" ")}
               >
                 {n}
@@ -140,7 +140,7 @@ export function FeudSetup({
                   "rounded-full border px-5 py-2 font-display tabular-nums transition-colors",
                   clockSeconds === n
                     ? "border-accent/60 bg-accent/15 text-accent-bright"
-                    : "border-white/10 bg-white/[0.03] text-moon/75 hover:border-accent/40",
+                    : "border-line/10 bg-line/[0.03] text-moon/75 hover:border-accent/40",
                 ].join(" ")}
               >
                 {n === 0 ? "No clock" : `${n}s`}

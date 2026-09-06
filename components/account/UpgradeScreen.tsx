@@ -95,7 +95,7 @@ function Column({
         "rounded-3xl border p-6",
         highlight
           ? "border-accent/60 bg-accent/[0.07]"
-          : "border-white/12 bg-white/[0.03]",
+          : "border-line/12 bg-line/[0.03]",
       ].join(" ")}
     >
       <p

@@ -243,7 +243,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
                     "rounded-full border px-5 py-2 font-display tabular-nums transition-colors",
                     rounds === n
                       ? "border-accent/60 bg-accent/15 text-accent-bright"
-                      : "border-white/10 bg-white/[0.03] text-moon/75 hover:border-accent/40",
+                      : "border-line/10 bg-line/[0.03] text-moon/75 hover:border-accent/40",
                   ].join(" ")}
                 >
                   {n}
@@ -335,7 +335,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
                   key={team.id}
                   className={[
                     "flex items-center justify-between rounded-xl border px-5 py-3",
-                    i === 0 ? "border-accent/50 bg-accent/[0.08]" : "border-white/10",
+                    i === 0 ? "border-accent/50 bg-accent/[0.08]" : "border-line/10",
                   ].join(" ")}
                 >
                   <span className="font-display text-xl uppercase tracking-wide text-moon">
@@ -374,7 +374,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
                 "flex flex-col items-center rounded-xl border px-4 py-[1.2vmin]",
                 i === state.turn
                   ? "border-accent/70 bg-gradient-to-b from-accent/15 to-transparent"
-                  : "border-white/10 bg-white/[0.03]",
+                  : "border-line/10 bg-line/[0.03]",
               ].join(" ")}
             >
               <span

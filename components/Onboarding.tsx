@@ -71,7 +71,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         initial={{ y: 14, scale: 0.985 }}
         animate={{ y: 0, scale: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 26 }}
-        className="w-full max-w-3xl rounded-3xl border border-white/12 bg-dusk p-6 shadow-tile sm:p-8"
+        className="w-full max-w-3xl rounded-3xl border border-line/12 bg-dusk p-6 shadow-tile sm:p-8"
       >
         <p className="t-label font-display uppercase text-moon-deep">How it works</p>
 
@@ -103,7 +103,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
                 aria-label={`Step ${i + 1}`}
                 className={[
                   "h-2 rounded-full transition-all",
-                  i === beat ? "w-8 bg-accent" : "w-2 bg-white/20",
+                  i === beat ? "w-8 bg-accent" : "w-2 bg-line/20",
                 ].join(" ")}
               />
             ))}
@@ -145,7 +145,7 @@ function Scene({ beat }: { beat: number }) {
   return (
     <svg
       viewBox="0 0 400 220"
-      className="mt-4 w-full rounded-2xl border border-white/8 bg-midnight"
+      className="mt-4 w-full rounded-2xl border border-line/8 bg-midnight"
       role="img"
       aria-label="A television showing a room code, and four people on a sofa joining from their phones"
     >

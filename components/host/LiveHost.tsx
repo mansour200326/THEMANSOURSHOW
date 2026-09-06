@@ -120,7 +120,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
           {standings.map((p) => (
             <span
               key={p.id}
-              className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 font-display uppercase tracking-wide text-moon/75"
+              className="rounded-full border border-line/10 bg-line/[0.03] px-4 py-2 font-display uppercase tracking-wide text-moon/75"
             >
               {p.emoji} {p.name} · <Tally value={p.score} />
             </span>
@@ -179,12 +179,12 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
                     className={[
                       "flex items-center gap-2 rounded-full border px-4 py-2 font-display uppercase tracking-wide transition-colors",
                       out
-                        ? "border-white/10 text-moon-deep line-through opacity-50"
+                        ? "border-line/10 text-moon-deep line-through opacity-50"
                         : state.phase === "reveal" && right
                           ? "border-emerald-400/60 bg-emerald-500/10 text-emerald-200"
                           : answered
                             ? "border-accent/60 bg-accent/10 text-accent-bright"
-                            : "border-white/10 text-moon/75",
+                            : "border-line/10 text-moon/75",
                     ].join(" ")}
                   >
                     <span>{p.emoji}</span>
@@ -209,7 +209,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
                 {liveShuffledEvents(state).map((event, i) => (
                   <div
                     key={i}
-                    className="rounded-xl border border-white/10 bg-dusk/60 px-6 py-[1.6vmin] text-left font-display text-[clamp(1rem,1.9vw,2rem)] uppercase tracking-wide text-moon/75"
+                    className="rounded-xl border border-line/10 bg-dusk/60 px-6 py-[1.6vmin] text-left font-display text-[clamp(1rem,1.9vw,2rem)] uppercase tracking-wide text-moon/75"
                   >
                     {event}
                   </div>
@@ -246,7 +246,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
               <span>{item?.right}</span>
             </div>
 
-            <div className="relative mt-[1.5vmin] h-[6vmin] min-h-[44px] overflow-hidden rounded-full border border-white/10 bg-gradient-to-r from-dusk via-dusk-lit to-dusk">
+            <div className="relative mt-[1.5vmin] h-[6vmin] min-h-[44px] overflow-hidden rounded-full border border-line/10 bg-gradient-to-r from-dusk via-dusk-lit to-dusk">
               {state.phase === "reveal" && (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -330,7 +330,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
         {players.map((p) => (
           <span
             key={p.id}
-            className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-[0.7vmin] font-display text-[clamp(0.9rem,1.6vw,1.7rem)] uppercase tracking-wide text-moon/85"
+            className="flex items-center gap-2 rounded-full border border-line/10 bg-line/[0.03] px-4 py-[0.7vmin] font-display text-[clamp(0.9rem,1.6vw,1.7rem)] uppercase tracking-wide text-moon/85"
           >
             {p.emoji} {p.name} ·{" "}
             <ScoreNudge

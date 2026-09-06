@@ -106,7 +106,7 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
                     "rounded-full border px-8 py-3 font-display text-[clamp(1rem,2vw,1.8rem)] uppercase tracking-wide transition-colors",
                     i === bidTeam
                       ? "border-accent bg-accent/20 text-accent-bright"
-                      : "border-white/15 text-moon/70",
+                      : "border-line/15 text-moon/70",
                   ].join(" ")}
                 >
                   {t.name}

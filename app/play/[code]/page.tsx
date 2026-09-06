@@ -144,8 +144,8 @@ export default function PlayPage({
                     chosen
                       ? "scale-110 border-accent bg-accent/20 shadow-glow"
                       : taken
-                        ? "border-white/5 opacity-25"
-                        : "border-white/12 active:scale-95",
+                        ? "border-line/5 opacity-25"
+                        : "border-line/12 active:scale-95",
                   ].join(" ")}
                 >
                   {a}
@@ -325,7 +325,7 @@ function LeaveButton({ onLeave }: { onLeave: () => void }) {
   return (
     <button
       onClick={onLeave}
-      className="fixed right-3 top-3 z-50 rounded-full border border-white/10 bg-midnight/70 px-3 py-1.5 font-display text-[0.65rem] uppercase tracking-widest text-moon-deep opacity-50 transition-opacity hover:opacity-100"
+      className="fixed right-3 top-3 z-50 rounded-full border border-line/10 bg-midnight/70 px-3 py-1.5 font-display text-[0.65rem] uppercase tracking-widest text-moon-deep opacity-50 transition-opacity hover:opacity-100"
     >
       Leave
     </button>

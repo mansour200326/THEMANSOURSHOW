@@ -42,7 +42,7 @@ export function RoomCodeChip({ code }: { code: string }) {
       title="Show the room code"
       // Clear of the sound control, which is pinned to the bottom-left corner
       // at a higher layer and was sitting directly on top of this.
-      className="fixed bottom-3 left-16 z-40 rounded-full border border-white/12 bg-midnight/70 px-4 py-1.5 font-display text-sm uppercase tracking-[0.25em] text-moon-deep backdrop-blur transition-colors hover:border-accent/50 hover:text-moon"
+      className="fixed bottom-3 left-[7.25rem] z-40 rounded-full border border-line/12 bg-midnight/70 px-4 py-1.5 font-display text-sm uppercase tracking-[0.25em] text-moon-deep backdrop-blur transition-colors hover:border-accent/50 hover:text-moon"
     >
       {code}
     </button>

@@ -132,7 +132,7 @@ export function HowToPlay({
                   "min-w-[3.5rem] rounded-xl border px-4 py-2.5 font-display tabular-nums transition-colors",
                   rounds === n
                     ? "border-accent bg-accent/15 text-accent-bright"
-                    : "border-white/12 text-moon/75 hover:border-white/25",
+                    : "border-line/12 text-moon/75 hover:border-line/25",
                 ].join(" ")}
               >
                 {n}
@@ -164,7 +164,7 @@ export function HowToPlay({
 
 function Note({ label, text }: { label: string; text: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+    <div className="rounded-2xl border border-line/10 bg-line/[0.03] p-5">
       <p className="t-label font-display uppercase text-moon-deep">{label}</p>
       <p className="mt-1.5 text-[clamp(0.85rem,1.3vw,1.2rem)] leading-snug text-moon/75">
         {text}

@@ -102,7 +102,7 @@ export function ImpostorPlayer({
                 "flex items-center gap-3 rounded-xl border px-5 py-5 text-left text-lg transition-colors",
                 voted === p.id
                   ? "border-accent bg-accent/20 text-moon"
-                  : "border-white/12 bg-white/[0.03] text-moon/75",
+                  : "border-line/12 bg-line/[0.03] text-moon/75",
               ].join(" ")}
             >
               <span className="text-2xl">{p.emoji}</span>
@@ -118,7 +118,7 @@ export function ImpostorPlayer({
   /* talking */
   return (
     <main className="flex min-h-dvh flex-col justify-center gap-5 p-6">
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-center">
+      <div className="rounded-2xl border border-line/10 bg-line/[0.03] p-6 text-center">
         {impostor ? (
           <p className="font-display text-2xl uppercase tracking-wide text-rose-300">
             You&apos;re the impostor
@@ -172,7 +172,7 @@ function NamePlace({
           <button
             key={place.name}
             onClick={() => onGuessPlace(i)}
-            className="rounded-xl border border-white/12 bg-white/[0.03] px-3 py-4 text-sm text-moon/75 active:border-rose-400"
+            className="rounded-xl border border-line/12 bg-line/[0.03] px-3 py-4 text-sm text-moon/75 active:border-rose-400"
           >
             {place.name}
           </button>

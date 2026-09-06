@@ -25,7 +25,7 @@ export function DifficultyBar({ value, onChange, compact }: Props) {
                 compact ? "text-sm" : "text-base",
                 active
                   ? "border-accent/60 bg-accent/15 text-accent-bright"
-                  : "border-white/10 bg-white/[0.03] text-moon-dim hover:border-accent/40 hover:text-accent-bright",
+                  : "border-line/10 bg-line/[0.03] text-moon-dim hover:border-accent/40 hover:text-accent-bright",
               ].join(" ")}
             >
               {difficultyLabel[level]}

@@ -25,7 +25,7 @@ type Props = {
 const FACE: Record<string, string> = {
   a: "border-fuchsia-400/80 bg-fuchsia-500/30 text-fuchsia-50",
   b: "border-amber-400/80 bg-amber-500/30 text-amber-50",
-  neutral: "border-white/15 bg-white/[0.06] text-moon-dim",
+  neutral: "border-line/15 bg-line/[0.06] text-moon-dim",
   assassin: "border-rose-500 bg-rose-950 text-rose-300",
 };
 
@@ -212,7 +212,7 @@ function Grid({ state, reveal }: { state: CodeGridState & ViewerExtras; reveal?:
               "text-[clamp(0.6rem,1.35vw,1.6rem)]",
               shown && owner !== "hidden"
                 ? FACE[owner]
-                : "tile-face border-white/10 text-moon",
+                : "tile-face border-line/10 text-moon",
             ].join(" ")}
           >
             {shown && (owner === "a" || owner === "b") && (

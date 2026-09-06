@@ -159,7 +159,7 @@ export function SketchCanvas({
       onPointerCancel={end}
       className={[
         // Paper, not a screen. Ink needs something to be ink on.
-        "aspect-square touch-none rounded-2xl border border-white/15 bg-[#F4F2EC] shadow-tile",
+        "aspect-square touch-none rounded-2xl border border-line/15 bg-[#F4F2EC] shadow-tile",
         className ?? "",
       ].join(" ")}
     />

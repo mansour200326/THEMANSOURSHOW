@@ -140,7 +140,7 @@ export function GameSetup({
                   "rounded-full border px-4 py-1.5 text-sm transition-colors",
                   taken
                     ? "border-accent/50 bg-accent/10 text-accent-bright"
-                    : "border-white/12 text-moon/75 hover:border-accent/40 hover:text-moon",
+                    : "border-line/12 text-moon/75 hover:border-accent/40 hover:text-moon",
                 ].join(" ")}
               >
                 {topic}
@@ -171,7 +171,7 @@ export function GameSetup({
                   "flex-1 rounded-xl border py-3 font-display uppercase tracking-wide tabular-nums transition-colors",
                   minutes === n
                     ? "border-accent bg-accent/15 text-accent-bright"
-                    : "border-white/12 text-moon/75 hover:border-white/25",
+                    : "border-line/12 text-moon/75 hover:border-line/25",
                 ].join(" ")}
               >
                 {n} min

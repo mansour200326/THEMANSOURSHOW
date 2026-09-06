@@ -101,7 +101,7 @@ export function SketchPlayer({
                 "h-11 rounded-full border-2 transition-transform",
                 colour === i
                   ? "scale-110 border-moon shadow-glow"
-                  : "border-white/20 active:scale-95",
+                  : "border-line/20 active:scale-95",
               ].join(" ")}
               style={{ backgroundColor: hex }}
             />
@@ -121,7 +121,7 @@ export function SketchPlayer({
                 "flex h-12 w-12 items-center justify-center rounded-full border transition-colors",
                 width === i
                   ? "border-accent bg-accent/15"
-                  : "border-white/15 active:bg-white/5",
+                  : "border-line/15 active:bg-line/5",
               ].join(" ")}
             >
               <span
@@ -196,7 +196,7 @@ export function SketchPlayer({
           {mine.slice(-4).map((g, i) => (
             <span
               key={i}
-              className="rounded-full border border-white/10 px-3 py-1 text-sm text-moon-deep line-through"
+              className="rounded-full border border-line/10 px-3 py-1 text-sm text-moon-deep line-through"
             >
               {g}
             </span>

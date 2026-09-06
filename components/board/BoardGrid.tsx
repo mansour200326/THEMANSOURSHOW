@@ -37,7 +37,7 @@ export function BoardGrid({
         {board.categories.map((cat) => (
           <div
             key={cat.title}
-            className="flex items-center justify-center rounded-lg border border-white/10 bg-gradient-to-b from-dusk-lit/70 to-midnight-deep px-2 py-[1.6vmin] text-center"
+            className="flex items-center justify-center rounded-lg border border-line/10 bg-gradient-to-b from-dusk-lit/70 to-midnight-deep px-2 py-[1.6vmin] text-center"
           >
             <h3 className="t-category font-display font-semibold uppercase tracking-wider text-moon">
               {cat.title}
@@ -65,7 +65,7 @@ export function BoardGrid({
               return (
                 <div
                   key={key}
-                  className="flex items-center justify-center rounded-lg border border-white/5 bg-dusk/40"
+                  className="flex items-center justify-center rounded-lg border border-line/5 bg-dusk/40"
                 >
                   {wasDaily && (
                     <span className="font-display text-xs uppercase tracking-widest text-accent/50">
@@ -86,7 +86,7 @@ export function BoardGrid({
                 whileTap={disabled ? undefined : { scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 400, damping: 26 }}
                 className="tile-face tile-face-hover group flex items-center justify-center rounded-lg
-                           border border-white/10 shadow-tile transition-colors
+                           border border-line/10 shadow-tile transition-colors
                            disabled:cursor-default"
               >
                 <span className="accent-text t-tile-value font-display font-bold tabular-nums drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">

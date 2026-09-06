@@ -37,7 +37,7 @@ export default async function AccountPage() {
         <p className="font-display text-xl text-moon">{email}</p>
       </div>
 
-      <div className="rounded-3xl border border-white/12 bg-white/[0.03] p-6">
+      <div className="rounded-3xl border border-line/12 bg-line/[0.03] p-6">
         <p className="font-display text-2xl uppercase tracking-wide text-accent-bright">
           {plan === "pro" ? "Pro Host" : "Free"}
         </p>

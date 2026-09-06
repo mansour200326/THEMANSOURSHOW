@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Oswald } from "next/font/google";
 import { ConnectionBar } from "@/components/ConnectionBar";
 import { SoundControl } from "@/components/SoundControl";
+import { THEME_BOOT, ThemeToggle } from "@/components/ThemeToggle";
 import "./globals.css";
 
 const display = Oswald({
@@ -48,11 +49,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`}>
+    <html lang="en" className={`${display.variable} ${body.variable}`} suppressHydrationWarning>
+      <head>
+        {/*
+          * Applies a stored light-mode choice before anything paints. React
+          * can't do this early enough: by the time it runs, the dark stage
+          * has already been on screen for a frame.
+          */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
+      </head>
       <body>
         {children}
         <ConnectionBar />
-        <SoundControl />
+        {/* The bottom-left corner: sound and lights, side by side. */}
+        <div className="fixed bottom-3 left-3 z-50 flex items-center gap-2">
+          <SoundControl />
+          <ThemeToggle />
+        </div>
       </body>
     </html>
   );

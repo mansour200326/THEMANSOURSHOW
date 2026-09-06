@@ -3,8 +3,22 @@
 @tailwind utilities;
 
 :root {
-  --stage-bg: #101a3c;
+  /* ---- the dark stage: Midnight & Coral, the brand ---- */
+  color-scheme: dark;
+  --midnight-rgb: 16 26 60;
+  --midnight-deep-rgb: 11 19 48;
+  --midnight-soft-rgb: 22 34 74;
+  --dusk-rgb: 28 42 85;
+  --dusk-lit-rgb: 37 53 106;
+  --dusk-line-rgb: 46 63 118;
+  --moon-rgb: 244 242 236;
+  --moon-dim-rgb: 198 202 218;
+  --moon-deep-rgb: 139 147 174;
+  /* Ink for hairlines and washes; shadow ink for drop shadows. */
+  --line-rgb: 255 255 255;
+  --shadow-rgb: 0 0 0;
   --stage-glow: rgba(46, 70, 150, 0.45);
+  --stage-warm: rgba(255, 107, 87, 0.07);
 
   /*
    * The colour lighting the current screen. Moonlight by default, so the
@@ -14,6 +28,37 @@
   --accent-rgb: 244 242 236;
   --accent-bright-rgb: 255 255 255;
 }
+
+/*
+ * ---- the light stage ----
+ * The same product with the lights on. Warm off-white rather than pure white,
+ * for the same reason the dark stage is never pure black: a party isn't an
+ * office. Text goes to midnight, hairlines and washes flip to midnight ink,
+ * and the game families get darker versions of their colours, because a lime
+ * accent that reads on navy vanishes on cream.
+ */
+html[data-theme="light"] {
+  color-scheme: light;
+  --midnight-rgb: 247 246 242;
+  --midnight-deep-rgb: 255 255 255;
+  --midnight-soft-rgb: 240 238 232;
+  --dusk-rgb: 255 255 255;
+  --dusk-lit-rgb: 244 242 236;
+  --dusk-line-rgb: 226 223 215;
+  --moon-rgb: 16 26 60;
+  --moon-dim-rgb: 58 68 104;
+  --moon-deep-rgb: 107 115 144;
+  --line-rgb: 16 26 60;
+  --shadow-rgb: 16 26 60;
+  --stage-glow: rgba(255, 107, 87, 0.14);
+  --stage-warm: rgba(16, 26, 60, 0.04);
+  --accent-rgb: 16 26 60;
+  --accent-bright-rgb: 58 68 104;
+}
+html[data-theme="light"] .g-trivia { --accent-rgb: 14 143 134; --accent-bright-rgb: 9 112 105; }
+html[data-theme="light"] .g-deception { --accent-rgb: 91 71 214; --accent-bright-rgb: 70 52 178; }
+html[data-theme="light"] .g-social { --accent-rgb: 194 46 108; --accent-bright-rgb: 158 33 86; }
+html[data-theme="light"] .g-word { --accent-rgb: 94 155 20; --accent-bright-rgb: 72 122 12; }
 
 /* ---- game families ---- */
 /* Trivia: the big board, buzzer rounds, anything quiz-shaped. */
@@ -47,7 +92,7 @@
     @apply bg-midnight text-moon font-body antialiased;
     background-image:
       radial-gradient(ellipse 80% 60% at 50% -10%, var(--stage-glow), transparent 70%),
-      radial-gradient(ellipse 60% 40% at 50% 110%, rgba(255, 107, 87, 0.07), transparent 70%);
+      radial-gradient(ellipse 60% 40% at 50% 110%, var(--stage-warm), transparent 70%);
     background-attachment: fixed;
     overscroll-behavior: none;
   }
@@ -113,7 +158,7 @@
     background: linear-gradient(
       100deg,
       transparent 38%,
-      rgba(255, 255, 255, 0.9) 50%,
+      rgb(var(--line-rgb) / 0.9) 50%,
       transparent 62%
     );
     background-size: 250% 100%;
@@ -132,7 +177,7 @@
   }
 
   .panel {
-    @apply rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm;
+    @apply rounded-2xl border border-line/10 bg-line/[0.03] backdrop-blur-sm;
   }
 
   .btn {
@@ -150,7 +195,7 @@
     @apply btn border border-accent/50 bg-accent/10 text-accent-bright hover:bg-accent/20;
   }
   .btn-ghost {
-    @apply btn border border-white/15 bg-white/5 text-moon-dim hover:bg-white/10 hover:border-white/25;
+    @apply btn border border-line/15 bg-line/5 text-moon-dim hover:bg-line/10 hover:border-line/25;
   }
   .btn-good {
     @apply btn bg-emerald-500/90 text-midnight-deep hover:bg-emerald-400;
@@ -160,7 +205,7 @@
   }
 
   .field {
-    @apply w-full rounded-xl border border-white/10 bg-dusk/70 px-4 py-3 text-lg
+    @apply w-full rounded-xl border border-line/10 bg-dusk/70 px-4 py-3 text-lg
            text-moon placeholder:text-moon-deep outline-none transition
            focus:border-accent/60 focus:bg-dusk;
   }
@@ -170,12 +215,12 @@
 .tile-face {
   background:
     linear-gradient(180deg, rgb(var(--accent-rgb) / 0.16) 0%, transparent 45%),
-    linear-gradient(180deg, #25356a 0%, #1c2a55 60%, #16224a 100%);
+    linear-gradient(180deg, rgb(var(--dusk-lit-rgb)) 0%, rgb(var(--dusk-rgb)) 60%, rgb(var(--midnight-soft-rgb)) 100%);
 }
 .tile-face-hover:hover {
   background:
     linear-gradient(180deg, rgb(var(--accent-rgb) / 0.3) 0%, transparent 45%),
-    linear-gradient(180deg, #2e3f76 0%, #25356a 60%, #1c2a55 100%);
+    linear-gradient(180deg, rgb(var(--dusk-line-rgb)) 0%, rgb(var(--dusk-lit-rgb)) 60%, rgb(var(--dusk-rgb)) 100%);
 }
 
 @media (prefers-reduced-motion: reduce) {

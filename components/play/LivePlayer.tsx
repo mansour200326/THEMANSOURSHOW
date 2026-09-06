@@ -42,7 +42,7 @@ function Clock({ left, seconds }: { left: number; seconds: number }) {
   const urgent = left <= 5;
   return (
     <div className="mb-1">
-      <div className="h-2 overflow-hidden rounded-full bg-white/10">
+      <div className="h-2 overflow-hidden rounded-full bg-line/10">
         <div
           className={[
             "h-full rounded-full transition-[width] duration-200 ease-linear",
@@ -268,10 +268,10 @@ function OrderBox({
                 "flex items-center gap-3 rounded-xl border px-4 py-4 text-left transition-colors",
                 place >= 0
                   ? "border-accent/70 bg-accent/15 text-moon"
-                  : "border-white/12 bg-white/[0.03] text-moon/75",
+                  : "border-line/12 bg-line/[0.03] text-moon/75",
               ].join(" ")}
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/15 font-display tabular-nums">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line/15 font-display tabular-nums">
                 {place >= 0 ? place + 1 : ""}
               </span>
               <span className="text-base leading-snug">{event}</span>
@@ -389,7 +389,7 @@ function Spectrum({
         <span>{left}</span>
         <span>{right}</span>
       </div>
-      <div className="relative mt-2 h-14 overflow-hidden rounded-full border border-white/10 bg-gradient-to-r from-dusk via-dusk-lit to-dusk">
+      <div className="relative mt-2 h-14 overflow-hidden rounded-full border border-line/10 bg-gradient-to-r from-dusk via-dusk-lit to-dusk">
         <div
           className="absolute inset-y-0 w-[4px] -translate-x-1/2 bg-accent"
           style={{ left: `${marker}%` }}

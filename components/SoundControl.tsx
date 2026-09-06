@@ -42,11 +42,11 @@ export function SoundControl() {
       aria-label={off ? "Turn sound on" : "Turn sound off"}
       title={off ? "Sound is off" : "Sound is on"}
       className={[
-        "fixed bottom-3 left-3 z-50 flex h-11 w-11 items-center justify-center rounded-full",
+        "flex h-11 w-11 items-center justify-center rounded-full",
         "border text-lg transition-all duration-200",
         off
           ? "border-rose-500/40 bg-rose-950/60 opacity-70 hover:opacity-100"
-          : "border-white/10 bg-midnight/70 opacity-35 hover:border-accent/50 hover:opacity-100",
+          : "border-line/10 bg-midnight/70 opacity-35 hover:border-accent/50 hover:opacity-100",
       ].join(" ")}
     >
       {off ? "🔇" : "🔊"}

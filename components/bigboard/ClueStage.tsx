@@ -122,7 +122,7 @@ export function ClueStage({
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="max-h-full max-w-full rounded-2xl border border-white/12 object-contain shadow-tile"
+              className="max-h-full max-w-full rounded-2xl border border-line/12 object-contain shadow-tile"
             />
           </div>
         )}
@@ -192,7 +192,7 @@ export function ClueStage({
                   "rounded-xl border p-[1vmin] transition-opacity",
                   i === turn && !stealOpen
                     ? "border-accent/50 bg-accent/[0.07]"
-                    : "border-white/10 bg-white/[0.02]",
+                    : "border-line/10 bg-line/[0.02]",
                   can ? "" : "opacity-30",
                 ].join(" ")}
               >

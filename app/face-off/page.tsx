@@ -326,7 +326,7 @@ function FaceOffStage() {
                         "flex items-center justify-between rounded-xl border px-5 py-3",
                         i === 0
                           ? "border-accent/50 bg-accent/[0.08]"
-                          : "border-white/10",
+                          : "border-line/10",
                       ].join(" ")}
                     >
                       <span className="font-display text-xl uppercase tracking-wide text-moon">
@@ -363,7 +363,7 @@ function FaceOffStage() {
                   "flex flex-col items-center rounded-xl border px-4 py-[1.2vmin]",
                   active
                     ? "border-accent/70 bg-gradient-to-b from-accent/15 to-transparent"
-                    : "border-white/10 bg-white/[0.03]",
+                    : "border-line/10 bg-line/[0.03]",
                 ].join(" ")}
               >
                 <span

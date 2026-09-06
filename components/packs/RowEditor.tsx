@@ -143,7 +143,7 @@ export function RowEditor({
           : (rows as Row[]).map((row, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-white/10 bg-white/[0.02] p-3"
+                className="rounded-xl border border-line/10 bg-line/[0.02] p-3"
               >
                 <div className="flex items-start gap-3">
                   <Index n={i + 1} />

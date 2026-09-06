@@ -84,7 +84,7 @@ export default async function SignInPage({
 
           {/* Don't promise an email that nothing is going to send. */}
           {!canEmail() && (
-            <p className="rounded-xl border border-white/12 bg-white/[0.03] px-4 py-3 text-sm text-moon-dim">
+            <p className="rounded-xl border border-line/12 bg-line/[0.03] px-4 py-3 text-sm text-moon-dim">
               No email provider is configured, so the link is printed in the
               server logs instead of sent. Only somebody with access to this
               deployment can read it — which is fine for one person and no use

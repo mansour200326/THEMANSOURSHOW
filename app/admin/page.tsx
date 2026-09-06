@@ -150,7 +150,7 @@ export default async function AdminPage() {
             </thead>
             <tbody>
               {users.map((u) => (
-                <tr key={u.id} className="border-t border-white/8">
+                <tr key={u.id} className="border-t border-line/8">
                   <td className="py-2 pr-4 text-moon">{u.email}</td>
                   <td className="py-2 pr-4">
                     <span
@@ -186,7 +186,7 @@ export default async function AdminPage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-white/12 bg-white/[0.03] p-4">
+    <div className="rounded-2xl border border-line/12 bg-line/[0.03] p-4">
       <p className="t-label font-display uppercase text-moon-deep">{label}</p>
       <p className="mt-1 font-display text-2xl tabular-nums text-moon">{value}</p>
     </div>

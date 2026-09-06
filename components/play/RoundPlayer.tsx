@@ -86,7 +86,7 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
     return (
       <Shell title={isGuessWho ? "Who wrote this?" : prompt?.text ?? ""}>
         {isGuessWho && focusText && (
-          <p className="rounded-xl border border-white/15 bg-white/[0.04] px-5 py-4 text-center text-lg text-moon">
+          <p className="rounded-xl border border-line/15 bg-line/[0.04] px-5 py-4 text-center text-lg text-moon">
             “{focusText}”
           </p>
         )}
@@ -101,8 +101,8 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
                 className={[
                   "min-h-[4.5rem] rounded-xl border px-5 py-4 text-left text-lg transition-colors",
                   mine
-                    ? "cursor-not-allowed border-white/8 bg-white/[0.02] text-moon-deep/70"
-                    : "border-white/15 bg-white/[0.04] text-moon active:border-accent/70 active:bg-accent/10",
+                    ? "cursor-not-allowed border-line/8 bg-line/[0.02] text-moon-deep/70"
+                    : "border-line/15 bg-line/[0.04] text-moon active:border-accent/70 active:bg-accent/10",
                 ].join(" ")}
               >
                 {option.label}

@@ -111,7 +111,7 @@ export function OddPlayer({ room, state, me, onAnswer, onVote }: Props) {
           <button
             key={p.id}
             onClick={() => { haptic("buzz"); onVote(p.id); }}
-            className={["flex items-center gap-3 rounded-2xl border px-4 py-4 text-left transition-colors", mine ? "border-accent bg-accent/15" : "border-white/12 bg-white/[0.03] active:bg-white/10"].join(" ")}
+            className={["flex items-center gap-3 rounded-2xl border px-4 py-4 text-left transition-colors", mine ? "border-accent bg-accent/15" : "border-line/12 bg-line/[0.03] active:bg-line/10"].join(" ")}
           >
             <span className="text-3xl">{p.emoji}</span>
             <span className="min-w-0 flex-1">

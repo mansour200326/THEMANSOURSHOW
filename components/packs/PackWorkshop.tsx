@@ -135,7 +135,7 @@ export function PackWorkshop({
                   "flex items-center gap-1 rounded-full border py-1 pl-4 pr-1 transition-colors",
                   pack.id === editingId
                     ? "border-accent bg-accent/15"
-                    : "border-white/12 bg-white/[0.03]",
+                    : "border-line/12 bg-line/[0.03]",
                 ].join(" ")}
               >
                 <button
@@ -200,7 +200,7 @@ export function PackWorkshop({
 
       {note && <p className="mt-4 text-sm text-accent">{note}</p>}
 
-      <div className="sticky bottom-0 mt-8 flex flex-wrap items-center gap-3 border-t border-white/10 bg-midnight/90 py-4 backdrop-blur">
+      <div className="sticky bottom-0 mt-8 flex flex-wrap items-center gap-3 border-t border-line/10 bg-midnight/90 py-4 backdrop-blur">
         <span
           className={[
             "font-display text-sm uppercase tracking-widest",

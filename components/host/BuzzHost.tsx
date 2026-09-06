@@ -264,7 +264,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
                 ? "border-accent/70 bg-accent/15"
                 : state.lockedOut.includes(p.id)
                   ? "border-rose-500/40 bg-rose-500/5 opacity-50"
-                  : "border-white/10 bg-white/[0.03]",
+                  : "border-line/10 bg-line/[0.03]",
             ].join(" ")}
           >
             <span className="text-[clamp(1.3rem,2.3vw,2.6rem)]">{p.emoji}</span>
@@ -304,7 +304,7 @@ function Standings({ room }: { room: Room }) {
           key={p.id}
           className={[
             "flex items-center justify-between rounded-xl border px-5 py-3",
-            i === 0 ? "border-accent/50 bg-accent/[0.08]" : "border-white/10",
+            i === 0 ? "border-accent/50 bg-accent/[0.08]" : "border-line/10",
           ].join(" ")}
         >
           <span className="flex items-center gap-3 font-display text-xl uppercase tracking-wide text-moon">

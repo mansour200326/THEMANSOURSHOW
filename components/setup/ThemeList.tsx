@@ -161,7 +161,7 @@ export function ThemeList({
                   "rounded-full border px-3.5 py-1.5 text-sm transition-colors",
                   used
                     ? "cursor-default border-accent/40 bg-accent/10 text-accent-bright"
-                    : "border-white/10 bg-white/[0.03] text-moon/75 hover:border-accent/50 hover:text-accent-bright",
+                    : "border-line/10 bg-line/[0.03] text-moon/75 hover:border-accent/50 hover:text-accent-bright",
                 ].join(" ")}
               >
                 {topic}

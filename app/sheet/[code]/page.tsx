@@ -99,7 +99,7 @@ function Sheet({ code, hostKey }: { code: string; hostKey: string }) {
               "flex items-center justify-between gap-3 rounded-xl border px-4 py-3",
               line.hidden
                 ? "border-accent/50 bg-accent/10"
-                : "border-white/10 bg-white/[0.02] opacity-50",
+                : "border-line/10 bg-line/[0.02] opacity-50",
             ].join(" ")}
           >
             <span className="font-display text-lg uppercase tracking-wide text-moon">

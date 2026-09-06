@@ -41,9 +41,9 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
     <main className="flex min-min-h-dvh lg:h-dvh flex-col gap-3 p-3 lg:h-dvh lg:gap-[1.4vmin] lg:lg:overflow-hidden lg:p-[1.8vmin] pb-16 lg:pb-[1.6vmin]">
       {/* One compact band: brand, join details, who's here. */}
       <header className="flex shrink-0 flex-col items-stretch gap-3 lg:h-[15vmin] lg:min-h-[104px] lg:flex-row lg:gap-[1.4vmin]">
-        <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-3 lg:gap-5 lg:px-6 lg:py-[1.4vmin]">
+        <div className="flex items-center gap-4 rounded-2xl border border-line/10 bg-line/[0.02] px-4 py-3 lg:gap-5 lg:px-6 lg:py-[1.4vmin]">
           <ShowMark size="sm" />
-          <div className="border-l border-white/10 pl-5">
+          <div className="border-l border-line/10 pl-5">
             <p className="t-label font-display uppercase text-moon-deep">
               Room code
             </p>
@@ -54,7 +54,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
               {joinUrl || "…"}
             </p>
           </div>
-          <div className="hidden max-w-[22ch] border-l border-white/10 pl-5 sm:block">
+          <div className="hidden max-w-[22ch] border-l border-line/10 pl-5 sm:block">
             <p className="t-label font-display uppercase text-moon-deep">
               Phones join at
             </p>
@@ -71,7 +71,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
           </div>
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-col rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-2.5 lg:px-5 lg:py-[1vmin]">
+        <div className="flex min-w-0 flex-1 flex-col rounded-2xl border border-line/10 bg-line/[0.02] px-4 py-2.5 lg:px-5 lg:py-[1vmin]">
           <div className="flex shrink-0 items-center justify-between gap-4">
             <span className="t-label font-display uppercase text-moon-deep">
               In the room · {live.length}
@@ -112,7 +112,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
                   className={[
                     "flex items-center gap-2 rounded-full border py-1.5 pl-4 pr-1.5",
                     p.bot
-                      ? "border-white/10 bg-white/[0.03] text-moon-deep"
+                      ? "border-line/10 bg-line/[0.03] text-moon-deep"
                       : "border-accent/30 bg-accent/[0.07] text-moon",
                   ].join(" ")}
                 >
@@ -219,7 +219,7 @@ function Card({
         "relative flex h-full flex-col overflow-hidden rounded-2xl border p-3 text-center transition-all duration-200 lg:p-[1.2vmin]",
         ready
           ? "border-accent/40 bg-gradient-to-b from-accent/[0.14] to-transparent group-hover:-translate-y-1 group-hover:border-accent group-hover:shadow-glow"
-          : "border-white/10 bg-white/[0.02]",
+          : "border-line/10 bg-line/[0.02]",
       ].join(" ")}
     >
       {/* A lit edge in the game's colour — the lineup reads as families from the couch. */}
@@ -252,7 +252,7 @@ function Card({
               ? "text-[0.62rem] text-moon-deep"
               // Amber, full strength, a size up, with a phone on it: the one
               // line on a greyed-out card that has to be read from the sofa.
-              : "rounded-full border border-amber-400/50 bg-amber-500/15 px-2.5 py-1 text-[clamp(0.7rem,1.1vw,1.1rem)] text-amber-200",
+              : "rounded-full border border-amber-400/50 bg-amber-500/15 px-2.5 py-1 text-[clamp(0.7rem,1.1vw,1.1rem)] text-amber-200 [html[data-theme=light]_&]:border-amber-600/60 [html[data-theme=light]_&]:bg-amber-500/25 [html[data-theme=light]_&]:text-amber-900",
         ].join(" ")}
       >
         {!ready && status !== "Pro" ? `📱 ${status}` : status}

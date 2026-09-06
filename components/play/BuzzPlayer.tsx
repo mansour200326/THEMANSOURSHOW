@@ -84,8 +84,8 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
                     className={[
                       "flex-1 rounded-lg border py-3 font-display text-sm font-bold tabular-nums",
                       spent
-                        ? "border-white/5 text-moon-deep/40"
-                        : "tile-face border-white/10 text-accent",
+                        ? "border-line/5 text-moon-deep/40"
+                        : "tile-face border-line/10 text-accent",
                     ].join(" ")}
                   >
                     {spent ? "" : clue.value}
@@ -127,12 +127,12 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
           iBuzzed
             ? "border-emerald-300 bg-emerald-500/30 text-emerald-100"
             : iAmOut
-              ? "border-white/10 bg-white/[0.02] text-moon-deep/40"
+              ? "border-line/10 bg-line/[0.02] text-moon-deep/40"
               : someoneElse
-                ? "border-white/10 bg-white/[0.02] text-moon-deep/70"
+                ? "border-line/10 bg-line/[0.02] text-moon-deep/70"
                 : live
                   ? "border-accent bg-accent/20 text-accent-bright"
-                  : "border-white/10 bg-white/[0.03] text-moon-deep/70",
+                  : "border-line/10 bg-line/[0.03] text-moon-deep/70",
         ].join(" ")}
       >
         {iBuzzed ? "YOU!" : iAmOut ? "OUT" : live ? "BUZZ" : "WAIT"}

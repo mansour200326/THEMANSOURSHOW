@@ -102,7 +102,7 @@ export function WinnerScreen({ teams, onRematch, onNewGame }: Props) {
               "flex items-center justify-between rounded-xl border px-5 py-3",
               i === 0
                 ? "border-accent/50 bg-accent/[0.08]"
-                : "border-white/10 bg-white/[0.02]",
+                : "border-line/10 bg-line/[0.02]",
             ].join(" ")}
           >
             <div className="flex items-center gap-4">

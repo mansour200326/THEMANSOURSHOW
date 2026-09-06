@@ -63,7 +63,7 @@ export function BoardEditor({
                 "flex items-center gap-2 rounded-full border px-4 py-2 font-display text-sm uppercase tracking-wide transition-colors",
                 i === open
                   ? "border-accent bg-accent/15 text-accent-bright"
-                  : "border-white/12 text-moon/75 hover:border-accent/50",
+                  : "border-line/12 text-moon/75 hover:border-accent/50",
               ].join(" ")}
             >
               <span className="max-w-[14ch] truncate">
@@ -74,7 +74,7 @@ export function BoardEditor({
                   "rounded-full px-1.5 text-[0.65rem] tabular-nums",
                   complete
                     ? "bg-emerald-500/20 text-emerald-200"
-                    : "bg-white/10 text-moon-deep",
+                    : "bg-line/10 text-moon-deep",
                 ].join(" ")}
               >
                 {done(c)}/{BOARD_VALUES.length}
@@ -86,7 +86,7 @@ export function BoardEditor({
           <button
             type="button"
             onClick={add}
-            className="rounded-full border border-dashed border-white/20 px-4 py-2 font-display text-sm uppercase tracking-wide text-moon-deep hover:border-accent/50 hover:text-accent"
+            className="rounded-full border border-dashed border-line/20 px-4 py-2 font-display text-sm uppercase tracking-wide text-moon-deep hover:border-accent/50 hover:text-accent"
           >
             + Category
           </button>
@@ -95,7 +95,7 @@ export function BoardEditor({
 
       {/* The open column */}
       {current && (
-        <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+        <div className="mt-5 rounded-2xl border border-line/10 bg-line/[0.02] p-4">
           <div className="flex items-center gap-3">
             <input
               value={current.title}
@@ -129,7 +129,7 @@ export function BoardEditor({
               return (
                 <div
                   key={value}
-                  className="flex flex-col gap-2 rounded-xl border border-white/10 bg-midnight/40 p-3 sm:flex-row sm:items-center"
+                  className="flex flex-col gap-2 rounded-xl border border-line/10 bg-midnight/40 p-3 sm:flex-row sm:items-center"
                 >
                   <span className="accent-text w-14 shrink-0 font-display text-xl font-bold tabular-nums">
                     {value}

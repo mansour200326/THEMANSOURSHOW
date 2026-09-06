@@ -40,7 +40,7 @@ export function SurveyEditor({
         return (
           <div
             key={i}
-            className="rounded-2xl border border-white/10 bg-white/[0.02] p-4"
+            className="rounded-2xl border border-line/10 bg-line/[0.02] p-4"
           >
             <div className="flex items-center gap-3">
               <span className="w-6 shrink-0 text-center font-display text-lg tabular-nums text-moon-deep/70">

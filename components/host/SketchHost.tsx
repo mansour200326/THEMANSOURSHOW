@@ -121,7 +121,7 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
                     "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm",
                     place >= 0
                       ? "border-emerald-400/60 bg-emerald-500/10 text-emerald-200"
-                      : "border-white/10 bg-white/[0.02] text-moon-dim",
+                      : "border-line/10 bg-line/[0.02] text-moon-dim",
                   ].join(" ")}
                 >
                   <span>{p.emoji}</span>

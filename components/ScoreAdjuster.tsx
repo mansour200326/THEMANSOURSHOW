@@ -71,7 +71,7 @@ export function ScoreAdjuster({
         animate={{ scale: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 320, damping: 26 }}
         onClick={(e) => e.stopPropagation()}
-        className="max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-3xl border border-white/12 bg-dusk p-5 shadow-tile"
+        className="max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-3xl border border-line/12 bg-dusk p-5 shadow-tile"
       >
         <div className="flex items-baseline justify-between gap-4">
           <h2 className="font-display text-xl uppercase tracking-widest text-moon">
@@ -109,7 +109,7 @@ export function ScoreAdjuster({
           {entries.map((entry) => (
             <div
               key={entry.id}
-              className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 sm:flex-nowrap sm:gap-3"
+              className="flex flex-wrap items-center gap-2 rounded-2xl border border-line/10 bg-line/[0.03] px-4 py-3 sm:flex-nowrap sm:gap-3"
             >
               <span className="min-w-0 flex-1 truncate font-display uppercase tracking-wide text-moon">
                 {entry.name}

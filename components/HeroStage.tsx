@@ -141,7 +141,7 @@ export function HeroStage({
             }}
           >
             <motion.div
-              className="tile-face flex items-center justify-center rounded-xl border border-white/10 shadow-tile"
+              className="tile-face flex items-center justify-center rounded-xl border border-line/10 shadow-tile"
               style={{
                 width: "13vmin",
                 height: "9vmin",

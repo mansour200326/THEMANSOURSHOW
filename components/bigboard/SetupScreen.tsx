@@ -55,13 +55,13 @@ function Toggle({
         "flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-colors",
         checked
           ? "border-accent/45 bg-accent/[0.07]"
-          : "border-white/10 bg-white/[0.02] hover:border-white/20",
+          : "border-line/10 bg-line/[0.02] hover:border-line/20",
       ].join(" ")}
     >
       <span
         className={[
           "mt-0.5 flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition-colors",
-          checked ? "bg-accent" : "bg-white/15",
+          checked ? "bg-accent" : "bg-line/15",
         ].join(" ")}
       >
         <motion.span
@@ -252,8 +252,8 @@ export function SetupScreen({
                         active
                           ? "border-accent/60 bg-accent/15 text-accent-bright"
                           : rules.timer
-                            ? "border-white/10 bg-white/[0.03] text-moon/75 hover:border-accent/40 hover:text-accent-bright"
-                            : "border-white/10 bg-white/[0.02] text-moon-deep/70 hover:border-white/20 hover:text-moon-dim",
+                            ? "border-line/10 bg-line/[0.03] text-moon/75 hover:border-accent/40 hover:text-accent-bright"
+                            : "border-line/10 bg-line/[0.02] text-moon-deep/70 hover:border-line/20 hover:text-moon-dim",
                       ].join(" ")}
                     >
                       {seconds}s

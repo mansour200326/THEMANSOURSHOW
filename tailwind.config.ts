@@ -20,23 +20,35 @@ const config: Config = {
     extend: {
       colors: {
         /* The room the show is staged in. Never pure black. */
+        /*
+         * The stage, the panels and the text are CSS variables rather than
+         * hex, so a second theme is a second set of values in globals.css and
+         * not a second set of components. Dark is the default — it's the
+         * brand — and light is the same product with the lights on.
+         */
         midnight: {
-          DEFAULT: "#101A3C",
-          deep: "#0B1330",
-          soft: "#16224A",
+          DEFAULT: "rgb(var(--midnight-rgb) / <alpha-value>)",
+          deep: "rgb(var(--midnight-deep-rgb) / <alpha-value>)",
+          soft: "rgb(var(--midnight-soft-rgb) / <alpha-value>)",
         },
         /* Cards, panels, tiles — one step up out of the dark. */
         dusk: {
-          DEFAULT: "#1C2A55",
-          lit: "#25356A",
-          line: "#2E3F76",
+          DEFAULT: "rgb(var(--dusk-rgb) / <alpha-value>)",
+          lit: "rgb(var(--dusk-lit-rgb) / <alpha-value>)",
+          line: "rgb(var(--dusk-line-rgb) / <alpha-value>)",
         },
-        /* Text. Never pure white. */
+        /* Text. Never pure white — or, in the light, never pure black. */
         moon: {
-          DEFAULT: "#F4F2EC",
-          dim: "#C6CADA",
-          deep: "#8B93AE",
+          DEFAULT: "rgb(var(--moon-rgb) / <alpha-value>)",
+          dim: "rgb(var(--moon-dim-rgb) / <alpha-value>)",
+          deep: "rgb(var(--moon-deep-rgb) / <alpha-value>)",
         },
+        /*
+         * The ink for translucent lines and fills — hairline borders, the
+         * faint wash behind a panel. White on the dark stage; midnight on the
+         * light one. Everything that used to be white-at-ten-percent is this.
+         */
+        line: "rgb(var(--line-rgb) / <alpha-value>)",
         /* Brand only: logo, primary buttons, winners. */
         coral: {
           DEFAULT: "#FF6B57",
@@ -61,7 +73,7 @@ const config: Config = {
         body: ["var(--font-body)", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        tile: "inset 0 1px 0 rgba(255,255,255,0.08), 0 10px 30px rgba(0,0,0,0.45)",
+        tile: "inset 0 1px 0 rgb(var(--line-rgb) / 0.08), 0 10px 30px rgb(var(--shadow-rgb) / 0.45)",
         glow: "0 0 60px rgb(var(--accent-rgb) / 0.22)",
         brand: "0 0 60px rgba(255,107,87,0.28)",
       },

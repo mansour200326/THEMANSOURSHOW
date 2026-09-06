@@ -128,7 +128,7 @@ export function ImpostorHost({
                   "rounded-full border px-4 py-2 font-display uppercase tracking-wide",
                   state.ready.includes(p.id)
                     ? "border-accent/60 bg-accent/10 text-accent-bright"
-                    : "border-white/10 text-moon-deep",
+                    : "border-line/10 text-moon-deep",
                 ].join(" ")}
               >
                 {p.emoji} {p.name}
@@ -155,7 +155,7 @@ export function ImpostorHost({
             {state.places.map((place) => (
               <div
                 key={place.name}
-                className="rounded-lg border border-white/10 bg-dusk/50 px-3 py-[1.2vmin] text-center font-display text-[clamp(0.7rem,1.15vw,1.3rem)] uppercase tracking-wide text-moon/75"
+                className="rounded-lg border border-line/10 bg-dusk/50 px-3 py-[1.2vmin] text-center font-display text-[clamp(0.7rem,1.15vw,1.3rem)] uppercase tracking-wide text-moon/75"
               >
                 {place.name}
               </div>
@@ -181,7 +181,7 @@ export function ImpostorHost({
                   "rounded-full border px-4 py-2 font-display uppercase tracking-wide",
                   state.votes[p.id]
                     ? "border-accent/60 bg-accent/10 text-accent-bright"
-                    : "border-white/10 text-moon-deep",
+                    : "border-line/10 text-moon-deep",
                 ].join(" ")}
               >
                 {p.emoji} {p.name}
@@ -233,7 +233,7 @@ export function ImpostorHost({
         {players.map((p) => (
           <span
             key={p.id}
-            className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-[0.7vmin] font-display text-[clamp(0.9rem,1.6vw,1.7rem)] uppercase tracking-wide text-moon/85"
+            className="flex items-center gap-2 rounded-full border border-line/10 bg-line/[0.03] px-4 py-[0.7vmin] font-display text-[clamp(0.9rem,1.6vw,1.7rem)] uppercase tracking-wide text-moon/85"
           >
             {p.emoji} {p.name} ·{" "}
             <ScoreNudge

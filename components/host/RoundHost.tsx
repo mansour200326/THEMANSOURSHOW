@@ -102,7 +102,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
                       "flex items-center gap-2 rounded-full border px-4 py-2 font-display text-[clamp(0.8rem,1.2vw,1.3rem)] uppercase tracking-wide transition-colors",
                       done
                         ? "border-emerald-400/60 bg-emerald-500/15 text-emerald-200"
-                        : "border-white/10 bg-white/[0.03] text-moon-deep",
+                        : "border-line/10 bg-line/[0.03] text-moon-deep",
                     ].join(" ")}
                   >
                     <span>{p.emoji}</span>
@@ -131,7 +131,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
                       "relative overflow-hidden rounded-xl border px-5 py-[1.4vmin]",
                       revealed && isTruth
                         ? "border-emerald-400/70 bg-emerald-500/10"
-                        : "border-white/10 bg-white/[0.03]",
+                        : "border-line/10 bg-line/[0.03]",
                     ].join(" ")}
                   >
                     {revealed && (
@@ -252,7 +252,7 @@ function HerdResults({ room, state }: { room: Room; state: RoundState }) {
             "flex items-center justify-between gap-4 rounded-xl border px-5 py-[1.4vmin]",
             ids.length === biggest && biggest > 1
               ? "border-accent/60 bg-accent/10"
-              : "border-white/10 bg-white/[0.03]",
+              : "border-line/10 bg-line/[0.03]",
           ].join(" ")}
         >
           <span className="truncate font-display text-[clamp(1rem,2vw,2.2rem)] uppercase tracking-wide text-moon">
@@ -286,7 +286,7 @@ function Standings({ room }: { room: Room }) {
           transition={{ delay: i * 0.07 }}
           className={[
             "flex items-center justify-between rounded-xl border px-5 py-3",
-            i === 0 ? "border-accent/50 bg-accent/[0.08]" : "border-white/10",
+            i === 0 ? "border-accent/50 bg-accent/[0.08]" : "border-line/10",
           ].join(" ")}
         >
           <span className="flex items-center gap-3 font-display text-xl uppercase tracking-wide text-moon">
@@ -319,7 +319,7 @@ function ScoreStrip({
         return (
           <div
             key={p.id}
-            className="relative flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-[0.9vmin]"
+            className="relative flex items-center gap-3 rounded-xl border border-line/10 bg-line/[0.03] px-4 py-[0.9vmin]"
           >
             <span className="text-[clamp(1.3rem,2.3vw,2.6rem)]">{p.emoji}</span>
             <span className="font-display text-[clamp(0.9rem,1.6vw,1.7rem)] uppercase tracking-wide text-moon/85">

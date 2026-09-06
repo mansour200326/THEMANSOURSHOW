@@ -150,7 +150,7 @@ export function FinalStage({
                       ? "border-emerald-400/60 bg-emerald-500/10"
                       : result === false
                         ? "border-rose-500/60 bg-rose-500/10"
-                        : "border-white/10 bg-white/[0.02]",
+                        : "border-line/10 bg-line/[0.02]",
                   ].join(" ")}
                 >
                   <p className="truncate font-display text-[clamp(0.85rem,1.2vw,1.5rem)] uppercase tracking-wider text-moon/90">

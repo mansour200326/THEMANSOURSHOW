@@ -93,7 +93,7 @@ export function NightScreen({
           lobby.
         </p>
       ) : (
-        <div className="min-h-0 flex-1 overflow-auto rounded-3xl border border-white/10 bg-white/[0.02]">
+        <div className="min-h-0 flex-1 overflow-auto rounded-3xl border border-line/10 bg-line/[0.02]">
           <table className="w-full text-left">
             <thead className="sticky top-0 bg-dusk">
               <tr className="text-moon-deep">
@@ -131,7 +131,7 @@ export function NightScreen({
                 <tr
                   key={row.name}
                   className={[
-                    "border-t border-white/8",
+                    "border-t border-line/8",
                     row.total === top && top > 0 ? "bg-accent/[0.07]" : "",
                   ].join(" ")}
                 >

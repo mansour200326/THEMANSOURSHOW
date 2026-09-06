@@ -95,7 +95,7 @@ export function FeudBoard({
                 "flex h-[4vmin] max-h-12 min-h-8 w-[4vmin] min-w-8 max-w-12 items-center justify-center rounded-lg border font-display text-[clamp(1rem,1.8vw,2rem)] font-bold",
                 i < state.strikes
                   ? "border-rose-500/70 bg-rose-500/20 text-rose-300"
-                  : "border-white/10 text-moon-deep/40",
+                  : "border-line/10 text-moon-deep/40",
               ].join(" ")}
             >
               ✗
@@ -107,7 +107,7 @@ export function FeudBoard({
       {/* Think time */}
       {left !== null && (
         <div className="flex shrink-0 items-center justify-center gap-3">
-          <div className="h-[1.2vmin] min-h-[6px] w-[36vw] overflow-hidden rounded-full bg-white/10">
+          <div className="h-[1.2vmin] min-h-[6px] w-[36vw] overflow-hidden rounded-full bg-line/10">
             <div
               className={[
                 "h-full rounded-full transition-[width] duration-200 ease-linear",
@@ -159,10 +159,10 @@ export function FeudBoard({
               className={[
                 "relative flex items-center justify-between overflow-hidden rounded-xl border px-5 py-[1.6vmin] text-left transition-all",
                 open
-                  ? "tile-face border-white/15 shadow-tile"
+                  ? "tile-face border-line/15 shadow-tile"
                   : clickable
-                    ? "border-white/10 bg-white/[0.03] hover:border-accent/50 hover:bg-white/[0.06]"
-                    : "border-white/8 bg-white/[0.02]",
+                    ? "border-line/10 bg-line/[0.03] hover:border-accent/50 hover:bg-line/[0.06]"
+                    : "border-line/8 bg-line/[0.02]",
               ].join(" ")}
             >
               <AnimatePresence mode="wait">
