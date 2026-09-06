@@ -184,18 +184,18 @@ export const RULES: Record<string, GameRules> = {
   },
   "code-grid": {
     summary:
-      "Twenty-five words on the TV. Nine belong to your team — only one of you knows which.",
+      "Two teams, one grid of 25 words. Get your team to tap all of your words before the other team taps all of theirs.",
     how: [
-      "Split into two teams. One person per team is the clue-giver, and their phone shows which words are whose.",
-      "The clue-giver says ONE word and a number. Nothing else — no gestures, no hints.",
-      "The number is how many of your words that one clue covers. Their team taps the words they think it means.",
-      "Tap one of yours and you carry on. Tap anything else and your turn ends.",
+      "Two teams: pink and amber. One person on each team holds the key card on their phone — it shows which of the 25 words are pink, which are amber, which are grey, and the one black word.",
+      "On your turn the key-holder says ONE word and a number, like “Fruit, 2”. That's the whole clue. It means: two of our words are fruit.",
+      "The rest of the team taps the words they think the clue means. Tap one of yours — keep going. Tap grey — turn over. Tap the other team's — turn over, and you've helped them.",
+      "Tap the black word and your team loses on the spot.",
     ],
     scoring:
-      "First team to find all nine of theirs wins. One word on the board is the assassin — tap it and you lose instantly.",
-    needs: "Four phones or more, so each team has a clue-giver and at least one guesser.",
+      "No points. First team to turn over all of their words wins the game. Pink has nine words; amber has eight and goes second.",
+    needs: "Four phones or more: a key-holder and at least one guesser per team.",
     example:
-      "Your words include APPLE and TREE, so you say “Orchard, 2”. Your team taps APPLE — right, keep going — then taps TREE. Both yours, turn continues. Say “Orchard, 2” badly and they might tap PALM instead, which is the other team's, and you've just helped them.",
+      "Pink's key card shows APPLE and BANANA are theirs. Their key-holder says “Fruit, 2”. Pink taps APPLE — pink, carry on — then BANANA — pink again, turn ends, two down. If they'd tapped LEMON, which was amber's, the turn ends and amber is one closer.",
   },
   "sketch-and-guess": {
     summary: "Draw on your phone, live on the TV.",

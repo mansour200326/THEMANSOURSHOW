@@ -16,7 +16,7 @@ type Props = {
 
 /** The key card, as seen by the two people allowed to see it. */
 const KEY_FACE: Record<string, string> = {
-  a: "border-sky-400/70 bg-sky-500/30 text-sky-100",
+  a: "border-fuchsia-400/80 bg-fuchsia-500/35 text-fuchsia-50",
   b: "border-amber-400/70 bg-amber-500/30 text-amber-100",
   neutral: "border-white/15 bg-white/[0.05] text-moon-deep",
   assassin: "border-rose-500 bg-rose-900 text-rose-200",
@@ -61,7 +61,7 @@ export function GridPlayer({ state, me, onClue, onTap, onPass, onAssign }: Props
                 "rounded-2xl border p-4 transition-colors",
                 mine
                   ? i === 0
-                    ? "border-sky-400/70 bg-sky-500/10"
+                    ? "border-fuchsia-400/70 bg-fuchsia-500/10"
                     : "border-amber-400/70 bg-amber-500/10"
                   : "border-white/12 bg-white/[0.03]",
               ].join(" ")}

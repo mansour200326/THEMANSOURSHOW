@@ -68,6 +68,18 @@ function looksRight(title: string, subject: string): boolean {
   return words.length <= 2 ? hits === words.length : hits >= Math.ceil(words.length * 0.7);
 }
 
+/**
+ * Pictures with the answer written on them.
+ *
+ * "What's this drink?" over a photo of a Coca-Cola can is not a clue, and it
+ * happened. The prompt now tells the model not to ask for that kind of
+ * subject, but the model is not the last line — a photo of almost anything
+ * branded, packaged, labelled or signposted will have the name in the frame,
+ * and Commons filenames say so often enough to catch most of it.
+ */
+const GIVES_IT_AWAY =
+  /\b(logo|label|labelled|packaging|bottle|can|cans|tin|box|wrapper|poster|cover|jersey|kit|shirt|badge|emblem|sign|signage|banner|billboard|storefront|shopfront|advert|advertisement|ad|menu|ticket|stamp|coin|banknote|note|title page|book|album|magazine|newspaper|brand|branded|trademark)\b/i;
+
 /** Diagrams, maps, logos and charts are not "who is this?" material. */
 const WRONG_SHAPE =
   /\b(map|diagram|chart|logo|icon|coat of arms|signature|location|locator|graph|plaque|timeline|blank)\b/i;
@@ -146,6 +158,7 @@ export async function findPicture(subject: string): Promise<ClueImage | null> {
       const title = page.title.replace(/^File:/, "");
       if (WRONG_SHAPE.test(title)) continue;
       if (GRIM.test(title)) continue;
+      if (GIVES_IT_AWAY.test(title)) continue;
       if (!looksRight(title, term)) continue;
 
       const info = page.imageinfo?.[0];

@@ -120,6 +120,19 @@ const GeneratedClue = z.object({
     .describe(
       "For a clue best shown as a photograph, the exact real-world subject to picture — usually the answer. Empty string for every other clue.",
     ),
+  /*
+   * A separate, explicit judgement rather than trusting the model to leave
+   * `picture` empty. Told not to ask for branded things it still did — a
+   * can of Coca-Cola under "what's this drink?" — because "is this a good
+   * picture clue?" and "would the photo have the name written on it?" are
+   * different questions, and a model answering the first forgets to ask the
+   * second. Made to answer it.
+   */
+  pictureShowsName: z
+    .boolean()
+    .describe(
+      "True if a typical photograph of the picture subject would have its name, logo or label visible in the frame — a product, a brand, a shop, a sign, a cover, a shirt. False for landmarks, people, animals, dishes, artworks and objects that don't carry their own name.",
+    ),
 });
 
 const GeneratedCategory = z.object({
@@ -170,12 +183,21 @@ next to a photograph: "This landmark…", "This artist painted…". Aim for roug
 one clue in five.
 
 Only ask for a picture of something a free photograph plausibly exists of: real
-people, places, landmarks, buildings, animals, plants, food, flags, artworks,
+people, places, landmarks, buildings, animals, plants, dishes, flags, artworks,
 vehicles, objects. Do NOT ask for one of a character from a film, cartoon,
 comic or game — those images are not freely licensed, and what comes back is a
-mural or a costume rather than the thing itself. Leave "picture" empty for
-every clue where the words are the point: dates, quotes, wordplay, statistics,
-plots, anything abstract.
+mural or a costume rather than the thing itself.
+
+Never ask for a picture that would have the answer written on it. A brand, a
+product, a drink, a shop, a car badge, a book or album cover, a poster, a road
+sign, a team shirt, a building with its name over the door — a photograph of
+any of these carries the name in the frame and hands the answer over before
+the clue is read. If the subject is the kind of thing that is usually
+photographed with its name on it, leave "picture" empty and write the clue in
+words.
+
+Leave "picture" empty for every clue where the words are the point: dates,
+quotes, wordplay, statistics, plots, anything abstract.
 
 Write every clue so it still works with no picture at all. A picture may turn
 out not to exist, and the clue will be played as text.
@@ -340,7 +362,7 @@ export async function generateTriviaBoard({
  */
 async function attachPictures(
   board: Board,
-  source: Array<{ clues: Array<{ picture?: string }> }>,
+  source: Array<{ clues: Array<{ picture?: string; pictureShowsName?: boolean }> }>,
 ): Promise<void> {
   const wanted: Array<{ clue: Clue; subject: string }> = [];
 
@@ -360,8 +382,12 @@ async function attachPictures(
     let used = 0;
     cat.clues.forEach((clue, r) => {
       if (used >= PICTURES_PER_CATEGORY) return;
-      const subject = source[c]?.clues?.[r]?.picture?.trim();
+      const asked = source[c]?.clues?.[r];
+      const subject = asked?.picture?.trim();
       if (!subject) return;
+      // The model says the photo would have the answer written on it. Then
+      // it's not a clue, and the words will do.
+      if (asked?.pictureShowsName) return;
       wanted.push({ clue, subject });
       used++;
     });

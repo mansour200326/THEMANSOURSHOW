@@ -13,10 +13,18 @@ type Props = {
   onQuit: () => void;
 };
 
-/** Face-up words wear their team's colour; the assassin wears none of them. */
+/**
+ * Face-up words wear their team's colour; the assassin wears none of them.
+ *
+ * Team A was sky blue, on a midnight-blue screen — the same hue as the
+ * background, and from across a room a revealed blue word looked like an
+ * unrevealed one. Pink and amber are both hot against navy and far apart from
+ * each other, and each face-up word also carries its team's mark, so colour
+ * is never the only thing telling you whose it is.
+ */
 const FACE: Record<string, string> = {
-  a: "border-sky-400/70 bg-sky-500/25 text-sky-100",
-  b: "border-amber-400/70 bg-amber-500/25 text-amber-100",
+  a: "border-fuchsia-400/80 bg-fuchsia-500/30 text-fuchsia-50",
+  b: "border-amber-400/80 bg-amber-500/30 text-amber-50",
   neutral: "border-white/15 bg-white/[0.06] text-moon-dim",
   assassin: "border-rose-500 bg-rose-950 text-rose-300",
 };
@@ -56,14 +64,14 @@ export function GridHost({ room, state, onBegin, onQuit }: Props) {
               className={[
                 "flex min-h-0 flex-col gap-[1.5vmin] rounded-3xl border p-[3vmin]",
                 i === 0
-                  ? "border-sky-400/50 bg-sky-500/[0.07]"
-                  : "border-amber-400/50 bg-amber-500/[0.07]",
+                  ? "border-fuchsia-400/60 bg-fuchsia-500/[0.08]"
+                  : "border-amber-400/60 bg-amber-500/[0.08]",
               ].join(" ")}
             >
               <p
                 className={[
                   "font-display text-[clamp(1.2rem,3vw,2.6rem)] uppercase tracking-wide",
-                  i === 0 ? "text-sky-200" : "text-amber-200",
+                  i === 0 ? "text-fuchsia-200" : "text-amber-200",
                 ].join(" ")}
               >
                 {t.name}
@@ -127,7 +135,7 @@ export function GridHost({ room, state, onBegin, onQuit }: Props) {
           Code Grid
         </span>
         <div className="flex items-center gap-4">
-          <Tally label={state.teams[0].name} left={state.remaining?.[0] ?? 0} tone="sky" />
+          <Tally label={state.teams[0].name} left={state.remaining?.[0] ?? 0} tone="pink" />
           <Tally label={state.teams[1].name} left={state.remaining?.[1] ?? 0} tone="amber" />
           <button onClick={onQuit} className="btn-ghost px-3 py-1.5 text-xs">
             End segment
@@ -145,6 +153,17 @@ export function GridHost({ room, state, onBegin, onQuit }: Props) {
             : ""}
       </p>
 
+      {/*
+        * What the room needs to know, said every turn. The rules screen is
+        * read once and forgotten; this is the part people ask about
+        * mid-game — "wait, what happens if we tap grey?"
+        */}
+      <p className="shrink-0 text-center text-[clamp(0.75rem,1.4vw,1.4rem)] text-moon-deep">
+        {state.phase === "clue"
+          ? "Clue-giver: one word and a number, nothing else."
+          : "Tap your own words to keep going · a grey word ends your turn · the other team's word helps them · the black word loses the game."}
+      </p>
+
       <div className="flex min-h-0 flex-1 items-center justify-center">
         <Grid state={state} />
       </div>
@@ -159,14 +178,14 @@ function Tally({
 }: {
   label: string;
   left: number;
-  tone: "sky" | "amber";
+  tone: "pink" | "amber";
 }) {
   return (
     <span
       className={[
         "rounded-full border px-4 py-1 font-display text-sm uppercase tracking-wide",
-        tone === "sky"
-          ? "border-sky-400/50 text-sky-200"
+        tone === "pink"
+          ? "border-fuchsia-400/60 text-fuchsia-200"
           : "border-amber-400/50 text-amber-200",
       ].join(" ")}
     >
@@ -189,13 +208,18 @@ function Grid({ state, reveal }: { state: CodeGridState & ViewerExtras; reveal?:
             key={i}
             animate={{ scale: state.revealed.includes(i) ? 0.97 : 1 }}
             className={[
-              "flex min-h-0 items-center justify-center rounded-xl border px-2 text-center font-display uppercase tracking-wide transition-colors",
+              "relative flex min-h-0 items-center justify-center rounded-xl border px-2 text-center font-display uppercase tracking-wide transition-colors",
               "text-[clamp(0.6rem,1.35vw,1.6rem)]",
               shown && owner !== "hidden"
                 ? FACE[owner]
                 : "tile-face border-white/10 text-moon",
             ].join(" ")}
           >
+            {shown && (owner === "a" || owner === "b") && (
+              <span className="absolute left-[0.6vmin] top-[0.4vmin] font-display text-[clamp(0.5rem,1vw,1rem)] opacity-80">
+                {owner === "a" ? "●" : "▲"}
+              </span>
+            )}
             {word}
           </motion.div>
         );
