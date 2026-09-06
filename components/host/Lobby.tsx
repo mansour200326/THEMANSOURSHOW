@@ -17,10 +17,12 @@ type Props = {
   onAddBots: () => void;
   onClearBots: () => void;
   onKick: (playerId: string) => void;
+  /** Open the night's combined standings. */
+  onNight: () => void;
 };
 
 /** Games that run on this screen alone — no room, no phones. */
-export function Lobby({ room, onStart, onAddBots, onClearBots, onKick }: Props) {
+export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }: Props) {
   const me = useEntitlements();
   const locked = (id: string) => me.plan !== "pro" && !me.freeGameIds.includes(id);
   const [joinUrl, setJoinUrl] = useState("");
@@ -59,6 +61,13 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick }: Props) 
             <p className="break-all text-[clamp(0.65rem,0.95vw,1rem)] leading-tight text-moon/75">
               {joinUrl || "…"}
             </p>
+            {room.hostKey && (
+              <p className="mt-2 text-[clamp(0.55rem,0.8vw,0.85rem)] leading-tight text-moon-deep">
+                Host&apos;s phone: <span className="text-moon/70">{joinUrl.replace(/\/play$/, "")}/sheet/{room.code}</span>
+                {" · key "}
+                <span className="font-display tracking-[0.2em] text-moon/70">{room.hostKey}</span>
+              </p>
+            )}
           </div>
         </div>
 
@@ -74,6 +83,13 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick }: Props) 
                 </button>
               )}
               <AccountLink className="self-center" />
+              <button
+                onClick={onNight}
+                className="btn-ghost px-3 py-1 text-xs"
+                title="Every game played tonight, added up"
+              >
+                Tonight{room.night?.length ? ` · ${room.night.length}` : ""}
+              </button>
               <button
                 onClick={onAddBots}
                 disabled={bots.length >= 3}

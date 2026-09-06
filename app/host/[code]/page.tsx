@@ -13,6 +13,7 @@ import { ImpostorHost } from "@/components/host/ImpostorHost";
 import { LiveHost } from "@/components/host/LiveHost";
 import { SketchHost } from "@/components/host/SketchHost";
 import { GameSetup } from "@/components/host/GameSetup";
+import { NightScreen } from "@/components/host/NightScreen";
 import { RoomCodeChip } from "@/components/host/RoomCodeChip";
 import { ScoreFixer } from "@/components/ScoreAdjuster";
 import { connectedPlayers } from "@/lib/room/types";
@@ -71,6 +72,7 @@ export default function HostPage({
 
   // Every game explains itself first; some then ask what they're about.
   const [explaining, setExplaining] = useState<string | null>(null);
+  const [showNight, setShowNight] = useState(false);
   const [setupFor, setSetupFor] = useState<string | null>(null);
   /** Chosen on the rules screen; survives the setup step in between. */
   const [rounds, setRounds] = useState<number | undefined>();
@@ -275,9 +277,20 @@ export default function HostPage({
     );
   }
 
+  if (!room.gameId && showNight) {
+    return (
+      <NightScreen
+        night={room.night ?? []}
+        onBack={() => setShowNight(false)}
+        onClear={() => send("night:clear")}
+      />
+    );
+  }
+
   if (!room.gameId) {
     return (
       <Lobby
+        onNight={() => setShowNight(true)}
         room={room}
         onStart={(gameId) => {
           if (!canPlay(me.plan, gameId)) {

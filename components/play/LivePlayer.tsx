@@ -7,6 +7,7 @@ import {
   liveShuffledEvents,
 } from "@/lib/games/liveEngine";
 import type { Player } from "@/lib/room/types";
+import { haptic } from "@/lib/haptics";
 
 type Props = {
   state: LiveState;
@@ -64,11 +65,17 @@ function Clock({ left, seconds }: { left: number; seconds: number }) {
 
 export function LivePlayer({ state, me, onSubmit, onClue }: Props) {
   const item = liveCurrent(state);
+
+  // A kick when it's you: the clue-giver's turn, or a fresh prompt landing.
+  const leading = state.lead === me.id;
+  useEffect(() => {
+    if (state.phase === "brief" && leading) haptic("turn");
+    else if (state.phase === "collect") haptic("nudge");
+  }, [state.phase, state.round, leading]);
   const left = useCountdown(state.startedAt, state.seconds);
   const clock = <Clock left={left} seconds={state.seconds} />;
   const benched = state.benched.includes(me.id);
   const submitted = state.answers[me.id] !== undefined;
-  const leading = state.lead === me.id;
 
   if (state.phase === "done") {
     return (
@@ -96,6 +103,7 @@ export function LivePlayer({ state, me, onSubmit, onClue }: Props) {
 
   if (state.phase === "reveal") {
     const scored = state.lastScores[me.id] ?? 0;
+    haptic(scored ? "right" : "wrong");
     return (
       <Centre>
         <p className="text-6xl">{me.emoji}</p>

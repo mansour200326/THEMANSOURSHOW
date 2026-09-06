@@ -120,6 +120,27 @@ function redactSketch(
  * Games without secrets pass straight through untouched.
  */
 export function redactFor(room: Room, viewerId: string | null): Room {
+  /*
+   * Two things ride on the room that aren't for everyone. The host key is
+   * shown on the TV — the one screen with no player behind it — so the host
+   * can type it into their phone; no phone ever receives it. The sheet goes
+   * the other way: only to a phone that presented the key, never to the TV,
+   * because the TV is what the sheet is hiding things from.
+   */
+  const isTv = viewerId === null;
+  const isHostPhone =
+    viewerId !== null &&
+    viewerId.startsWith("host:") &&
+    Boolean(room.hostKey) &&
+    viewerId.slice(5).toUpperCase() === room.hostKey;
+
+  const scrubbed: Room = {
+    ...room,
+    hostKey: isTv ? room.hostKey : undefined,
+    hostSheet: isHostPhone ? room.hostSheet : null,
+  };
+  room = scrubbed;
+
   const game = room.game as { kind?: string } | null;
   if (!game?.kind) return room;
 

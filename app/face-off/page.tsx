@@ -18,14 +18,55 @@ import {
 } from "@/lib/feud/engine";
 import { resolveGuess } from "@/lib/feud/judge";
 import { sampleFeudPack } from "@/lib/feud/samplePack";
-import { type FeudQuestion, type FeudState, otherTeam } from "@/lib/feud/types";
+import { type FeudQuestion, type FeudState, otherTeam, currentQuestion } from "@/lib/feud/types";
 import { backHref } from "@/lib/backHref";
+import { recordNight, setHostSheet } from "@/lib/night/report";
 import { ScoreNudge } from "@/components/ScoreNudge";
 
 const KEY = "bignight:feud:v1";
 
 function FaceOffStage() {
   const [state, dispatch] = useReducer(feudReducer, undefined, emptyFeud);
+
+  /*
+   * The host's phone gets the card. Every time the board changes, the current
+   * question and its answers go to the room this game was opened from, marked
+   * by which are still face down. Only a phone holding the host key ever
+   * receives them — the TV certainly doesn't.
+   */
+  useEffect(() => {
+    const q = currentQuestion(state);
+    if (state.phase !== "play" && state.phase !== "face-off") {
+      setHostSheet(null);
+      return;
+    }
+    if (!q) return;
+    setHostSheet({
+      title: q.question,
+      lines: q.answers.map((a, i) => ({
+        text: a.text,
+        note: String(a.points),
+        hidden: !state.revealed.includes(i),
+      })),
+      at: Date.now(),
+    });
+  }, [state.round, state.revealed, state.phase, state.questions]);
+
+  // Played to the end: the scores join the night.
+  const reported = useRef(false);
+  useEffect(() => {
+    if (state.phase !== "winner") {
+      reported.current = false;
+      return;
+    }
+    if (reported.current) return;
+    reported.current = true;
+    recordNight(
+      "face-off",
+      "Face-Off",
+      state.teams.map((t) => ({ name: t.name, points: t.score })),
+    );
+  }, [state.phase, state.teams]);
   const [saved, setSaved] = useState<FeudState | null>(null);
   const [generating, setGenerating] = useState<FeudConfig | null>(null);
   const [error, setError] = useState<string | null>(null);

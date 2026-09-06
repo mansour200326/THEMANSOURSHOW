@@ -29,6 +29,7 @@ import { clearGame, loadGame, saveGame } from "@/lib/bigboard/storage";
 import type { GameState } from "@/lib/bigboard/types";
 import type { Board, FinalClue } from "@/lib/board/types";
 import { backHref } from "@/lib/backHref";
+import { recordNight } from "@/lib/night/report";
 
 /**
  * Big Board keeps no record of how the host called an answer, so the cue is
@@ -63,6 +64,22 @@ function BigBoardStage() {
   );
   useJudgementCue(state.spent.length, state.teams);
   useCueWhen(state.phase === "winner", "fanfare");
+
+  // Played to the end: the scores join the night this board was opened from.
+  const reported = useRef(false);
+  useEffect(() => {
+    if (state.phase !== "winner") {
+      reported.current = false;
+      return;
+    }
+    if (reported.current) return;
+    reported.current = true;
+    recordNight(
+      "big-board",
+      "Big Board",
+      state.teams.map((t) => ({ name: t.name, points: t.score })),
+    );
+  }, [state.phase, state.teams]);
 
   /** The rules come first. Deliberately not part of game state. */
   const [explained, setExplained] = useState(false);

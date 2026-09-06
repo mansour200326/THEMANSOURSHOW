@@ -16,6 +16,31 @@ export type Player = {
   bot?: boolean;
 };
 
+/**
+ * One finished game's final scores, kept for the night.
+ *
+ * Keyed by display name rather than player id, because the screen-only games
+ * score teams and the room games score people, and a night has both. A name
+ * that appears in several games adds up; one that appears in one game just
+ * has that game's points.
+ */
+export type NightEntry = {
+  gameId: string;
+  label: string;
+  at: number;
+  scores: Array<{ name: string; points: number }>;
+};
+
+/**
+ * What the host's phone is allowed to see that the television isn't.
+ * Set by the screen-only games — the answers still face down on the board.
+ */
+export type HostSheet = {
+  title: string;
+  lines: Array<{ text: string; note?: string; hidden: boolean }>;
+  at: number;
+};
+
 export type Room = {
   code: string;
   players: Player[];
@@ -28,6 +53,15 @@ export type Room = {
   touchedAt?: number;
   /** Phones allowed, fixed by the host's plan when the room was made. */
   maxPlayers?: number;
+  /** Every finished game tonight, oldest first. */
+  night?: NightEntry[];
+  /**
+   * Lets a phone act as the host's private screen. Shown on the TV in the
+   * lobby only; a phone that opens the room "as host:<key>" gets the sheet
+   * and nothing else does. Never in a phone's snapshot.
+   */
+  hostKey?: string;
+  hostSheet?: HostSheet | null;
   /** Bumped on every mutation so clients can drop stale snapshots. */
   version: number;
 };

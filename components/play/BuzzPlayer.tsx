@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { type BuzzState, buzzArmed } from "@/lib/games/buzzEngine";
 import type { Player, Room } from "@/lib/room/types";
+import { haptic } from "@/lib/haptics";
 
 type Props = {
   room: Room;
@@ -113,7 +114,10 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
       </p>
 
       <motion.button
-        onClick={onBuzz}
+        onClick={() => {
+          haptic("buzz");
+          onBuzz();
+        }}
         disabled={!live}
         whileTap={{ scale: 0.94 }}
         animate={live ? { scale: [1, 1.02, 1] } : { scale: 1 }}

@@ -18,6 +18,7 @@ import { emptyRapid, rapidReducer, rapidStandings, rapidWinners } from "@/lib/ra
 import { drawPrompts } from "@/lib/rapid/packs";
 import { ScoreNudge } from "@/components/ScoreNudge";
 import { backHref } from "@/lib/backHref";
+import { recordNight } from "@/lib/night/report";
 import {
   type RapidMode,
   type RapidState,
@@ -29,6 +30,22 @@ const ROUND_CHOICES = [3, 5, 8];
 
 export function RapidGame({ mode }: { mode: RapidMode }) {
   const [state, dispatch] = useReducer(rapidReducer, mode, emptyRapid);
+
+  // Played to the end: the scores join the night this game was opened from.
+  const reported = useRef(false);
+  useEffect(() => {
+    if (state.phase !== "winner") {
+      reported.current = false;
+      return;
+    }
+    if (reported.current) return;
+    reported.current = true;
+    recordNight(
+      mode,
+      RAPID_TITLE[mode],
+      state.teams.map((t) => ({ name: t.name, points: t.score })),
+    );
+  }, [state.phase, state.teams, mode]);
   const [names, setNames] = useState(startingTeams);
   const [themes, setThemes] = useState<string[]>([""]);
   const [rounds, setRounds] = useState(5);

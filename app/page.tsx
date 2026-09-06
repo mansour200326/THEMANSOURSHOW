@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { HeroStage } from "@/components/HeroStage";
 import { IMPACT, ShowMark } from "@/components/ShowMark";
 import { AccountLink } from "@/components/account/AccountLink";
+import { Onboarding, useFirstVisit } from "@/components/Onboarding";
 
 export default function Home() {
   const router = useRouter();
@@ -23,10 +24,27 @@ export default function Home() {
     }
   };
 
+  const [firstVisit, dismissOnboarding] = useFirstVisit();
+  const [showHow, setShowHow] = useState(false);
+
   return (
     <main className="relative">
       {/* The only entrance to an account, and the only one there should be. */}
       <AccountLink className="absolute right-5 top-5 z-20" />
+      <button
+        onClick={() => setShowHow(true)}
+        className="absolute left-5 top-5 z-20 font-display text-xs uppercase tracking-[0.25em] text-moon-deep transition-colors hover:text-moon"
+      >
+        How it works
+      </button>
+      {(firstVisit || showHow) && (
+        <Onboarding
+          onDone={() => {
+            dismissOnboarding();
+            setShowHow(false);
+          }}
+        />
+      )}
       {/*
        * The middle of the stage is the wordmark and two buttons, nothing else.
        * The explanation used to sit between them, where the floating tiles ran

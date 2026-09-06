@@ -5,6 +5,8 @@ import { BOT_ROSTER, settleBots } from "@/lib/room/bots";
 import { loadRooms, saveRooms } from "@/lib/room/persist";
 import {
   type Action,
+  type HostSheet,
+  type NightEntry,
   type Player,
   type Room,
   AVATARS,
@@ -33,6 +35,12 @@ const rooms = (g.__showRooms ??= new Map<string, Room>(
   loadRooms().map((room) => [room.code, room]),
 ));
 const listeners = (g.__showListeners ??= new Map<string, Set<Listener>>());
+
+/** Short enough to type off a TV, long enough not to be guessed by a phone. */
+const makeHostKey = () => {
+  const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  return Array.from({ length: 6 }, () => letters[Math.floor(Math.random() * letters.length)]).join("");
+};
 
 /* ------------------------------------------------------------------ access */
 
@@ -76,6 +84,9 @@ export function createRoom(maxPlayers = 12): Room {
     createdAt: Date.now(),
     touchedAt: Date.now(),
     maxPlayers,
+    night: [],
+    hostKey: makeHostKey(),
+    hostSheet: null,
     version: 0,
   };
   rooms.set(code, room);
@@ -291,18 +302,79 @@ function reduceRoom(room: Room, action: Action): Room {
       return started;
     }
 
-    case "game:end":
+    case "game:end": {
       /**
        * Back to the lobby with a clean slate. The finished game's standings
        * stay on screen right up until the host taps away from them, so this
        * never wipes a result anybody is still reading.
+       *
+       * If it was played to the end, the scores go into the night's ledger
+       * first. A game the host bailed out of halfway isn't a result.
        */
+      const phase = (room.game as { phase?: string } | null)?.phase;
+      const finished = phase === "done" || phase === "winner";
+      const scores = room.players
+        .filter((p) => !p.bot)
+        .map((p) => ({ name: p.name, points: p.score }));
+      const entry: NightEntry | null =
+        finished && room.gameId && scores.some((x) => x.points !== 0)
+          ? {
+              gameId: room.gameId,
+              label: games[room.gameId]?.name ?? room.gameId,
+              at: Date.now(),
+              scores,
+            }
+          : null;
       return {
         ...room,
         gameId: null,
         game: null,
         players: clearScores(room.players),
+        night: entry ? [...(room.night ?? []), entry] : room.night,
       };
+    }
+
+    /** A screen-only game reporting its final scores into the night. */
+    case "night:record": {
+      const gameId = String(action.payload?.gameId ?? "");
+      const label = String(action.payload?.label ?? gameId).slice(0, 40);
+      const raw = Array.isArray(action.payload?.scores) ? action.payload.scores : [];
+      const scores = raw
+        .map((x) => ({
+          name: String((x as { name?: unknown })?.name ?? "").trim().slice(0, 30),
+          points: Math.round(Number((x as { points?: unknown })?.points)),
+        }))
+        .filter((x) => x.name && Number.isFinite(x.points));
+      if (!gameId || !scores.length) return room;
+      return {
+        ...room,
+        night: [...(room.night ?? []), { gameId, label, at: Date.now(), scores }],
+      };
+    }
+
+    /** Start the night's ledger again. */
+    case "night:clear":
+      return { ...room, night: [] };
+
+    /** The host's private sheet, set by a screen-only game as it plays. */
+    case "sheet:set": {
+      const raw = action.payload?.sheet as HostSheet | null | undefined;
+      if (raw === null) return { ...room, hostSheet: null };
+      if (!raw || typeof raw !== "object") return room;
+      const lines = Array.isArray(raw.lines) ? raw.lines : [];
+      return {
+        ...room,
+        hostSheet: {
+          title: String(raw.title ?? "").slice(0, 80),
+          lines: lines.slice(0, 20).map((l) => ({
+            text: String(l?.text ?? "").slice(0, 80),
+            note: l?.note ? String(l.note).slice(0, 40) : undefined,
+            hidden: Boolean(l?.hidden),
+          })),
+          at: Date.now(),
+        },
+      };
+    }
 
     case "bots:add": {
       const already = room.players.filter((p) => p.bot).length;
