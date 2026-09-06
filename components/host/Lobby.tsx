@@ -88,7 +88,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
                 className="btn-ghost px-3 py-1 text-xs"
                 title="Every game played tonight, added up"
               >
-                Tonight{room.night?.length ? ` · ${room.night.length}` : ""}
+                Leaderboard{room.night?.length ? ` · ${room.night.length}` : ""}
               </button>
               <button
                 onClick={onAddBots}

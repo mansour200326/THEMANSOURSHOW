@@ -8,6 +8,7 @@ import { HeroStage } from "@/components/HeroStage";
 import { IMPACT, ShowMark } from "@/components/ShowMark";
 import { AccountLink } from "@/components/account/AccountLink";
 import { Onboarding, useFirstVisit } from "@/components/Onboarding";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Home() {
   const router = useRouter();
@@ -42,8 +43,11 @@ export default function Home() {
 
   return (
     <main className="relative">
-      {/* The only entrance to an account, and the only one there should be. */}
-      <AccountLink className="absolute right-5 top-5 z-20" />
+      {/* Top right: the lights, and the only entrance to an account. */}
+      <div className="absolute right-5 top-5 z-20 flex items-center gap-3">
+        <AccountLink />
+        <ThemeToggle prominent />
+      </div>
       {/*
         * A button, not a footnote. Set in the same grey as the legal line it
         * looked like exactly that, and a first-time host is the one person

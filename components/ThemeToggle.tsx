@@ -18,7 +18,14 @@ export function applyTheme(theme: Theme) {
   document.documentElement.dataset.theme = theme;
 }
 
-export function ThemeToggle({ className = "" }: { className?: string }) {
+export function ThemeToggle({
+  className = "",
+  prominent = false,
+}: {
+  className?: string;
+  /** A real button with a label, for the one place it should be noticed. */
+  prominent?: boolean;
+}) {
   const [theme, setTheme] = useState<Theme>("dark");
   useEffect(() => {
     const current = document.documentElement.dataset.theme;
@@ -35,6 +42,19 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
       /* private mode — it still flips for this visit */
     }
   };
+
+  if (prominent) {
+    return (
+      <button
+        type="button"
+        onClick={flip}
+        aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        className={`btn-ghost px-4 py-2.5 text-sm opacity-100 ${className}`}
+      >
+        {theme === "dark" ? "☀️ Light mode" : "🌙 Dark mode"}
+      </button>
+    );
+  }
 
   return (
     <button
