@@ -219,7 +219,7 @@ function Card({
         "relative flex h-full flex-col overflow-hidden rounded-2xl border p-3 text-center transition-all duration-200 lg:p-[1.2vmin]",
         ready
           ? "border-accent/40 bg-gradient-to-b from-accent/[0.14] to-transparent group-hover:-translate-y-1 group-hover:border-accent group-hover:shadow-glow"
-          : "border-white/10 bg-white/[0.02] opacity-45",
+          : "border-white/10 bg-white/[0.02]",
       ].join(" ")}
     >
       {/* A lit edge in the game's colour — the lineup reads as families from the couch. */}
@@ -236,7 +236,7 @@ function Card({
         <h3
           className={[
             "text-balance font-display text-base uppercase leading-tight tracking-wide lg:text-[clamp(0.9rem,1.45vw,1.8rem)]",
-            ready ? "text-accent" : "text-moon-dim",
+            ready ? "text-accent" : "text-moon/45",
           ].join(" ")}
         >
           {name}
@@ -245,11 +245,17 @@ function Card({
 
       <span
         className={[
-          "mt-2 block font-display text-[0.62rem] uppercase tracking-[0.18em]",
-          ready ? "text-accent/60" : "text-moon-deep",
+          "mt-2 block font-display uppercase tracking-[0.18em]",
+          ready
+            ? "text-[0.62rem] text-accent/60"
+            : status === "Pro"
+              ? "text-[0.62rem] text-moon-deep"
+              // Amber, full strength, a size up, with a phone on it: the one
+              // line on a greyed-out card that has to be read from the sofa.
+              : "rounded-full border border-amber-400/50 bg-amber-500/15 px-2.5 py-1 text-[clamp(0.7rem,1.1vw,1.1rem)] text-amber-200",
         ].join(" ")}
       >
-        {status}
+        {!ready && status !== "Pro" ? `📱 ${status}` : status}
       </span>
     </div>
   );
