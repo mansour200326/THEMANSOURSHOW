@@ -209,7 +209,7 @@ export function SetupScreen({
               onChange={(v) => setRule("deduct", v)}
             />
             <Toggle
-              label="Daily doubles"
+              label="Double downs"
               hint="Two hidden tiles. The team wagers before seeing the clue."
               checked={rules.dailyDoubles}
               onChange={(v) => setRule("dailyDoubles", v)}

@@ -31,7 +31,7 @@ const REVEAL_BEAT_MS = 900;
 
 const TITLES: Record<LiveState["variant"], string> = {
   standing: "Last One Standing",
-  timeline: "Timeline",
+  timeline: "In Order",
   dial: "Dial It In",
 };
 

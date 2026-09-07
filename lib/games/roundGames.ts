@@ -209,7 +209,7 @@ export const punchline = createRoundGame(
   PUNCHLINE,
 );
 
-/* --------------------------------------------------------- 4. Caption This */
+/* --------------------------------------------------------- 4. Add a Caption */
 
 /*
  * A picture goes up and everyone captions it. The pictures are real files
@@ -255,7 +255,7 @@ const CAPTION_THIS: Prompt[] = [
 export const captionThis = createRoundGame(
   {
     id: "caption-this",
-    name: "Caption This",
+    name: "Add a Caption",
     minPlayers: 3,
     collect: { prompt: "Write the caption", maxLength: 80 },
     rounds: 6,

@@ -11,7 +11,7 @@ type Props = {
   /** Which game, so the suggested topics suit it. */
   gameId: string;
   /**
-   * Trivia Royale needs a full board and can't start without one; every other
+   * Speed Trivia needs a full board and can't start without one; every other
    * game has a bundled pack and treats generating as optional.
    */
   needsBoard?: boolean;

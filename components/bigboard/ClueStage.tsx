@@ -12,7 +12,7 @@ type Props = {
   answer: string;
   /** Present only on picture clues — see lib/images/commons.ts. */
   image?: ClueImage;
-  /** Points at stake — clue value, or the wager on a daily double. */
+  /** Points at stake — clue value, or the wager on a double down. */
   value: number;
   isDaily: boolean;
   teams: Team[];
@@ -39,7 +39,7 @@ export function ClueStage({
 }: Props) {
   const [revealed, setRevealed] = useState(false);
 
-  // On a daily double only the picking team plays it — nobody can steal.
+  // On a double down only the picking team plays it — nobody can steal.
   const eligible = (i: number) =>
     isDaily ? i === turn : !lockedOut.includes(i);
 
@@ -74,7 +74,7 @@ export function ClueStage({
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0">
           <p className="t-label font-display uppercase text-moon-deep">
-            {isDaily ? "Daily Double" : category}
+            {isDaily ? "Double Down" : category}
           </p>
           <p className="truncate font-display text-[clamp(1.1rem,2vw,2.5rem)] uppercase tracking-wide text-moon/90">
             {isDaily ? category : teams[turn]?.name}

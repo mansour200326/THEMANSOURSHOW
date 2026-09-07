@@ -97,9 +97,9 @@ export default function HostPage({
 
   /** Games that ask what they should be about before they start. */
   const NEEDS_SETUP: Record<string, string> = {
-    "trivia-royale": "Trivia Royale",
+    "trivia-royale": "Speed Trivia",
     "last-one-standing": "Last One Standing",
-    timeline: "Timeline",
+    timeline: "In Order",
     "dial-it-in": "Dial It In",
     impostor: "Impostor",
     "sketch-and-guess": "Sketch & Guess",
@@ -107,7 +107,7 @@ export default function HostPage({
     "bluff-trivia": "Bluff Trivia",
     "most-likely-to": "Most Likely To",
     punchline: "Punchline",
-    "caption-this": "Caption This",
+    "caption-this": "Add a Caption",
   };
 
   const launch = async (
@@ -118,7 +118,7 @@ export default function HostPage({
     // written pack or not.
     const seconds = config.minutes ? config.minutes * 60 : undefined;
     setSetupError(null);
-    // Trivia Royale needs a full board; the rest are happy with their
+    // Speed Trivia needs a full board; the rest are happy with their
     // bundled pack if the host doesn't want to wait for a written one.
     const board = gameId === "trivia-royale";
     if (board ? config.categories.length < 3 : config.categories.length === 0) {

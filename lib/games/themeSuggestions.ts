@@ -174,7 +174,7 @@ export const THEME_SUGGESTIONS: Record<string, string[]> = {
     "Flatmates",
     "Weddings",
   ],
-  /* --- Caption This: what the photo should be of --- */
+  /* --- Add a Caption: what the photo should be of --- */
   "caption-this": [
     "Cats",
     "Dogs",

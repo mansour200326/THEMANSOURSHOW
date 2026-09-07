@@ -76,7 +76,7 @@ export const lastOneStanding = createLiveGame(
 export const timeline = createLiveGame(
   {
     id: "timeline",
-    name: "Timeline",
+    name: "In Order",
     minPlayers: 1,
     variant: "timeline",
     rounds: 6,

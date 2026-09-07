@@ -33,7 +33,7 @@ export function WagerStage({
         transition={{ type: "spring", stiffness: 220, damping: 18 }}
       >
         <p className="accent-text t-hero font-display font-bold uppercase tracking-tight drop-shadow-[0_0_60px_rgb(var(--accent-rgb)/0.35)]">
-          Daily Double
+          Double Down
         </p>
       </motion.div>
 

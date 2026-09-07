@@ -19,7 +19,7 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
   const mySubmission = state.submissions[me.id];
   const myVote = state.votes[me.id];
   const isGuessWho = room.gameId === "who-said-it";
-  /** Punchline and Caption This: you're voting on what people wrote. */
+  /** Punchline and Add a Caption: you're voting on what people wrote. */
   const picksBest = room.gameId === "punchline" || room.gameId === "caption-this";
   const picture = prompt?.image ? (
     // eslint-disable-next-line @next/next/no-img-element

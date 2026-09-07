@@ -1,13 +1,13 @@
 import { type BuzzItem, createBuzzGame } from "@/lib/games/buzzEngine";
 import { sampleBoard } from "@/lib/bigboard/sampleBoard";
 
-/* ------------------------------------------------------------ Trivia Royale */
+/* ------------------------------------------------------------ Speed Trivia */
 
 /** Same board as Big Board — but everyone races for it on their phone. */
 export const triviaRoyale = createBuzzGame(
   {
     id: "trivia-royale",
-    name: "Trivia Royale",
+    name: "Speed Trivia",
     minPlayers: 1,
     mode: "board",
     deductOnWrong: true,

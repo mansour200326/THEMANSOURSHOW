@@ -9,12 +9,12 @@ type Props = {
   spent: string[];
   onPick?: (ref: TileRef) => void;
   disabled?: boolean;
-  /** Reveal where the daily doubles were hiding (end of game). */
+  /** Reveal where the double downs were hiding (end of game). */
   showDailyDoubles?: string[];
 };
 
 /**
- * The board itself knows nothing about teams, scores or turns — Trivia Royale
+ * The board itself knows nothing about teams, scores or turns — Speed Trivia
  * (Phase 4) renders the same grid and just swaps what onPick does.
  */
 export function BoardGrid({

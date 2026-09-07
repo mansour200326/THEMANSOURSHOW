@@ -499,7 +499,7 @@ export async function generatePunchlines({
   return { content, isPersonal: parsed.isPersonal };
 }
 
-/* --------------------------------------------- Caption This pictures */
+/* --------------------------------------------- Add a Caption pictures */
 
 const GeneratedSubjects = z.object({
   subjects: z.array(

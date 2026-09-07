@@ -9,7 +9,7 @@ import {
 
 /**
  * The shape shared by every prompt → answer → vote → reveal game. Most Likely
- * To, Who Said It, Punchline and Caption This are all this machine with
+ * To, Who Said It, Punchline and Add a Caption are all this machine with
  * different content and a different scoring rule.
  */
 
@@ -25,7 +25,7 @@ export type Prompt = {
   text: string;
   /** Bluff Trivia's real answer; unused elsewhere. */
   answer?: string;
-  /** Caption This: the picture everyone is captioning. */
+  /** Add a Caption: the picture everyone is captioning. */
   image?: PromptImage;
   /** What the picture is of, so the same one isn't served twice. */
   subject?: string;
