@@ -22,6 +22,7 @@ import { type FeudQuestion, type FeudState, otherTeam, currentQuestion } from "@
 import { backHref } from "@/lib/backHref";
 import { recordNight, setHostSheet } from "@/lib/night/report";
 import { ScoreNudge } from "@/components/ScoreNudge";
+import { WinnerMoment } from "@/components/WinnerMoment";
 
 const KEY = "bignight:feud:v1";
 
@@ -313,11 +314,11 @@ function FaceOffStage() {
                 <p className="t-label font-display uppercase text-moon-deep">
                   {feudWinners(state.teams).length > 1 ? "It's a tie" : "Champions"}
                 </p>
-                <h2 className="brand-text t-hero drop-shadow-[0_0_80px_rgba(255,107,87,0.45)] text-balance font-display font-bold uppercase tracking-tight">
+                <WinnerMoment>
                   {feudWinners(state.teams)
                     .map((t) => t.name)
                     .join(" & ")}
-                </h2>
+                </WinnerMoment>
                 <div className="w-full max-w-2xl space-y-2">
                   {feudStandings(state.teams).map((team, i) => (
                     <div

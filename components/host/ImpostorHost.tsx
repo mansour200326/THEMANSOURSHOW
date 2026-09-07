@@ -10,6 +10,7 @@ import {
 } from "@/lib/games/impostor";
 import { type Room, connectedPlayers } from "@/lib/room/types";
 import { ScoreNudge } from "@/components/ScoreNudge";
+import { WinnerMoment } from "@/components/WinnerMoment";
 
 type Props = {
   /** Host putting a score right by hand. */
@@ -79,9 +80,9 @@ export function ImpostorHost({
         <p className="t-label font-display uppercase text-moon-deep">
           Impostor — that&apos;s the lot
         </p>
-        <h2 className="brand-text t-hero font-display font-bold uppercase tracking-tight drop-shadow-[0_0_80px_rgba(255,107,87,0.45)]">
+        <WinnerMoment>
           {standings[0]?.name ?? "Nobody"}
-        </h2>
+        </WinnerMoment>
         <button onClick={onQuit} className="btn-brand px-10 py-4 text-lg">
           Back to the lobby
         </button>

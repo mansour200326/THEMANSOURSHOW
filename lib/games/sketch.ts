@@ -2,6 +2,7 @@ import { matchAnswer } from "@/lib/feud/match";
 import { roundsFor } from "@/lib/games/lengths";
 import type { GameModule } from "@/lib/games/types";
 import { type Action, type Room, award, connectedPlayers } from "@/lib/room/types";
+import { startsAfterLeadIn } from "@/lib/games/leadIn";
 
 /**
  * One phone draws, the TV shows it appearing, everyone else types what they
@@ -121,7 +122,7 @@ export function createSketchGame(pool: string[]): GameModule {
         live: { c: 0, p: [] },
         guesses: {},
         solved: [],
-        startedAt: Date.now(),
+        startedAt: startsAfterLeadIn(),
         lastScores: {},
       },
     };

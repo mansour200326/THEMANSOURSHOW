@@ -8,6 +8,8 @@ import { Tally } from "@/components/Tally";
 import { type BuzzState, buzzArmed, buzzCurrent } from "@/lib/games/buzzEngine";
 import { type Room, connectedPlayers, playerById } from "@/lib/room/types";
 import { ScoreNudge } from "@/components/ScoreNudge";
+import { useRoundCard } from "@/components/RoundCard";
+import { WinnerMoment } from "@/components/WinnerMoment";
 
 type Props = {
   /** Host putting a score right by hand. */
@@ -19,6 +21,7 @@ type Props = {
 
 export function BuzzHost({ room, state, send, onAdjust }: Props) {
   const item = buzzCurrent(state);
+  const roundCard = useRoundCard(state.index, state.items.length, state.mode === "sequence" && state.phase !== "done");
   const buzzer = playerById(room, state.buzzedBy ?? undefined);
 
   /*
@@ -59,6 +62,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
 
   return (
     <main className="flex min-h-dvh lg:h-dvh flex-col gap-[1.2vmin] lg:overflow-hidden p-[1.6vmin] pb-16 lg:pb-[1.6vmin]">
+      {roundCard}
       <header className="flex shrink-0 items-center justify-between">
         <span className="font-display text-xs uppercase tracking-[0.25em] text-moon-deep">
           {state.mode === "sequence"
@@ -291,8 +295,16 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
 
 function Standings({ room }: { room: Room }) {
   const ranked = [...room.players].sort((a, b) => b.score - a.score);
+  const top = ranked[0];
   return (
-    <div className="w-full max-w-3xl space-y-2">
+    <div className="flex w-full max-w-3xl flex-col items-center gap-[2vmin]">
+      {/* The name first, big, with the confetti; the table is the receipt. */}
+      {top && (
+        <WinnerMoment className="text-center">
+          {top.emoji} {top.name} wins
+        </WinnerMoment>
+      )}
+      <div className="w-full space-y-2">
       <p className="mb-[2vmin] text-center font-display text-[clamp(1.5rem,4vw,4rem)] uppercase text-accent">
         Game over
       </p>
@@ -314,6 +326,7 @@ function Standings({ room }: { room: Room }) {
           </span>
         </div>
       ))}
+      </div>
     </div>
   );
 }

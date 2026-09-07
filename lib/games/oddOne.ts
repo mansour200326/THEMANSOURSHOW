@@ -5,6 +5,7 @@ import {
   award,
   connectedPlayers,
 } from "@/lib/room/types";
+import { startsAfterLeadIn } from "@/lib/games/leadIn";
 
 /**
  * Bluff Trivia — everyone gets the same question, except one of you.
@@ -102,7 +103,7 @@ export function createOddGame(pack: QuestionPair[]): GameModule {
         order: [],
         caught: null,
         lastScores: {},
-        startedAt: Date.now(),
+        startedAt: startsAfterLeadIn(),
         seconds: ODD_ANSWER_SECONDS,
       },
     };

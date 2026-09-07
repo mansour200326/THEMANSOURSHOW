@@ -25,6 +25,7 @@ import {
   RAPID_RULE,
   RAPID_TITLE,
 } from "@/lib/rapid/types";
+import { WinnerMoment } from "@/components/WinnerMoment";
 
 const ROUND_CHOICES = [3, 5, 8];
 
@@ -326,9 +327,9 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
             <p className="t-label font-display uppercase text-moon-deep">
               {rapidWinners(state.teams).length > 1 ? "It's a tie" : "Winner"}
             </p>
-            <h2 className="brand-text t-hero drop-shadow-[0_0_80px_rgba(255,107,87,0.45)] text-balance font-display font-bold uppercase tracking-tight">
+            <WinnerMoment>
               {rapidWinners(state.teams).map((t) => t.name).join(" & ")}
-            </h2>
+            </WinnerMoment>
             <div className="w-full max-w-2xl space-y-2">
               {rapidStandings(state.teams).map((team, i) => (
                 <div

@@ -8,6 +8,10 @@ import { useCue, useCueWhen } from "@/components/useCue";
 import { type OddState, oddPair } from "@/lib/games/oddOne";
 import type { ViewerExtras } from "@/lib/room/redact";
 import { type Room, connectedPlayers, playerById } from "@/lib/room/types";
+import { clockLeft } from "@/lib/games/leadIn";
+import { CountIn } from "@/components/CountIn";
+import { useRoundCard } from "@/components/RoundCard";
+import { WinnerMoment } from "@/components/WinnerMoment";
 
 type Props = {
   room: Room;
@@ -42,8 +46,7 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
       setLeft(state.seconds);
       return;
     }
-    const tick = () =>
-      setLeft(Math.max(0, state.seconds - (Date.now() - state.startedAt!) / 1000));
+    const tick = () => setLeft(clockLeft(state.startedAt, state.seconds));
     tick();
     const id = window.setInterval(tick, 200);
     return () => window.clearInterval(id);
@@ -53,6 +56,7 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
   }, [left, state.phase, state.startedAt, onForce]);
 
   useCue(state.round, "pop");
+  const roundCard = useRoundCard(state.round, state.pairs.length, state.phase !== "done");
   useCueWhen(state.phase === "vote", "whoosh");
   useCueWhen(state.phase === "reveal", state.caught ? "correct" : "wrong");
   useCueWhen(state.phase === "done", "fanfare");
@@ -68,9 +72,9 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
     return (
       <main className="flex min-h-dvh lg:h-dvh flex-col items-center justify-center gap-[3vmin] p-[4vmin] text-center pb-16 lg:pb-[1.6vmin]">
         <p className="t-label font-display uppercase text-moon-deep">That&apos;s the game</p>
-        <h2 className="brand-text t-hero font-display font-bold uppercase tracking-tight">
+        <WinnerMoment>
           {ranked[0]?.name ?? "Nobody"} wins
-        </h2>
+        </WinnerMoment>
         <Standings room={room} onAdjust={onAdjust} />
         <button onClick={onQuit} className="btn-brand px-10 py-4 text-lg">
           Back to the lobby
@@ -81,6 +85,8 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
 
   return (
     <main className="flex min-h-dvh lg:h-dvh flex-col gap-[2vmin] p-[2.5vmin] pb-16 lg:pb-[1.6vmin]">
+      {roundCard}
+      {state.phase === "answer" && <CountIn startedAt={state.startedAt} />}
       <header className="flex shrink-0 items-center justify-between">
         <span className="font-display text-[clamp(0.8rem,1.4vw,1.4rem)] uppercase tracking-[0.25em] text-moon-deep">
           Bluff Trivia · round {state.round + 1} of {state.pairs.length}

@@ -8,6 +8,9 @@ import {
   STRIKES_ALLOWED,
   currentQuestion,
 } from "@/lib/feud/types";
+import { clockLeft } from "@/lib/games/leadIn";
+import { CountIn } from "@/components/CountIn";
+import { useRoundCard } from "@/components/RoundCard";
 
 type Props = {
   state: FeudState;
@@ -55,6 +58,7 @@ export function FeudBoard({
   useCueWhen(state.phase === "round-end", "correct");
 
   const left = useShotClock(state.clock);
+  const roundCard = useRoundCard(state.round, state.questions.length, state.phase !== "winner");
   useCueWhen(left !== null && left <= 0, "strike");
 
   if (!question) return null;
@@ -73,6 +77,8 @@ export function FeudBoard({
 
   return (
     <div className="flex h-full flex-col gap-[1.5vmin]">
+      {roundCard}
+      {state.phase === "play" && <CountIn startedAt={state.clock?.startedAt} />}
       {/* Question */}
       <p className="shrink-0 text-balance px-[4vw] text-center font-display text-[clamp(1.2rem,3vw,3.4rem)] uppercase leading-tight tracking-wide text-moon">
         {question.question}
@@ -333,8 +339,7 @@ function useShotClock(clock: FeudState["clock"]) {
       setLeft(null);
       return;
     }
-    const tick = () =>
-      setLeft(clock.seconds - (Date.now() - clock.startedAt) / 1000);
+    const tick = () => setLeft(clockLeft(clock.startedAt, clock.seconds));
     tick();
     const id = window.setInterval(tick, 200);
     return () => window.clearInterval(id);

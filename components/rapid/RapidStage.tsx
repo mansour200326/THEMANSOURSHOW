@@ -8,6 +8,9 @@ import {
   RAPID_RULE,
   rapidPrompt,
 } from "@/lib/rapid/types";
+import { clockLeft, startsAfterLeadIn } from "@/lib/games/leadIn";
+import { CountIn } from "@/components/CountIn";
+import { useRoundCard } from "@/components/RoundCard";
 
 type Props = {
   state: RapidState;
@@ -27,6 +30,8 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
   const [bidTeam, setBidTeam] = useState(0);
   const [bid, setBid] = useState(5);
   const startedAt = useRef<number>(0);
+  const [stamp, setStamp] = useState<number | null>(null);
+  const roundCard = useRoundCard(state.round, state.prompts.length, state.phase !== "winner");
 
   // Clock runs locally — the reducer only cares that it finished.
   useEffect(() => {
@@ -34,11 +39,13 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
       setLeft(state.seconds);
       return;
     }
-    startedAt.current = Date.now();
+    // Three seconds ahead: the count-in runs in the gap and the clock
+    // itself is untouched.
+    startedAt.current = startsAfterLeadIn();
+    setStamp(startedAt.current);
     setLeft(state.seconds);
     const id = window.setInterval(() => {
-      const elapsed = (Date.now() - startedAt.current) / 1000;
-      const remaining = Math.max(0, state.seconds - elapsed);
+      const remaining = clockLeft(startedAt.current, state.seconds);
       setLeft(remaining);
       if (remaining <= 0) {
         window.clearInterval(id);
@@ -66,6 +73,8 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-[3vmin] text-center">
+      {roundCard}
+      {state.phase === "running" && <CountIn startedAt={stamp} />}
       <div>
         <p className="t-label font-display uppercase text-moon-deep">
           Round {state.round + 1} of {state.prompts.length}
@@ -76,8 +85,8 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
         </p>
         <motion.p
           key={prompt}
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ y: 18 }}
+          animate={{ y: 0 }}
           className="t-clue mt-2 max-w-[80vw] text-balance font-display uppercase tracking-wide text-moon"
         >
           {prompt}
@@ -88,9 +97,9 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
         {state.phase === "bidding" && (
           <motion.div
             key="bidding"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ y: 8 }}
+            animate={{ y: 0 }}
+            exit={{ y: -8, transition: { duration: 0.15 } }}
             className="flex flex-col items-center gap-[2vmin]"
           >
             <p className="font-display text-[clamp(0.9rem,1.5vw,1.6rem)] uppercase tracking-[0.25em] text-moon-deep">
@@ -151,9 +160,9 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
         {state.phase === "ready" && (
           <motion.div
             key="ready"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ y: 8 }}
+            animate={{ y: 0 }}
+            exit={{ y: -8, transition: { duration: 0.15 } }}
             className="flex flex-col items-center gap-[2vmin]"
           >
             <p className="font-display text-[clamp(0.9rem,1.5vw,1.6rem)] uppercase tracking-[0.25em] text-moon-deep">
@@ -170,9 +179,9 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
         {state.phase === "running" && (
           <motion.div
             key="running"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            exit={{ y: -8, transition: { duration: 0.15 } }}
             className="flex flex-col items-center gap-[1.5vmin]"
           >
             <motion.span
@@ -201,8 +210,8 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
         {state.phase === "judge" && (
           <motion.div
             key="judge"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ y: 16 }}
+            animate={{ y: 0 }}
             className="flex flex-col items-center gap-[2.5vmin]"
           >
             <p className="font-display text-[clamp(1.2rem,3vw,3rem)] uppercase tracking-[0.2em] text-rose-400">

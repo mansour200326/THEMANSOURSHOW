@@ -8,6 +8,7 @@ import {
 } from "@/lib/games/liveEngine";
 import type { Player } from "@/lib/room/types";
 import { haptic } from "@/lib/haptics";
+import { clockLeft } from "@/lib/games/leadIn";
 
 type Props = {
   state: LiveState;
@@ -27,8 +28,7 @@ function useCountdown(startedAt: number | null, seconds: number) {
       setLeft(seconds);
       return;
     }
-    const tick = () =>
-      setLeft(Math.max(0, seconds - (Date.now() - startedAt) / 1000));
+    const tick = () => setLeft(clockLeft(startedAt, seconds));
     tick();
     const id = window.setInterval(tick, 200);
     return () => window.clearInterval(id);

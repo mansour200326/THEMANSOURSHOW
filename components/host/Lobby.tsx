@@ -11,6 +11,7 @@ import { SCREEN_ONLY } from "@/lib/games/screenOnly";
 import { useEntitlements } from "@/lib/plan/useEntitlements";
 import { AccountLink } from "@/components/account/AccountLink";
 import { JoinQr } from "@/components/host/JoinQr";
+import { startBed, stopBed } from "@/lib/sound";
 
 type Props = {
   room: Room;
@@ -27,6 +28,11 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
   const me = useEntitlements();
   const locked = (id: string) => me.plan !== "pro" && !me.freeGameIds.includes(id);
   const [joinUrl, setJoinUrl] = useState("");
+  // Something quiet while people arrive; it stops the moment a game starts.
+  useEffect(() => {
+    startBed();
+    return () => stopBed();
+  }, []);
   useEffect(() => setJoinUrl(`${window.location.host}/play`), []);
 
   const live = room.players.filter((p) => p.connected);

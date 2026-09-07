@@ -9,6 +9,7 @@ import {
   nextInLine,
   otherTeam,
 } from "@/lib/feud/types";
+import { startsAfterLeadIn } from "@/lib/games/leadIn";
 
 const UNDO_DEPTH = 25;
 
@@ -61,9 +62,12 @@ export type FeudAction =
  * mid-night in somebody's living room right now, and reading a missing field
  * as zero would silently take their clock away with no way to get it back.
  */
-const startClock = (s: FeudState): FeudState["clock"] => {
+const startClock = (s: FeudState, leadIn = false): FeudState["clock"] => {
   const seconds = s.clockSeconds ?? FEUD_CLOCK_DEFAULT;
-  return seconds > 0 ? { startedAt: Date.now(), seconds } : null;
+  if (seconds <= 0) return null;
+  // A count-in when the board changes hands; not on every answer, which
+  // would be a three-second wait between each shout.
+  return { startedAt: leadIn ? startsAfterLeadIn() : Date.now(), seconds };
 };
 
 const snapshot = (s: FeudState): FeudState[] =>
@@ -110,7 +114,7 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
         ...state,
         control: action.team,
         phase: "play",
-        clock: startClock(state),
+        clock: startClock(state, true),
       };
     }
 
@@ -208,7 +212,7 @@ export function feudReducer(state: FeudState, action: FeudAction): FeudState {
           control: heir,
           strikes: 0,
           handoverAt: Date.now(),
-          clock: startClock(state),
+          clock: startClock(state, true),
         };
       }
 

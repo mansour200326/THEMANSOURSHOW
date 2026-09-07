@@ -26,7 +26,17 @@ export type Cue =
   | "whoosh"
   | "fanfare"
   /** The title card: a rise into the moment the letters hit. */
-  | "title";
+  | "title"
+  /** One beat of a three-two-one. */
+  | "countdown"
+  /** The round is live. */
+  | "go"
+  /** A round card sliding in. */
+  | "card"
+  /** A game starting. */
+  | "sting"
+  /** Somebody won the whole thing. Bigger than the fanfare. */
+  | "win";
 
 const STORAGE_KEY = "bignight:muted";
 
@@ -182,6 +192,41 @@ function rise(
  * good, down is bad, flat and harsh is the buzzer.
  */
 const CUES: Record<Cue, (c: AudioContext) => void> = {
+  /* A single clean beat, the same each time, so three of them read as a count. */
+  countdown: (c) => {
+    tone(c, { type: "sine", from: 880, duration: 0.09, gain: 0.5 });
+    tone(c, { type: "triangle", from: 440, duration: 0.14, gain: 0.25 });
+  },
+  /* Up and out: the gate opening. */
+  go: (c) => {
+    tone(c, { type: "sine", from: 660, to: 1320, duration: 0.16, gain: 0.55 });
+    tone(c, { type: "triangle", from: 1320, at: 0.12, duration: 0.42, gain: 0.4 });
+    tone(c, { type: "sine", from: 2640, at: 0.16, duration: 0.5, gain: 0.14 });
+  },
+  /* A short soft sweep, felt more than heard. */
+  card: (c) => {
+    tone(c, { type: "sine", from: 240, to: 520, duration: 0.22, gain: 0.28, attack: 0.05 });
+    tone(c, { type: "triangle", from: 1046, at: 0.18, duration: 0.18, gain: 0.18 });
+  },
+  /* The show's sting: three rising notes and a shimmer. */
+  sting: (c) => {
+    tone(c, { type: "triangle", from: 392, duration: 0.18, gain: 0.5 });
+    tone(c, { type: "triangle", from: 523, at: 0.14, duration: 0.18, gain: 0.5 });
+    tone(c, { type: "triangle", from: 784, at: 0.28, duration: 0.5, gain: 0.55 });
+    tone(c, { type: "sine", from: 1568, at: 0.32, duration: 0.8, gain: 0.18 });
+    tone(c, { type: "sine", from: 98, at: 0.28, duration: 0.7, gain: 0.35, attack: 0.02 });
+  },
+  /* A full chord, an arpeggio over it, and a long shimmer on top. */
+  win: (c) => {
+    for (const [f, at] of [[523, 0], [659, 0], [784, 0], [1046, 0]] as const) {
+      tone(c, { type: "triangle", from: f, at, duration: 1.4, gain: 0.22, attack: 0.03 });
+    }
+    for (const [f, at] of [[1046, 0.15], [1318, 0.3], [1568, 0.45], [2093, 0.6]] as const) {
+      tone(c, { type: "sine", from: f, at, duration: 0.5, gain: 0.3 });
+    }
+    tone(c, { type: "sine", from: 3136, at: 0.7, duration: 1.6, gain: 0.12 });
+    tone(c, { type: "sine", from: 65, duration: 1.2, gain: 0.45, attack: 0.02 });
+  },
   /** The one that has to cut through everything. */
   buzz(c) {
     tone(c, { type: "square", from: 200, to: 150, duration: 0.45, gain: 0.75 });
@@ -384,3 +429,68 @@ export function unlockAudio() {
 
 /** Whether the browser is actually letting us make a noise. For diagnostics. */
 export const audioState = () => ctx?.state ?? "none";
+
+
+/* ------------------------------------------------------------- the bed */
+
+let bed: { stop: () => void } | null = null;
+
+/**
+ * Something quiet between games.
+ *
+ * Two detuned tones a fifth apart under a slow low-pass sweep, at a gain low
+ * enough to sit under conversation. It starts when the lobby is on screen
+ * and stops the moment a game does, and it's silent when the host has muted
+ * the room. Nothing about it should ever be noticed directly; the room
+ * should only notice when it stops.
+ */
+export function startBed() {
+  if (bed || muted) return;
+  const c = audio();
+  if (!c || !master || c.state !== "running") return;
+
+  const out = c.createGain();
+  out.gain.setValueAtTime(0, c.currentTime);
+  out.gain.linearRampToValueAtTime(0.06, c.currentTime + 4);
+
+  const filter = c.createBiquadFilter();
+  filter.type = "lowpass";
+  filter.frequency.setValueAtTime(420, c.currentTime);
+  filter.Q.value = 0.7;
+
+  const lfo = c.createOscillator();
+  lfo.frequency.value = 0.045;
+  const lfoGain = c.createGain();
+  lfoGain.gain.value = 180;
+  lfo.connect(lfoGain).connect(filter.frequency);
+
+  const voices = [110, 110.7, 164.8, 165.4].map((f) => {
+    const o = c.createOscillator();
+    o.type = "triangle";
+    o.frequency.value = f;
+    o.connect(filter);
+    o.start();
+    return o;
+  });
+  filter.connect(out).connect(master);
+  lfo.start();
+
+  bed = {
+    stop: () => {
+      const t = c.currentTime;
+      out.gain.cancelScheduledValues(t);
+      out.gain.setValueAtTime(out.gain.value, t);
+      out.gain.linearRampToValueAtTime(0, t + 1.2);
+      window.setTimeout(() => {
+        voices.forEach((o) => o.stop());
+        lfo.stop();
+        out.disconnect();
+      }, 1400);
+    },
+  };
+}
+
+export function stopBed() {
+  bed?.stop();
+  bed = null;
+}

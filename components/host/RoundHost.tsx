@@ -6,6 +6,8 @@ import { useCue, useCueWhen } from "@/components/useCue";
 import type { RoundState } from "@/lib/games/roundEngine";
 import { type Room, connectedPlayers, playerById } from "@/lib/room/types";
 import { ScoreNudge } from "@/components/ScoreNudge";
+import { useRoundCard } from "@/components/RoundCard";
+import { WinnerMoment } from "@/components/WinnerMoment";
 
 type Props = {
   /** Host putting a score right by hand. */
@@ -28,6 +30,7 @@ const barColour = (i: number) =>
 
 export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Props) {
   const prompt = state.prompts[state.round];
+  const roundCard = useRoundCard(state.round, state.prompts.length, state.phase !== "done");
   const live = connectedPlayers(room);
 
   /*
@@ -60,6 +63,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
 
   return (
     <main className="flex min-h-dvh lg:h-dvh flex-col gap-[1.5vmin] lg:overflow-hidden p-[2vmin] pb-16 lg:pb-[1.6vmin]">
+      {roundCard}
       <header className="flex shrink-0 items-center justify-between">
         <span className="font-display text-xs uppercase tracking-[0.25em] text-moon-deep">
           Round {state.round + 1} of {state.prompts.length}
@@ -228,8 +232,16 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
 
 function Standings({ room }: { room: Room }) {
   const ranked = [...room.players].sort((a, b) => b.score - a.score);
+  const top = ranked[0];
   return (
-    <div className="w-full max-w-3xl space-y-2">
+    <div className="flex w-full max-w-3xl flex-col items-center gap-[2vmin]">
+      {/* The name first, big, with the confetti; the table is the receipt. */}
+      {top && (
+        <WinnerMoment className="text-center">
+          {top.emoji} {top.name} wins
+        </WinnerMoment>
+      )}
+      <div className="w-full space-y-2">
       <p className="mb-[2vmin] text-center font-display text-[clamp(1.5rem,4vw,4rem)] uppercase text-accent">
         Segment over
       </p>
@@ -254,6 +266,7 @@ function Standings({ room }: { room: Room }) {
           </span>
         </motion.div>
       ))}
+      </div>
     </div>
   );
 }

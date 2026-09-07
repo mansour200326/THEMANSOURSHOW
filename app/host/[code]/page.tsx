@@ -33,6 +33,7 @@ import type { SketchState } from "@/lib/games/sketch";
 import { useAccentFamily } from "@/components/useAccentFamily";
 import { games } from "@/lib/games/registry";
 import { useRoom } from "@/lib/room/useRoom";
+import { useCue } from "@/components/useCue";
 
 export default function HostPage({
   params,
@@ -61,6 +62,8 @@ export default function HostPage({
   }, [phase]);
 
   const gameId = room?.gameId ?? null;
+  // The show's sting, once, as a game takes the screen.
+  useCue(gameId, gameId ? "sting" : null);
   useEffect(() => {
     if (gameId) return;
     // The game just left the screen — bank whatever it earned.

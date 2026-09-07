@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { standings, winners } from "@/lib/bigboard/engine";
 import { Tally } from "@/components/Tally";
 import type { Team } from "@/lib/bigboard/types";
+import { WinnerMoment } from "@/components/WinnerMoment";
 
 const COLORS = ["#FF6B57", "#FF8D7C", "#DE4B37", "#F4F2EC", "#C6CADA"];
 
@@ -83,9 +84,9 @@ export function WinnerScreen({ teams, onRematch, onNewGame }: Props) {
         <p className="t-label font-display uppercase text-moon-deep">
           {tie ? "It's a tie" : "Champions"}
         </p>
-        <h2 className="brand-text t-hero text-balance font-display font-bold uppercase tracking-tight drop-shadow-[0_0_80px_rgba(255,107,87,0.45)]">
+        <WinnerMoment>
           {champs.map((t) => t.name).join(" & ")}
-        </h2>
+        </WinnerMoment>
         <p className="mt-2 font-display text-[clamp(1.5rem,3vw,3.5rem)] font-bold tabular-nums text-moon">
           <Tally value={champs[0]?.score ?? 0} duration={900} />
         </p>

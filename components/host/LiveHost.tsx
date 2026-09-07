@@ -11,6 +11,10 @@ import {
 } from "@/lib/games/liveEngine";
 import { type Room, connectedPlayers } from "@/lib/room/types";
 import { ScoreNudge } from "@/components/ScoreNudge";
+import { clockLeft } from "@/lib/games/leadIn";
+import { CountIn } from "@/components/CountIn";
+import { useRoundCard } from "@/components/RoundCard";
+import { WinnerMoment } from "@/components/WinnerMoment";
 
 type Props = {
   /** Host putting a score right by hand. */
@@ -49,10 +53,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
       setLeft(state.seconds);
       return;
     }
-    const tick = () => {
-      const gone = (Date.now() - state.startedAt!) / 1000;
-      setLeft(Math.max(0, state.seconds - gone));
-    };
+    const tick = () => setLeft(clockLeft(state.startedAt, state.seconds));
     tick();
     const id = window.setInterval(tick, 200);
     return () => window.clearInterval(id);
@@ -64,6 +65,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
   }, [left, state.phase, state.seconds, state.startedAt, onForce]);
 
   const urgent = left <= 5 && left > 0;
+  const roundCard = useRoundCard(state.round, state.items.length, state.phase !== "done");
 
   /*
    * Timeline used to drop all five events on screen 0.18s apart, which reads
@@ -111,11 +113,11 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
         <p className="t-label font-display uppercase text-moon-deep">
           {TITLES[state.variant]} — that&apos;s the lot
         </p>
-        <h2 className="brand-text t-hero text-balance font-display font-bold uppercase tracking-tight drop-shadow-[0_0_80px_rgba(255,107,87,0.45)]">
+        <WinnerMoment>
           {state.variant === "standing" && survivors.length === 1
             ? survivors[0].name
             : (standings[0]?.name ?? "Nobody")}
-        </h2>
+        </WinnerMoment>
         <div className="flex flex-wrap justify-center gap-3">
           {standings.map((p) => (
             <span
@@ -135,6 +137,8 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
 
   return (
     <main className="flex min-h-dvh lg:h-dvh flex-col gap-[2vmin] p-[2vmin] pb-16 lg:pb-[1.6vmin]">
+      {roundCard}
+      {(state.phase === "collect" || state.phase === "brief") && <CountIn startedAt={state.startedAt} />}
       <header className="flex shrink-0 items-center justify-between px-2">
         <span className="font-display text-sm uppercase tracking-[0.2em] text-moon-deep">
           {TITLES[state.variant]} · Round {state.round + 1}/{state.items.length}

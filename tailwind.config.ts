@@ -78,6 +78,19 @@ const config: Config = {
         brand: "0 0 60px rgba(255,107,87,0.28)",
       },
       keyframes: {
+        /* In over 0.2s, hold, out over 0.2s, then gone — 1.4s end to end. */
+        "go-out": {
+          "0%": { visibility: "visible" },
+          "99%": { visibility: "visible" },
+          "100%": { visibility: "hidden" },
+        },
+        "round-card": {
+          "0%": { transform: "translateY(40px)", visibility: "visible" },
+          "14%": { transform: "translateY(0)" },
+          "86%": { transform: "translateY(0)", visibility: "visible" },
+          "99%": { transform: "translateY(-40px)", visibility: "visible" },
+          "100%": { transform: "translateY(-40px)", visibility: "hidden" },
+        },
         "pop-in": {
           "0%": { transform: "scale(0.9)", opacity: "0" },
           "100%": { transform: "scale(1)", opacity: "1" },
@@ -88,6 +101,8 @@ const config: Config = {
         },
       },
       animation: {
+        "round-card": "round-card 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards",
+        "go-out": "go-out 0.6s linear forwards",
         "pop-in": "pop-in 220ms cubic-bezier(0.22,1,0.36,1)",
         shimmer: "shimmer 3s linear infinite",
       },

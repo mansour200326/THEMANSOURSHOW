@@ -2,6 +2,7 @@ import { matchAnswer } from "@/lib/feud/match";
 import { roundsFor } from "@/lib/games/lengths";
 import type { GameModule } from "@/lib/games/types";
 import { type Action, type Room, award, connectedPlayers } from "@/lib/room/types";
+import { startsAfterLeadIn } from "@/lib/games/leadIn";
 
 /**
  * Games where everybody answers the same thing at the same time, and the
@@ -148,7 +149,7 @@ export function createLiveGame(spec: LiveSpec, pack: LiveItem[]): GameModule {
     const next: LiveState = {
       ...s,
       phase: opening,
-      startedAt: Date.now(),
+      startedAt: startsAfterLeadIn(),
       seconds: LIVE_SECONDS[spec.variant][opening === "brief" ? "brief" : "collect"],
       answers: {},
       clue: "",
@@ -306,7 +307,7 @@ export function createLiveGame(spec: LiveSpec, pack: LiveItem[]): GameModule {
               ...s,
               phase: "collect",
               clue,
-              startedAt: Date.now(),
+              startedAt: startsAfterLeadIn(),
               seconds: LIVE_SECONDS[spec.variant].collect,
             },
           };
@@ -334,7 +335,7 @@ export function createLiveGame(spec: LiveSpec, pack: LiveItem[]): GameModule {
                 ...s,
                 phase: "collect",
                 clue: s.clue || "—",
-                startedAt: Date.now(),
+                startedAt: startsAfterLeadIn(),
                 seconds: LIVE_SECONDS[spec.variant].collect,
               },
             };

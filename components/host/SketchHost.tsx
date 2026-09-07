@@ -7,6 +7,10 @@ import { SketchCanvas } from "@/components/SketchCanvas";
 import type { SketchState } from "@/lib/games/sketch";
 import type { ViewerExtras } from "@/lib/room/redact";
 import { type Room, connectedPlayers } from "@/lib/room/types";
+import { clockLeft } from "@/lib/games/leadIn";
+import { CountIn } from "@/components/CountIn";
+import { useRoundCard } from "@/components/RoundCard";
+import { WinnerMoment } from "@/components/WinnerMoment";
 
 type Props = {
   room: Room;
@@ -20,6 +24,7 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
   const players = connectedPlayers(room);
   const drawer = players.find((p) => p.id === state.drawerId);
   const [left, setLeft] = useState(state.seconds);
+  const roundCard = useRoundCard(state.round, state.totalRounds ?? state.words.length, state.phase !== "done");
 
   // Somebody getting it, the clock running out, and the end of the night.
   useCue(state.solved.length, state.solved.length ? "correct" : null);
@@ -33,8 +38,7 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
       return;
     }
     const tick = () => {
-      const gone = Math.floor((Date.now() - state.startedAt!) / 1000);
-      setLeft(Math.max(0, state.seconds - gone));
+      setLeft(Math.ceil(clockLeft(state.startedAt, state.seconds)));
     };
     tick();
     const id = window.setInterval(tick, 500);
@@ -54,9 +58,9 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
         <p className="t-label font-display uppercase text-moon-deep">
           Sketch &amp; Guess — pens down
         </p>
-        <h2 className="brand-text t-hero font-display font-bold uppercase tracking-tight drop-shadow-[0_0_80px_rgba(255,107,87,0.45)]">
+        <WinnerMoment>
           {standings[0]?.name ?? "Nobody"}
-        </h2>
+        </WinnerMoment>
         <button onClick={onQuit} className="btn-brand px-10 py-4 text-lg">
           Back to the lobby
         </button>
@@ -68,6 +72,8 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
 
   return (
     <main className="flex min-h-dvh lg:h-dvh gap-[2vmin] p-[2vmin] pb-16 lg:pb-[1.6vmin]">
+      {roundCard}
+      {state.phase === "drawing" && <CountIn startedAt={state.startedAt} />}
       <section className="flex min-w-0 flex-1 flex-col items-center justify-center gap-[1.5vmin]">
         <SketchCanvas
           strokes={state.strokes}
