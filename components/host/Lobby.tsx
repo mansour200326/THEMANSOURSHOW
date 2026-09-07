@@ -10,6 +10,7 @@ import type { Room } from "@/lib/room/types";
 import { SCREEN_ONLY } from "@/lib/games/screenOnly";
 import { useEntitlements } from "@/lib/plan/useEntitlements";
 import { AccountLink } from "@/components/account/AccountLink";
+import { JoinQr } from "@/components/host/JoinQr";
 
 type Props = {
   room: Room;
@@ -58,9 +59,16 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
             <p className="t-label font-display uppercase text-moon-deep">
               Phones join at
             </p>
-            <p className="break-all text-[clamp(0.65rem,0.95vw,1rem)] leading-tight text-moon/75">
-              {joinUrl || "…"}
-            </p>
+            <div className="flex items-center gap-3">
+              <p className="break-all text-[clamp(0.65rem,0.95vw,1rem)] leading-tight text-moon/75">
+                {joinUrl || "…"}
+              </p>
+              {/* A camera reads this in a second; nobody mistypes it. */}
+              <JoinQr
+                url={joinUrl ? `${window.location.protocol}//${joinUrl}` : ""}
+                className="h-[clamp(4.5rem,9vmin,8rem)] w-[clamp(4.5rem,9vmin,8rem)] shrink-0"
+              />
+            </div>
             {room.hostKey && (
               <p className="mt-2 text-[clamp(0.55rem,0.8vw,0.85rem)] leading-tight text-moon-deep">
                 Host&apos;s phone: <span className="text-moon/70">{joinUrl.replace(/\/play$/, "")}/sheet/{room.code}</span>

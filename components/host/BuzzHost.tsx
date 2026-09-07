@@ -65,9 +65,6 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
             ? `Riddle ${Math.min(state.index + 1, state.items.length)} of ${state.items.length}`
             : "Pick a tile, then race for it"}
         </span>
-        <button onClick={() => send("game:end")} className="btn-ghost px-3 py-1.5 text-xs">
-          End game
-        </button>
       </header>
 
       <div className="flex min-h-0 flex-1 items-center justify-center">

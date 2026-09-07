@@ -64,9 +64,6 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
         <span className="font-display text-xs uppercase tracking-[0.25em] text-moon-deep">
           Round {state.round + 1} of {state.prompts.length}
         </span>
-        <button onClick={onQuit} className="btn-ghost px-3 py-1.5 text-xs">
-          End segment
-        </button>
       </header>
 
       {/* The prompt */}

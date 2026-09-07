@@ -86,14 +86,9 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
       </section>
 
       <aside className="flex w-[26vw] min-w-[240px] shrink-0 flex-col gap-[1.5vmin]">
-        <div className="flex items-center justify-between">
-          <span className="font-display text-sm uppercase tracking-[0.2em] text-moon-deep">
-            Round {state.round + 1}/{state.totalRounds ?? state.words.length}
-          </span>
-          <button onClick={onQuit} className="btn-ghost px-3 py-1.5 text-xs">
-            End
-          </button>
-        </div>
+        <span className="font-display text-sm uppercase tracking-[0.2em] text-moon-deep">
+          Round {state.round + 1}/{state.totalRounds ?? state.words.length}
+        </span>
 
         <p
           className={[

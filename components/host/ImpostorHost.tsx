@@ -106,9 +106,6 @@ export function ImpostorHost({
               Close the vote
             </button>
           )}
-          <button onClick={onQuit} className="btn-ghost px-3 py-1.5 text-xs">
-            End segment
-          </button>
         </div>
       </header>
 

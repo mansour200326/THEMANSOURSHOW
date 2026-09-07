@@ -85,9 +85,6 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
         <span className="font-display text-[clamp(0.8rem,1.4vw,1.4rem)] uppercase tracking-[0.25em] text-moon-deep">
           Bluff Trivia · round {state.round + 1} of {state.pairs.length}
         </span>
-        <button onClick={onQuit} className="btn-ghost px-3 py-1.5 text-xs">
-          End segment
-        </button>
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[2.5vmin] px-[3vw] text-center">

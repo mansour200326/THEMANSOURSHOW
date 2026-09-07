@@ -15,7 +15,8 @@ import { SketchHost } from "@/components/host/SketchHost";
 import { GameSetup } from "@/components/host/GameSetup";
 import { NightScreen } from "@/components/host/NightScreen";
 import { RoomCodeChip } from "@/components/host/RoomCodeChip";
-import { ScoreFixer } from "@/components/ScoreAdjuster";
+import { HostTray } from "@/components/host/HostTray";
+import { Stage } from "@/components/Stage";
 import { connectedPlayers } from "@/lib/room/types";
 import { Generating } from "@/components/Generating";
 import { HowToPlay } from "@/components/HowToPlay";
@@ -290,6 +291,7 @@ export default function HostPage({
 
   if (!room.gameId) {
     return (
+      <Stage id="lobby">
       <Lobby
         onNight={() => setShowNight(true)}
         room={room}
@@ -304,6 +306,7 @@ export default function HostPage({
         onAddBots={() => send("bots:add")}
         onClearBots={() => send("bots:clear")}
       />
+      </Stage>
     );
   }
 
@@ -399,23 +402,29 @@ export default function HostPage({
   })();
 
   /*
-   * The code and the score fixer live out here rather than in each game's
-   * screen: there are twelve of those, they share no layout, and a control
-   * that only exists in eleven of them is worse than one that exists in none.
+   * The code and the host's controls live out here rather than in each
+   * game's screen: there are ten of those, they share no layout, and a
+   * control that only exists in nine of them is worse than one that exists
+   * in none. Every game arrives through the same Stage, so the swap from
+   * lobby to game reads as one production.
    */
   return (
     <>
-      {inGame}
-      <div className="fixed bottom-3 right-3 z-40">
-        <ScoreFixer
-          entries={connectedPlayers(room).map((p) => ({
-            id: p.id,
-            name: `${p.emoji} ${p.name}`,
-            score: p.score,
-          }))}
-            onAdjust={(id, delta) => send("score:adjust", { id, delta })}
-        />
-      </div>
+      <Stage id={`game:${room.gameId}`}>{inGame}</Stage>
+      <HostTray
+        onEnd={() => send("game:end")}
+        // Only the game that shows no scores of its own needs the fallback.
+        scores={
+          state?.kind === "sketch"
+            ? connectedPlayers(room).map((p) => ({
+                id: p.id,
+                name: `${p.emoji} ${p.name}`,
+                score: p.score,
+              }))
+            : undefined
+        }
+        onAdjust={(id, delta) => send("score:adjust", { id, delta })}
+      />
       <RoomCodeChip code={roomCode} />
     </>
   );
