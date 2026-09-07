@@ -7,7 +7,6 @@ import {
   tally,
 } from "@/lib/games/roundEngine";
 import { type Room, connectedPlayers } from "@/lib/room/types";
-import { normalise } from "@/lib/feud/match";
 
 /* ------------------------------------------------------------ content packs */
 
@@ -40,19 +39,6 @@ const GUESS_WHO: Prompt[] = [
   { text: "What's the last thing you Googled?" },
   { text: "Name a rule you break constantly." },
   { text: "What's the worst haircut you've ever had?" },
-];
-
-const HERD_MENTALITY: Prompt[] = [
-  { text: "Name a colour." },
-  { text: "Name something you'd find in a living room." },
-  { text: "Name a football club." },
-  { text: "Name a fast food chain." },
-  { text: "Name something people lie about." },
-  { text: "Name a capital city." },
-  { text: "Name a thing everyone owns but nobody uses." },
-  { text: "Name a fruit." },
-  { text: "Name an excuse for being late." },
-  { text: "Name something that ruins a road trip." },
 ];
 
 /* -------------------------------------------------------------- 1. Most Likely To */
@@ -131,39 +117,7 @@ export const guessWhoSaidIt = createRoundGame(
  * characters. It uses the same matcher as the survey board now, which drops
  * filler words and plurals, so agreeing counts as agreeing.
  */
-export const herdMentality = createRoundGame(
-  {
-    id: "groupthink",
-    name: "Groupthink",
-    minPlayers: 3,
-    collect: { prompt: "Answer like everyone else would", maxLength: 40 },
-    rounds: 8,
-    allowSelfVote: true,
-    skipVote: true,
-    buildOptions: () => [],
-    score: (_room, s) => {
-      const groups: Record<string, string[]> = {};
-      Object.entries(s.submissions).forEach(([playerId, text]) => {
-        const key = normalise(text);
-        (groups[key] ??= []).push(playerId);
-      });
-      const biggest = Math.max(0, ...Object.values(groups).map((g) => g.length));
-      if (biggest < 2) return {};
-      const points: Record<string, number> = {};
-      Object.values(groups)
-        .filter((g) => g.length === biggest)
-        .flat()
-        .forEach((id) => {
-          points[id] = 1000;
-        });
-      return points;
-    },
-  },
-  HERD_MENTALITY,
-);
-
 export const roundGamePacks = {
   "most-likely-to": MOST_LIKELY_TO,
   "who-said-it": GUESS_WHO,
-  "groupthink": HERD_MENTALITY,
 };

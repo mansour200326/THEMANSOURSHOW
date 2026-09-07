@@ -92,8 +92,6 @@ const slot = (gameId: string, kind: string, data: unknown) =>
 check("trivia royale -> board", slot("trivia-royale", "board", []), "board");
 check("emoji riddles -> items", slot("emoji-riddles", "riddles", []), "items");
 check("impostor -> places", slot("impostor", "places", []), "places");
-check("code grid -> words", slot("code-grid", "words", []), "words");
-check("groupthink -> prompts", slot("groupthink", "prompts", []), "prompts");
 check("bluff trivia -> pairs", slot("bluff-trivia", "qa", []), "pairs");
 // The qa editor's two columns are everyone's question and the odd one's.
 const pairs = packToStartPayload("bluff-trivia", "qa" as never, [
@@ -102,9 +100,6 @@ const pairs = packToStartPayload("bluff-trivia", "qa" as never, [
 ] as never);
 check("qa rows become question/decoy pairs", pairs.pairs, [{ question: "Best topping?", decoy: "Worst topping?" }]);
 
-// Round games want {text}, not bare strings.
-const gt = packToStartPayload("groupthink", "prompts" as never, ["Name a colour", ""] as never);
-check("prompts wrapped for the round engine", gt.prompts, [{ text: "Name a colour" }]);
 
 // --- packSize agrees with the converters ---
 check("packSize counts board categories", packSize("board", [

@@ -1,7 +1,6 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { normalise } from "@/lib/feud/match";
 import { Tally } from "@/components/Tally";
 import { useCue, useCueWhen } from "@/components/useCue";
 import type { RoundState } from "@/lib/games/roundEngine";
@@ -30,7 +29,6 @@ const barColour = (i: number) =>
 export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Props) {
   const prompt = state.prompts[state.round];
   const live = connectedPlayers(room);
-  const isHerd = room.gameId === "groupthink";
 
   /*
    * Most Likely To, Who Said It, Bluff Trivia and Groupthink all run through
@@ -115,9 +113,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
         ) : (
           /* vote + reveal share the same board */
           <div className="w-full max-w-5xl space-y-[1vmin]">
-            {isHerd && state.phase === "reveal" ? (
-              <HerdResults room={room} state={state} />
-            ) : (
+            {(
               state.options.map((option, i) => {
                 const count = voteCounts[option.id] ?? 0;
                 const revealed = state.phase === "reveal";
@@ -232,44 +228,6 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
  * displayed as two — the board contradicted the scoreboard. Both sides count
  * the same way now, and the label is the wording the most people used.
  */
-function HerdResults({ room, state }: { room: Room; state: RoundState }) {
-  const groups: Record<string, { label: string; ids: string[] }> = {};
-  Object.entries(state.submissions).forEach(([playerId, text]) => {
-    const key = normalise(text) || text.trim().toLowerCase();
-    (groups[key] ??= { label: text.trim(), ids: [] }).ids.push(playerId);
-  });
-  const sorted = Object.entries(groups).sort(
-    (a, b) => b[1].ids.length - a[1].ids.length,
-  );
-  const biggest = sorted[0]?.[1].ids.length ?? 0;
-
-  return (
-    <div className="space-y-[1vmin]">
-      {sorted.map(([key, { label, ids }]) => (
-        <div
-          key={key}
-          className={[
-            "flex items-center justify-between gap-4 rounded-xl border px-5 py-[1.4vmin]",
-            ids.length === biggest && biggest > 1
-              ? "border-accent/60 bg-accent/10"
-              : "border-line/10 bg-line/[0.03]",
-          ].join(" ")}
-        >
-          <span className="truncate font-display text-[clamp(1rem,2vw,2.2rem)] uppercase tracking-wide text-moon">
-            {label}
-          </span>
-          <span className="flex shrink-0 gap-2">
-            {ids.map((id) => (
-              <span key={id} className="text-[clamp(1rem,1.8vw,1.8rem)]">
-                {playerById(room, id)?.emoji}
-              </span>
-            ))}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 function Standings({ room }: { room: Room }) {
   const ranked = [...room.players].sort((a, b) => b.score - a.score);

@@ -2,14 +2,12 @@
 
 import { use, useEffect, useState } from "react";
 import { BuzzPlayer } from "@/components/play/BuzzPlayer";
-import { GridPlayer } from "@/components/play/GridPlayer";
 import { ImpostorPlayer } from "@/components/play/ImpostorPlayer";
 import { OddPlayer } from "@/components/play/OddPlayer";
 import { LivePlayer } from "@/components/play/LivePlayer";
 import { SketchPlayer } from "@/components/play/SketchPlayer";
 import { RoundPlayer } from "@/components/play/RoundPlayer";
 import type { BuzzState } from "@/lib/games/buzzEngine";
-import type { CodeGridState } from "@/lib/games/codegrid";
 import type { ImpostorState } from "@/lib/games/impostor";
 import type { OddState } from "@/lib/games/oddOne";
 import type { LiveState } from "@/lib/games/liveEngine";
@@ -186,7 +184,7 @@ export default function PlayPage({
         | BuzzState
         | LiveState
         | ImpostorState | OddState
-        | CodeGridState
+       
         | SketchState
       ) &
         ViewerExtras)
@@ -248,24 +246,6 @@ export default function PlayPage({
           onAccuse={() => send("accuse", undefined, me.id)}
           onVote={(playerId) => send("vote", { playerId }, me.id)}
           onGuessPlace={(placeIndex) => send("guess", { placeIndex }, me.id)}
-        />
-      </>
-    );
-  }
-
-  if (room.gameId && state?.kind === "grid") {
-    return (
-      <>
-        <LeaveButton onLeave={leave} />
-        <GridPlayer
-          state={state}
-          me={me}
-          onClue={(word, count) => send("clue", { word, count }, me.id)}
-          onTap={(index) => send("tap", { index }, me.id)}
-          onPass={() => send("pass", undefined, me.id)}
-          onAssign={(playerId, team, spymaster) =>
-            send("assign", { playerId, team, spymaster }, me.id)
-          }
         />
       </>
     );

@@ -1,4 +1,3 @@
-import type { CodeGridState } from "@/lib/games/codegrid";
 import type { ImpostorState } from "@/lib/games/impostor";
 import type { LiveState } from "@/lib/games/liveEngine";
 import type { RoundState } from "@/lib/games/roundEngine";
@@ -37,7 +36,6 @@ const ANSWERS: Record<string, string[]> = {
     "A very small horse",
     "About forty minutes",
   ],
-  groupthink: ["Blue", "Coffee", "Red", "Traffic", "Apple", "Paris"],
   "last-one-standing": [
     "Not a clue",
     "Seven",
@@ -50,8 +48,6 @@ const ANSWERS: Record<string, string[]> = {
 };
 
 const CLUES = ["Middle", "Warm", "Halfway", "Sort of", "Mostly", "Nearly"];
-const GRID_CLUES = ["Water", "Sharp", "Loud", "Round", "Cold", "Old"];
-
 const FALLBACK = ["Something reasonable", "No idea honestly", "Probably that"];
 
 function botAnswer(gameId: string, seed: number): string {
@@ -77,7 +73,6 @@ type GameState =
   | RoundState
   | LiveState
   | ImpostorState
-  | CodeGridState
   | SketchState;
 
 /**
@@ -175,46 +170,6 @@ function nextBotMove(room: Room, state: GameState): Act | null {
           playerId: bot.id,
           payload: { playerId: pick.id },
         };
-      }
-    }
-    return null;
-  }
-
-  if (state.kind === "grid") {
-    const turn = state.teams[state.turn];
-    if (state.phase === "clue" && turn?.spymaster) {
-      const bot = bots.find((b) => b.id === turn.spymaster);
-      if (bot) {
-        return {
-          type: "clue",
-          playerId: bot.id,
-          payload: {
-            word: GRID_CLUES[Math.floor(Math.random() * GRID_CLUES.length)],
-            count: 1,
-          },
-        };
-      }
-    }
-    if (state.phase === "guess") {
-      // Only step in when the guessing team is all bots — otherwise they'd
-      // steamroll the person whose turn it actually is.
-      const humanOnTurn = room.players.some(
-        (p) => p.connected && !p.bot && turn?.members.includes(p.id),
-      );
-      const guesser = humanOnTurn
-        ? undefined
-        : bots.find((b) => turn?.members.includes(b.id));
-      if (guesser) {
-        const open = state.words
-          .map((_, i) => i)
-          .filter((i) => !state.revealed.includes(i));
-        if (open.length) {
-          return {
-            type: "tap",
-            playerId: guesser.id,
-            payload: { index: open[Math.floor(Math.random() * open.length)] },
-          };
-        }
       }
     }
     return null;

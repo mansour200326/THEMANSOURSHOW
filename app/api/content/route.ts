@@ -28,7 +28,6 @@ const RequestSchema = z.object({
     "timeline",
     "dial-it-in",
     "impostor",
-    "code-grid",
     "sketch-and-guess",
     "emoji-riddles",
     "bluff-trivia",
@@ -106,10 +105,6 @@ export async function POST(request: Request) {
     impostor: {
       key: "places",
       write: () => generateImpostorPlaces({ themes: spread, avoid, count: 10 }),
-    },
-    "code-grid": {
-      key: "words",
-      write: () => generateWordPack({ kind: "grid", themes: spread, avoid, count: 30 }),
     },
     "sketch-and-guess": {
       key: "words",

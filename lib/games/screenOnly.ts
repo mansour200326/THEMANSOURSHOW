@@ -4,7 +4,7 @@
  * They aren't in the registry because they don't run on the room engine at
  * all: each is its own page with its own state, played off the big screen.
  * The lobby lists them alongside the twelve that do, so this is where the
- * other four live and the two lists together are the sixteen.
+ * other four live and the two lists together are the fourteen.
  */
 export type ScreenOnlyGame = {
   id: string;

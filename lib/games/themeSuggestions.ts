@@ -85,18 +85,6 @@ export const THEME_SUGGESTIONS: Record<string, string[]> = {
   ],
 
   /* --- Code Grid: plain, concrete nouns that carry double meanings --- */
-  "code-grid": [
-    "Everyday objects",
-    "Animals",
-    "Places",
-    "Food",
-    "Sports",
-    "Nature",
-    "Tools",
-    "Body parts",
-    "Clothes",
-    "Music",
-  ],
 
   /* --- Emoji Riddles: things emoji can actually spell out --- */
   "emoji-riddles": [
@@ -172,16 +160,6 @@ export const THEME_SUGGESTIONS: Record<string, string[]> = {
     "Childhood stories",
     "Guilty pleasures",
     "Things you'd never admit",
-  ],
-  groupthink: [
-    "Everyday things",
-    "Food",
-    "Colours and shapes",
-    "Animals",
-    "Places",
-    "Famous people",
-    "Films",
-    "First thing that comes to mind",
   ],
 
   /* --- Categories / Three in Five: things you can list quickly --- */

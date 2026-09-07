@@ -6,16 +6,6 @@
  * things with a shape, drawable in ninety seconds by someone who can't draw.
  */
 
-export const GRID_WORDS = [
-  "Bank", "Star", "Cold", "Ring", "Court", "Match", "Spring", "Wave",
-  "Crane", "Palm", "Bolt", "Board", "Light", "Post", "Table", "Charge",
-  "Pitch", "Novel", "Draft", "Iron", "Model", "Case", "Plot", "Fair",
-  "Ship", "Watch", "Mint", "Trunk", "Cell", "Break", "Pupil", "Scale",
-  "Nail", "Note", "Root", "Bark", "Date", "Jam", "Seal", "Duck",
-  "Fan", "Bug", "Chest", "Deck", "Glass", "Kiwi", "Mouse", "Organ",
-  "Pound", "Rock", "Slip", "Tank", "Wind", "Yard", "Block", "Cast",
-];
-
 export const SKETCH_WORDS = [
   "Lighthouse", "Octopus", "Skateboard", "Pineapple", "Helicopter",
   "Snowman", "Sandcastle", "Toothbrush", "Windmill", "Umbrella",

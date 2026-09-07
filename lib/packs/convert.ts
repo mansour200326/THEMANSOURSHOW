@@ -168,7 +168,6 @@ export function packToStartPayload(
       return { items: packToSpectrums(data as Spectrum[]) };
     case "impostor":
       return { places: packToPlaces(data as Place[]) };
-    case "code-grid":
     case "sketch-and-guess":
       return { words: packToWords(data as string[]) };
     case "bluff-trivia":
@@ -177,7 +176,6 @@ export function packToStartPayload(
       return { pairs: packToPairs(data as QA[]) };
     case "most-likely-to":
     case "who-said-it":
-    case "groupthink":
       return { prompts: packToPrompts(data as string[]).map((text) => ({ text })) };
     default:
       return {};

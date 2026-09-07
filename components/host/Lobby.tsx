@@ -35,7 +35,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
     /*
      * Two shapes, one screen. On a TV everything has to fit at once, because
      * nobody scrolls a television from the sofa. On a phone that same layout
-     * crushes sixteen cards into a fixed height, so below lg it becomes an
+     * crushes fourteen cards into a fixed height, so below lg it becomes an
      * ordinary scrolling page with cards big enough to read.
      */
     <main className="flex min-min-h-dvh lg:h-dvh flex-col gap-3 p-3 lg:h-dvh lg:gap-[1.4vmin] lg:lg:overflow-hidden lg:p-[1.8vmin] pb-16 lg:pb-[1.6vmin]">

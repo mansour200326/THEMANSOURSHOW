@@ -8,7 +8,6 @@ import { useEntitlements } from "@/lib/plan/useEntitlements";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { BuzzHost } from "@/components/host/BuzzHost";
-import { GridHost } from "@/components/host/GridHost";
 import { ImpostorHost } from "@/components/host/ImpostorHost";
 import { OddHost } from "@/components/host/OddHost";
 import { LiveHost } from "@/components/host/LiveHost";
@@ -25,7 +24,6 @@ import { packToStartPayload } from "@/lib/packs/convert";
 import { Lobby } from "@/components/host/Lobby";
 import { RoundHost } from "@/components/host/RoundHost";
 import type { BuzzState } from "@/lib/games/buzzEngine";
-import type { CodeGridState } from "@/lib/games/codegrid";
 import type { ImpostorState } from "@/lib/games/impostor";
 import type { OddState } from "@/lib/games/oddOne";
 import type { LiveState } from "@/lib/games/liveEngine";
@@ -100,7 +98,6 @@ export default function HostPage({
     timeline: "Timeline",
     "dial-it-in": "Dial It In",
     impostor: "Impostor",
-    "code-grid": "Code Grid",
     "sketch-and-guess": "Sketch & Guess",
     "emoji-riddles": "Emoji Riddles",
     "bluff-trivia": "Bluff Trivia",
@@ -311,7 +308,7 @@ export default function HostPage({
   }
 
   const state = room.game as
-    | (RoundState | BuzzState | LiveState | ImpostorState | CodeGridState | SketchState | OddState)
+    | (RoundState | BuzzState | LiveState | ImpostorState | SketchState | OddState)
     | null;
 
   const inGame = (() => {
@@ -362,17 +359,6 @@ export default function HostPage({
             onAdjust={(id, delta) => send("score:adjust", { id, delta })}
           onTimeUp={() => send("timeup")}
           onNext={() => send("next")}
-          onQuit={() => send("game:end")}
-        />
-      );
-    }
-
-    if (state?.kind === "grid") {
-      return (
-        <GridHost
-          room={room}
-          state={state}
-          onBegin={() => send("begin")}
           onQuit={() => send("game:end")}
         />
       );

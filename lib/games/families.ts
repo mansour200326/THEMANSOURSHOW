@@ -13,11 +13,9 @@ export const FAMILY_OF: Record<string, Family> = {
   "last-one-standing": "trivia",
   /* Someone in the room is lying. */
   impostor: "deception",
-  "code-grid": "deception",
   /* The game is about the people playing it. */
   "most-likely-to": "social",
   "who-said-it": "social",
-  groupthink: "social",
   "face-off": "social",
   /* Words, clocks and canvases. */
   "emoji-riddles": "word",

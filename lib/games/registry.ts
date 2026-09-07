@@ -1,20 +1,17 @@
 import type { GameModule } from "@/lib/games/types";
 import {
   guessWhoSaidIt,
-  herdMentality,
   mostLikelyTo,
 } from "@/lib/games/roundGames";
 import { emojiRiddles, triviaRoyale } from "@/lib/games/buzzGames";
 import { dialItIn, lastOneStanding, timeline } from "@/lib/games/liveGames";
 import { createImpostorGame } from "@/lib/games/impostor";
 import { impostorPack } from "@/lib/games/impostorPack";
-import { createCodeGrid } from "@/lib/games/codegrid";
 import { createSketchGame } from "@/lib/games/sketch";
-import { GRID_WORDS, SKETCH_WORDS } from "@/lib/games/wordPacks";
+import { SKETCH_WORDS } from "@/lib/games/wordPacks";
 import { oddOneOut } from "@/lib/games/oddOne";
 
 const impostor = createImpostorGame(impostorPack);
-const codeGrid = createCodeGrid(GRID_WORDS);
 const sketchAndGuess = createSketchGame(SKETCH_WORDS);
 
 /**
@@ -27,13 +24,11 @@ export const games: Record<string, GameModule> = {
   [mostLikelyTo.id]: mostLikelyTo,
   [guessWhoSaidIt.id]: guessWhoSaidIt,
   [oddOneOut.id]: oddOneOut,
-  [herdMentality.id]: herdMentality,
   [emojiRiddles.id]: emojiRiddles,
   [lastOneStanding.id]: lastOneStanding,
   [timeline.id]: timeline,
   [dialItIn.id]: dialItIn,
   [impostor.id]: impostor,
-  [codeGrid.id]: codeGrid,
   [sketchAndGuess.id]: sketchAndGuess,
 };
 

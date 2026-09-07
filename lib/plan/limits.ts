@@ -10,7 +10,7 @@
 export type Plan = "free" | "pro";
 
 export type Entitlements = {
-  /** How many of the sixteen games this plan can open. */
+  /** How many of the fourteen games this plan can open. */
   games: number | "all";
   /** Boards and packs the model will write, per rolling night. */
   aiPerNight: number | "unlimited";
@@ -81,7 +81,7 @@ export type Gate = "game" | "ai" | "players" | "themes";
 export const GATE_COPY: Record<Gate, { title: string; line: string }> = {
   game: {
     title: "This one's on Pro",
-    line: "Free hosts get three games. Pro opens all sixteen.",
+    line: "Free hosts get three games. Pro opens all fourteen.",
   },
   ai: {
     title: "That's tonight's writing done",
