@@ -72,7 +72,7 @@ export function rapidReducer(state: RapidState, action: RapidAction): RapidState
     case "TIME_UP":
       return state.phase === "running" ? { ...state, phase: "judge" } : state;
 
-    /** Host banks the turn: a count for Categories, 1 or 0 for Three in Five. */
+    /** Host banks the turn: how many the team actually named. */
     case "SCORE": {
       if (state.phase !== "judge") return state;
       const count = Math.max(0, Math.round(action.points));

@@ -9,7 +9,7 @@ const check = (name: string, got: unknown, want: unknown) => {
   if (!ok) console.log(`FAIL  ${name}: got ${JSON.stringify(got)} want ${JSON.stringify(want)}`);
 };
 
-const start = (mode: "categories" | "three-in-five", rounds = 3): RapidState =>
+const start = (mode: "categories", rounds = 3): RapidState =>
   rapidReducer(emptyRapid(mode), {
     type: "START",
     teamNames: ["Reds", "Blues"],
@@ -76,7 +76,7 @@ check("undo returns the points", scores(undone), [0, 0]);
 // The host's "Finish now" button and the clock running out are the same
 // action. The reducer has no idea how much time was left, which is precisely
 // why stopping early can't behave differently from stopping late.
-for (const mode of ["categories", "three-in-five"] as const) {
+for (const mode of ["categories"] as const) {
   let early = start(mode);
   if (mode === "categories") early = rapidReducer(early, { type: "SET_BID", team: 0, count: 3 });
   early = rapidReducer(early, { type: "GO" });
@@ -89,23 +89,7 @@ for (const mode of ["categories", "three-in-five"] as const) {
 
 // TIME_UP is ignored from anywhere else, so a stray press can't skip a turn.
 check("time up does nothing while bidding", rapidReducer(start("categories"), { type: "TIME_UP" }).phase, "bidding");
-check("time up does nothing while ready", rapidReducer(start("three-in-five"), { type: "TIME_UP" }).phase, "ready");
 
-/* ------------------------------------------- Three in Five is unchanged */
-
-let t = start("three-in-five");
-check("three-in-five still starts ready", t.phase, "ready");
-t = rapidReducer(t, { type: "GO" });
-t = rapidReducer(t, { type: "TIME_UP" });
-t = rapidReducer(t, { type: "SCORE", points: 1 });
-check("first team scored", scores(t), [1, 0]);
-check("turn passes", t.turn, 1);
-check("still the same round until it's been round the teams", t.round, 0);
-t = rapidReducer(t, { type: "GO" });
-t = rapidReducer(t, { type: "TIME_UP" });
-t = rapidReducer(t, { type: "SCORE", points: 0 });
-check("round advances after both teams", t.round, 1);
-check("back to ready", t.phase, "ready");
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

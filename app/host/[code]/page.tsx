@@ -105,6 +105,7 @@ export default function HostPage({
     "sketch-and-guess": "Sketch & Guess",
     "emoji-riddles": "Emoji Riddles",
     "bluff-trivia": "Bluff Trivia",
+    "most-likely-to": "Most Likely To",
   };
 
   const launch = async (
@@ -159,6 +160,7 @@ export default function HostPage({
         places: data.places,
         words: data.words,
         pairs: data.pairs,
+        prompts: data.prompts,
         seconds,
         rounds,
       });
@@ -294,6 +296,7 @@ export default function HostPage({
 
   if (!room.gameId) {
     return (
+      <>
       <Stage id="lobby">
       <Lobby
         onNight={() => setShowNight(true)}
@@ -310,6 +313,15 @@ export default function HostPage({
         onClearBots={() => send("bots:clear")}
       />
       </Stage>
+      {/* The same tray as in a game, holding only the host-sheet key here. */}
+      <HostTray
+        sheet={
+          room.hostKey
+            ? { url: `${window.location.host}/sheet/${room.code}`, key: room.hostKey }
+            : undefined
+        }
+      />
+    </>
     );
   }
 
@@ -416,6 +428,11 @@ export default function HostPage({
       <Stage id={`game:${room.gameId}`}>{inGame}</Stage>
       <HostTray
         onEnd={() => send("game:end")}
+        sheet={
+          room.hostKey
+            ? { url: `${window.location.host}/sheet/${room.code}`, key: room.hostKey }
+            : undefined
+        }
         // Only the game that shows no scores of its own needs the fallback.
         scores={
           state?.kind === "sketch"

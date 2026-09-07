@@ -15,8 +15,12 @@ export function HostTray({
   onEnd,
   scores,
   onAdjust,
+  sheet,
 }: {
-  onEnd: () => void;
+  /** Ends the segment. Absent in the lobby, where there's nothing to end. */
+  onEnd?: () => void;
+  /** The host-sheet address and key, for the one host who wants the card. */
+  sheet?: { url: string; key: string };
   /** Present only for games that put no scores on screen of their own. */
   scores?: Adjustable[];
   onAdjust?: (id: string, delta: number) => void;
@@ -29,6 +33,16 @@ export function HostTray({
       <div className="fixed bottom-3 right-3 z-40 flex flex-col items-end gap-2">
         {open && (
           <div className="flex flex-col gap-2 rounded-2xl border border-line/12 bg-midnight/90 p-2 shadow-tile backdrop-blur">
+            {sheet && (
+              <div className="px-2 py-1 text-right text-xs leading-snug text-moon-deep">
+                <p className="font-display uppercase tracking-widest">Host&apos;s phone</p>
+                <p className="text-moon/70">{sheet.url}</p>
+                <p>
+                  key{" "}
+                  <span className="font-display tracking-[0.2em] text-moon/80">{sheet.key}</span>
+                </p>
+              </div>
+            )}
             {scores && onAdjust && (
               <button
                 onClick={() => {
@@ -40,6 +54,7 @@ export function HostTray({
                 Fix scores
               </button>
             )}
+            {onEnd && (
             <button
               onClick={() => {
                 setOpen(false);
@@ -49,6 +64,7 @@ export function HostTray({
             >
               End segment
             </button>
+            )}
           </div>
         )}
         <button

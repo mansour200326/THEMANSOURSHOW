@@ -12,7 +12,7 @@ export const runtime = "nodejs";
 export const maxDuration = 180;
 
 const RequestSchema = z.object({
-  mode: z.enum(["categories", "three-in-five"]),
+  mode: z.enum(["categories"]),
   count: z.number().int().min(1).max(20),
   themes: z.array(z.string().max(80)).max(6).optional(),
   difficulty: z.enum(["easy", "medium", "hard"]).optional(),

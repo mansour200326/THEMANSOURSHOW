@@ -2,7 +2,7 @@
  * How each game works, in the words you'd use to explain it to the room.
  *
  * These go on screen before anything starts, because the host shouldn't have
- * to remember the rules to fourteen games — and because half the room has
+ * to remember the rules to thirteen games — and because half the room has
  * never played any of them. Written to be read aloud off a TV: short lines,
  * no jargon, and the scoring said plainly rather than left to be discovered.
  */
@@ -114,16 +114,6 @@ export const RULES: Record<string, GameRules> = {
     needs: "This screen only.",
     example:
       "The category is “Countries in Africa”. One team says seven, the other says nine, the first says eleven and the second gives up. The first team now has thirty seconds to name eleven. Ten of them, and the point goes to the other side.",
-  },
-  "three-in-five": {
-    summary: "Name three things. Five seconds. Go.",
-    how: [
-      "A prompt goes up — 'name 3 things you'd take to a desert island'.",
-      "You get five seconds. It is much harder than it sounds.",
-      "Tap whether they managed it.",
-    ],
-    scoring: "One point if they got all three out in time. Nothing if they didn't.",
-    needs: "This screen only.",
   },
   "last-one-standing": {
     summary: "Get one wrong and you're out.",

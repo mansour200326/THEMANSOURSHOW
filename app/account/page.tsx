@@ -47,7 +47,7 @@ export default async function AccountPage() {
           </p>
         )}
         <ul className="mt-4 flex flex-col gap-1.5 text-moon/80">
-          <li>{limits.games === "all" ? "All fourteen games" : `${limits.games} games`}</li>
+          <li>{limits.games === "all" ? "All thirteen games" : `${limits.games} games`}</li>
           <li>
             {limits.aiPerNight === "unlimited"
               ? "Unlimited written boards"

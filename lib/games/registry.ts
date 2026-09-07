@@ -17,7 +17,7 @@ const sketchAndGuess = createSketchGame(SKETCH_WORDS);
 /**
  * Every phone-controlled segment the room knows how to run. Big Board isn't
  * here — it's the one game that runs entirely in the host's browser with no
- * room — and nor are Categories or Three in Five, for the same reason.
+ * room — and nor is Categories, for the same reason.
  */
 export const games: Record<string, GameModule> = {
   [triviaRoyale.id]: triviaRoyale,

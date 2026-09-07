@@ -1,14 +1,15 @@
 /**
- * Two shout-it-out games that share a machine. Both are TV-only — nobody types,
- * the host listens and scores.
+ * A shout-it-out game, TV-only — nobody types, the host listens and scores.
  *
- *   categories    — the category goes up, the teams bid against each other for
- *                   how many they reckon they can name, and the winner of the
- *                   bid plays the clock alone. One category, one team.
- *   three-in-five — five seconds to name three. Teams simply alternate.
+ *   categories — the category goes up, the teams bid against each other for
+ *                how many they reckon they can name, and the winner of the
+ *                bid plays the clock alone. One category, one team.
+ *
+ * The machine is written for a mode so a second shouting game can join it
+ * without a rewrite; there was one once, and it may come back.
  */
 
-export type RapidMode = "categories" | "three-in-five";
+export type RapidMode = "categories";
 
 export type RapidTeam = {
   id: string;
@@ -52,20 +53,17 @@ export type RapidState = {
 
 export const RAPID_SECONDS: Record<RapidMode, number> = {
   categories: 30,
-  "three-in-five": 5,
 };
 
 export const RAPID_TITLE: Record<RapidMode, string> = {
   categories: "Categories",
-  "three-in-five": "Three in Five",
 };
 
 export const RAPID_RULE: Record<RapidMode, string> = {
   categories: "Bid for the category, then name as many as you claimed.",
-  "three-in-five": "Name three. Five seconds. Go.",
 };
 
-/** Only Categories is bid for; Three in Five just goes round the teams. */
+/** Categories is bid for; a mode that isn't simply goes round the teams. */
 export const RAPID_BIDS = (mode: RapidMode) => mode === "categories";
 
 export const rapidPrompt = (s: RapidState): string | undefined =>

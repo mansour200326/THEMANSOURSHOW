@@ -405,6 +405,54 @@ async function attachPictures(
   console.log(`[board] ${hits}/${wanted.length} picture clues found an image`);
 }
 
+/* --------------------------------------------- Most Likely To prompts */
+
+const GeneratedMostLikely = z.object({
+  prompts: z.array(
+    z.string().describe(
+      'One "Most likely to…" prompt, starting with those words, about something a friend might plausibly do. Specific and a little unkind, never cruel.',
+    ),
+  ),
+  ...isPersonalField,
+});
+
+export async function generateMostLikely({
+  themes,
+  count,
+  avoid = [],
+}: {
+  themes: string[];
+  count: number;
+  /** Prompts this host has already been served. Off-limits. */
+  avoid?: string[];
+}): Promise<Written<Array<{ text: string }>>> {
+  const client = new Anthropic();
+  const response = await client.messages.parse({
+    model: MODELS.packs,
+    max_tokens: 2500,
+    system:
+      "You write prompts for a party game where everyone votes on which friend " +
+      "in the room is most likely to do a thing. Every prompt begins \"Most likely " +
+      "to\". The good ones are specific, faintly accusatory, and true of somebody " +
+      "in every friend group: not \"most likely to be famous\" but \"most likely to " +
+      "text 'omw' from the shower\". No two about the same thing. Clean enough for " +
+      "a living room with everyone's parents in it." + PERSONAL,
+    output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedMostLikely), "low"),
+    messages: [
+      { role: "user", content: `Write ${overAsk(count, avoid)} prompts.${themeLine(themes)}` + alreadyAsked(avoid) },
+    ],
+  });
+  const parsed = response.parsed_output;
+  if (!parsed) throw new Error("Couldn't write those prompts.");
+  const drafted = parsed.prompts
+    .map((t) => t.trim())
+    .filter((t) => /^most likely to/i.test(t))
+    .map((text) => ({ text }));
+  // Anything on the avoid list is dropped here, whatever the model did.
+  const content = enforceAvoid(drafted, avoid, (p) => p.text).slice(0, count);
+  return { content, isPersonal: parsed.isPersonal };
+}
+
 /* ------------------------------------------------ Bluff Trivia pairs */
 
 const GeneratedPairs = z.object({
@@ -1145,7 +1193,7 @@ export async function generateRapidPrompts({
   difficulty = "medium",
   avoid = [],
 }: {
-  mode: "categories" | "three-in-five";
+  mode: "categories";
   count: number;
   /** Spread the prompts across these. Empty means anything goes. */
   themes?: string[];
@@ -1155,14 +1203,13 @@ export async function generateRapidPrompts({
 }): Promise<Written<string[]>> {
   const client = new Anthropic();
 
-  const brief =
-    mode === "categories"
-      ? "Each prompt is a category broad enough that someone could rattle off " +
-        "ten or more answers in 30 seconds. Phrase them as 'Things that…', " +
-        "'Types of…', or a plain plural noun. Never a question."
-      : "Each prompt asks for exactly three things and starts with 'Name 3'. " +
-        "Pick things where three examples exist but come out slowly under " +
-        "pressure — that panic is the whole game.";
+  // One mode today; the switch stays so a second shouting game can add a brief.
+  const brief = {
+    categories:
+      "Each prompt is a category broad enough that someone could rattle off " +
+      "ten or more answers in 30 seconds. Phrase them as 'Things that…', " +
+      "'Types of…', or a plain plural noun. Never a question.",
+  }[mode];
 
   const response = await client.messages.parse({
     model: MODELS.packs,

@@ -26,10 +26,10 @@ export const metadata: Metadata = {
   ),
   title: "Big Night — party games for the room",
   description:
-    "One screen, everyone's phones, fourteen games. No downloads, no accounts.",
+    "One screen, everyone's phones, thirteen games. No downloads, no accounts.",
   openGraph: {
     title: "Big Night",
-    description: "Fourteen party games. One TV, everyone's phones.",
+    description: "Thirteen party games. One TV, everyone's phones.",
     siteName: "Big Night",
     type: "website",
   },

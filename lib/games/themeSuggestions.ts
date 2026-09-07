@@ -162,7 +162,7 @@ export const THEME_SUGGESTIONS: Record<string, string[]> = {
     "Things you'd never admit",
   ],
 
-  /* --- Categories / Three in Five: things you can list quickly --- */
+  /* --- Categories: things you can list quickly --- */
   categories: [
     "Things in a supermarket",
     "Countries",
@@ -174,16 +174,6 @@ export const THEME_SUGGESTIONS: Record<string, string[]> = {
     "Things at the beach",
     "Board games",
     "Things in a hospital",
-  ],
-  "three-in-five": [
-    "Things in a kitchen",
-    "Countries in Europe",
-    "Colours",
-    "Sports",
-    "Pizza toppings",
-    "Things you'd take camping",
-    "Superheroes",
-    "Things that fly",
   ],
 };
 

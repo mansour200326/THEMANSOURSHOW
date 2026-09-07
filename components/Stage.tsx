@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 /**
  * How every screen arrives.
  *
- * Screens used to swap hard, which made a night feel like fourteen separate
+ * Screens used to swap hard, which made a night feel like thirteen separate
  * apps. Every screen the host or a player sees now comes in the same way:
  * a short rise, nothing else. Transform only — never opacity — because an
  * entrance that fades from nothing hides the content until the animation

@@ -23,7 +23,6 @@ export const FAMILY_OF: Record<string, Family> = {
   "dial-it-in": "word",
   "sketch-and-guess": "word",
   categories: "word",
-  "three-in-five": "word",
 };
 
 /**

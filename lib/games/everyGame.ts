@@ -2,7 +2,7 @@ import { gameList } from "@/lib/games/registry";
 import { SCREEN_ONLY } from "@/lib/games/screenOnly";
 
 /**
- * All fourteen, in one place.
+ * All thirteen, in one place.
  *
  * The twelve that run on the room engine live in the registry and the four
  * screen-only ones don't, so anything that has to cover the whole lineup —

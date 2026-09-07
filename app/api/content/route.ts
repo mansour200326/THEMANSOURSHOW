@@ -11,6 +11,7 @@ import {
   friendlyAiError,
   generateEmojiRiddles,
   generateQuestionPairs,
+  generateMostLikely,
   generateImpostorPlaces,
   generateSpectrums,
   generateStandingQuestions,
@@ -31,6 +32,7 @@ const RequestSchema = z.object({
     "sketch-and-guess",
     "emoji-riddles",
     "bluff-trivia",
+    "most-likely-to",
   ]),
   themes: z.array(z.string().max(80)).max(6).optional(),
   difficulty: z.enum(["easy", "medium", "hard"]).optional(),
@@ -88,7 +90,7 @@ export async function POST(request: Request) {
    */
   const writers: Record<
     string,
-    { key: "items" | "places" | "words" | "pairs"; write: () => Promise<Written<unknown>> }
+    { key: "items" | "places" | "words" | "pairs" | "prompts"; write: () => Promise<Written<unknown>> }
   > = {
     "last-one-standing": {
       key: "items",
@@ -109,6 +111,10 @@ export async function POST(request: Request) {
     "sketch-and-guess": {
       key: "words",
       write: () => generateWordPack({ kind: "sketch", themes: spread, avoid, count: many(12) }),
+    },
+    "most-likely-to": {
+      key: "prompts",
+      write: () => generateMostLikely({ themes: spread, avoid, count: many(8) }),
     },
     "bluff-trivia": {
       key: "pairs",

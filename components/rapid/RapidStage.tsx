@@ -64,7 +64,7 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
     setBidTeam(0);
   }, [state.round]);
 
-  const urgent = left <= (state.mode === "three-in-five" ? 2 : 6);
+  const urgent = left <= 6;
 
   // A tick a second while the clock runs down, and a klaxon when it stops.
   useCue(state.phase === "running" && urgent ? Math.ceil(left) : null, "tick");

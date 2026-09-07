@@ -42,7 +42,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
     /*
      * Two shapes, one screen. On a TV everything has to fit at once, because
      * nobody scrolls a television from the sofa. On a phone that same layout
-     * crushes fourteen cards into a fixed height, so below lg it becomes an
+     * crushes thirteen cards into a fixed height, so below lg it becomes an
      * ordinary scrolling page with cards big enough to read.
      */
     <main className="flex min-min-h-dvh lg:h-dvh flex-col gap-3 p-3 lg:h-dvh lg:gap-[1.4vmin] lg:lg:overflow-hidden lg:p-[1.8vmin] pb-16 lg:pb-[1.6vmin]">
@@ -57,31 +57,17 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
             <p className="accent-text font-display text-[clamp(1.75rem,4.2vw,4.5rem)] font-bold leading-none tracking-[0.1em]">
               {room.code}
             </p>
-            <p className="mt-1 break-all text-[0.65rem] leading-tight text-moon-deep sm:hidden">
-              {joinUrl || "…"}
-            </p>
           </div>
           <div className="hidden max-w-[22ch] border-l border-line/10 pl-5 sm:block">
-            <p className="t-label font-display uppercase text-moon-deep">
-              Phones join at
-            </p>
-            <div className="flex items-center gap-3">
-              <p className="break-all text-[clamp(0.65rem,0.95vw,1rem)] leading-tight text-moon/75">
-                {joinUrl || "…"}
-              </p>
-              {/* A camera reads this in a second; nobody mistypes it. */}
-              <JoinQr
-                url={joinUrl ? `${window.location.protocol}//${joinUrl}` : ""}
-                className="h-[clamp(4.5rem,9vmin,8rem)] w-[clamp(4.5rem,9vmin,8rem)] shrink-0"
-              />
-            </div>
-            {room.hostKey && (
-              <p className="mt-2 text-[clamp(0.55rem,0.8vw,0.85rem)] leading-tight text-moon-deep">
-                Host&apos;s phone: <span className="text-moon/70">{joinUrl.replace(/\/play$/, "")}/sheet/{room.code}</span>
-                {" · key "}
-                <span className="font-display tracking-[0.2em] text-moon/70">{room.hostKey}</span>
-              </p>
-            )}
+            {/*
+              * The code encodes the room itself, not the site: scanning it
+              * lands a phone on the join screen with the code already in the
+              * address, so the only thing left to type is a name.
+              */}
+            <JoinQr
+              url={joinUrl ? `${window.location.protocol}//${joinUrl}/${room.code}` : ""}
+              className="h-[clamp(5.5rem,12vmin,11rem)] w-[clamp(5.5rem,12vmin,11rem)] shrink-0"
+            />
           </div>
         </div>
 

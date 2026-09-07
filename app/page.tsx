@@ -73,7 +73,7 @@ export default function Home() {
        * straight through it — it's a footnote now, out of the way at the
        * bottom, which is where anyone who wants it will look.
        */}
-      <HeroStage footnote="Fourteen games · the TV is the stage, your phone is the controller · no downloads, no accounts">
+      <HeroStage footnote="Thirteen games · the TV is the stage, your phone is the controller · no downloads, no accounts">
         <ShowMark />
 
         {/* Straight in behind the blast, not a polite fade afterwards. */}
