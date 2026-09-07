@@ -16,6 +16,8 @@ export const FAMILY_OF: Record<string, Family> = {
   /* The game is about the people playing it. */
   "most-likely-to": "social",
   "who-said-it": "social",
+  punchline: "social",
+  "caption-this": "social",
   "face-off": "social",
   /* Words, clocks and canvases. */
   "emoji-riddles": "word",

@@ -32,9 +32,11 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
   const prompt = state.prompts[state.round];
   const roundCard = useRoundCard(state.round, state.prompts.length, state.phase !== "done");
   const live = connectedPlayers(room);
+  /** Punchline and Caption This vote on sentences people wrote, not on names. */
+  const written = room.gameId === "punchline" || room.gameId === "caption-this";
 
   /*
-   * Most Likely To, Who Said It, Bluff Trivia and Groupthink all run through
+   * Most Likely To, Who Said It, Punchline and Caption This all run through
    * this screen, and it was the one host view with no sound in it at all.
    */
   useCue(
@@ -80,6 +82,23 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
         >
           {prompt?.text}
         </motion.p>
+        {/* Caption This: the picture is the prompt. Smaller once the captions are up. */}
+        {prompt?.image && (
+          <figure key={prompt.image.url} className="mt-[1vmin] flex flex-col items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={prompt.image.url}
+              alt=""
+              className={[
+                "rounded-xl border border-line/10 object-contain shadow-tile",
+                state.phase === "collect" ? "max-h-[44vh]" : "max-h-[22vh]",
+              ].join(" ")}
+            />
+            <figcaption className="mt-1 text-[clamp(0.55rem,0.8vw,0.85rem)] text-moon-deep">
+              {prompt.image.credit} · {prompt.image.licence} · Wikimedia Commons
+            </figcaption>
+          </figure>
+        )}
       </div>
 
       {/* Body */}
@@ -140,7 +159,20 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
                       />
                     )}
                     <div className="relative flex items-center justify-between gap-4">
-                      <span className="truncate font-display text-[clamp(1rem,2vw,2.2rem)] uppercase tracking-wide text-moon">
+                      {/*
+                        * A name fits on one shouted line. A punchline or a
+                        * caption is a sentence: it wraps, keeps its case, and
+                        * every line on the board is set the same way so a
+                        * short joke doesn't shout over a long one.
+                        */}
+                      <span
+                        className={[
+                          "font-display tracking-wide text-moon",
+                          written
+                            ? "line-clamp-2 text-[clamp(0.9rem,1.6vw,1.7rem)]"
+                            : "truncate text-[clamp(1rem,2vw,2.2rem)] uppercase",
+                        ].join(" ")}
+                      >
                         {option.label}
                       </span>
                       <span className="flex shrink-0 items-center gap-3">

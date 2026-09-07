@@ -163,6 +163,28 @@ export const THEME_SUGGESTIONS: Record<string, string[]> = {
   ],
 
   /* --- Categories: things you can list quickly --- */
+  /* --- Punchline: places a joke can be set --- */
+  punchline: [
+    "Dating",
+    "The office",
+    "Family dinners",
+    "Doctors and dentists",
+    "Airports",
+    "The gym",
+    "Flatmates",
+    "Weddings",
+  ],
+  /* --- Caption This: what the photo should be of --- */
+  "caption-this": [
+    "Cats",
+    "Dogs",
+    "Farm animals",
+    "Zoo animals",
+    "Birds",
+    "Animals in costumes",
+    "Animals in water",
+    "Baby animals",
+  ],
   categories: [
     "Things in a supermarket",
     "Countries",

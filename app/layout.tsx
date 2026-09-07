@@ -26,10 +26,10 @@ export const metadata: Metadata = {
   ),
   title: "Big Night — party games for the room",
   description:
-    "One screen, everyone's phones, thirteen games. No downloads, no accounts.",
+    "One screen, everyone's phones, fifteen games. No downloads, no accounts.",
   openGraph: {
     title: "Big Night",
-    description: "Thirteen party games. One TV, everyone's phones.",
+    description: "Fifteen party games. One TV, everyone's phones.",
     siteName: "Big Night",
     type: "website",
   },
@@ -61,8 +61,12 @@ export default function RootLayout({
       <body>
         {children}
         <ConnectionBar />
-        {/* The bottom-left corner: sound and lights, side by side. */}
-        <div className="fixed bottom-3 left-3 z-50 flex items-center gap-2">
+        {/*
+          * The bottom-left corner: sound and lights, side by side. Hidden
+          * while the lobby is up, because the lobby puts labelled ones in
+          * its header where they can actually be seen.
+          */}
+        <div className="fixed bottom-3 left-3 z-50 flex items-center gap-2 [body[data-controls=header]_&]:hidden">
           <SoundControl />
           <ThemeToggle />
         </div>

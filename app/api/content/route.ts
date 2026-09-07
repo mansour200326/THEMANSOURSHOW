@@ -12,6 +12,8 @@ import {
   generateEmojiRiddles,
   generateQuestionPairs,
   generateMostLikely,
+  generatePunchlines,
+  generateCaptionPictures,
   generateImpostorPlaces,
   generateSpectrums,
   generateStandingQuestions,
@@ -33,6 +35,8 @@ const RequestSchema = z.object({
     "emoji-riddles",
     "bluff-trivia",
     "most-likely-to",
+    "punchline",
+    "caption-this",
   ]),
   themes: z.array(z.string().max(80)).max(6).optional(),
   difficulty: z.enum(["easy", "medium", "hard"]).optional(),
@@ -115,6 +119,14 @@ export async function POST(request: Request) {
     "most-likely-to": {
       key: "prompts",
       write: () => generateMostLikely({ themes: spread, avoid, count: many(8) }),
+    },
+    punchline: {
+      key: "prompts",
+      write: () => generatePunchlines({ themes: spread, avoid, count: many(6) }),
+    },
+    "caption-this": {
+      key: "prompts",
+      write: () => generateCaptionPictures({ themes: spread, avoid, count: many(6) }),
     },
     "bluff-trivia": {
       key: "pairs",

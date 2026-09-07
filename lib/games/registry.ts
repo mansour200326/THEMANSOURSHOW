@@ -1,7 +1,9 @@
 import type { GameModule } from "@/lib/games/types";
 import {
+  captionThis,
   guessWhoSaidIt,
   mostLikelyTo,
+  punchline,
 } from "@/lib/games/roundGames";
 import { emojiRiddles, triviaRoyale } from "@/lib/games/buzzGames";
 import { dialItIn, lastOneStanding, timeline } from "@/lib/games/liveGames";
@@ -23,6 +25,8 @@ export const games: Record<string, GameModule> = {
   [triviaRoyale.id]: triviaRoyale,
   [mostLikelyTo.id]: mostLikelyTo,
   [guessWhoSaidIt.id]: guessWhoSaidIt,
+  [punchline.id]: punchline,
+  [captionThis.id]: captionThis,
   [oddOneOut.id]: oddOneOut,
   [emojiRiddles.id]: emojiRiddles,
   [lastOneStanding.id]: lastOneStanding,

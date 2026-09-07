@@ -9,14 +9,26 @@ import {
 
 /**
  * The shape shared by every prompt → answer → vote → reveal game. Most Likely
- * To, Who Said It, Bluff Trivia and Groupthink are all this machine
- * with different content and a different scoring rule.
+ * To, Who Said It, Punchline and Caption This are all this machine with
+ * different content and a different scoring rule.
  */
+
+/** A picture on a prompt, found on Commons — never invented by a model. */
+export type PromptImage = {
+  url: string;
+  credit: string;
+  licence: string;
+  sourceUrl: string;
+};
 
 export type Prompt = {
   text: string;
   /** Bluff Trivia's real answer; unused elsewhere. */
   answer?: string;
+  /** Caption This: the picture everyone is captioning. */
+  image?: PromptImage;
+  /** What the picture is of, so the same one isn't served twice. */
+  subject?: string;
 };
 
 export type VoteOption = {

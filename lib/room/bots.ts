@@ -29,6 +29,20 @@ const ANSWERS: Record<string, string[]> = {
     "Coffee and a long drive",
     "I once argued with a parking meter",
   ],
+  punchline: [
+    "…and that's why I'm not allowed back",
+    "Ask your mother",
+    "A goose with a grudge",
+    "Tuesdays, mostly",
+    "It's a long story involving a ladder",
+  ],
+  "caption-this": [
+    "Monday, in one picture",
+    "Me at your wedding",
+    "Nobody told him",
+    "Living his best life",
+    "The audacity",
+  ],
   "bluff-trivia": [
     "Twelve",
     "A silver spoon",

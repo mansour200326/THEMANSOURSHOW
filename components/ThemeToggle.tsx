@@ -49,7 +49,7 @@ export function ThemeToggle({
         type="button"
         onClick={flip}
         aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-        className={`btn-ghost px-4 py-2.5 text-sm opacity-100 ${className}`}
+        className={`btn-ghost opacity-100 ${className || "px-4 py-2.5 text-sm"}`}
       >
         {theme === "dark" ? "☀️ Light mode" : "🌙 Dark mode"}
       </button>

@@ -16,7 +16,14 @@ import { isMuted, play, setMuted, unlockAudio } from "@/lib/sound";
  * a screen the old toggle wasn't rendered on — in which case the first cue
  * created a suspended context and the room heard nothing all night.
  */
-export function SoundControl() {
+export function SoundControl({
+  prominent = false,
+  className = "",
+}: {
+  /** A labelled button, for the lobby, where the corner one went unnoticed. */
+  prominent?: boolean;
+  className?: string;
+} = {}) {
   const [off, setOff] = useState(false);
   const [ready, setReady] = useState(false);
 
@@ -29,16 +36,31 @@ export function SoundControl() {
   // Nothing during the server render, so the icon can't flash the wrong way.
   if (!ready) return null;
 
+  const flip = () => {
+    const next = !off;
+    setOff(next);
+    setMuted(next);
+    // Play the thing you just switched back on, so you know it worked.
+    if (!next) play("correct");
+  };
+
+  if (prominent) {
+    return (
+      <button
+        type="button"
+        onClick={flip}
+        aria-label={off ? "Turn sound on" : "Turn sound off"}
+        className={`btn-ghost opacity-100 ${off ? "border-rose-500/40 text-rose-200" : ""} ${className || "px-4 py-2.5 text-sm"}`}
+      >
+        {off ? "🔇 Sound off" : "🔊 Sound on"}
+      </button>
+    );
+  }
+
   return (
     <button
       type="button"
-      onClick={() => {
-        const next = !off;
-        setOff(next);
-        setMuted(next);
-        // Play the thing you just switched back on, so you know it worked.
-        if (!next) play("correct");
-      }}
+      onClick={flip}
       aria-label={off ? "Turn sound on" : "Turn sound off"}
       title={off ? "Sound is off" : "Sound is on"}
       className={[

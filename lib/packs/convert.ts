@@ -176,6 +176,8 @@ export function packToStartPayload(
       return { pairs: packToPairs(data as QA[]) };
     case "most-likely-to":
     case "who-said-it":
+    case "punchline":
+    case "caption-this":
       return { prompts: packToPrompts(data as string[]).map((text) => ({ text })) };
     default:
       return {};

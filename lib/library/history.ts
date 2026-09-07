@@ -42,7 +42,7 @@ const MAX_ANSWERS = 250;
  * board is stored under "board" and that wasn't on the list. Recursing into
  * everything can't fail that way when a shape changes.
  */
-const ANSWER_KEYS = new Set(["answer", "name", "text", "prompt", "question", "decoy"]);
+const ANSWER_KEYS = new Set(["answer", "name", "text", "prompt", "question", "decoy", "subject"]);
 
 export function harvest(
   value: unknown,

@@ -12,6 +12,8 @@ import { useEntitlements } from "@/lib/plan/useEntitlements";
 import { AccountLink } from "@/components/account/AccountLink";
 import { JoinQr } from "@/components/host/JoinQr";
 import { startBed, stopBed } from "@/lib/sound";
+import { SoundControl } from "@/components/SoundControl";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 type Props = {
   room: Room;
@@ -25,6 +27,14 @@ type Props = {
 
 /** Games that run on this screen alone — no room, no phones. */
 export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }: Props) {
+  // The corner sound/lights pair steps aside while this header carries them.
+  useEffect(() => {
+    document.body.dataset.controls = "header";
+    return () => {
+      delete document.body.dataset.controls;
+    };
+  }, []);
+
   const me = useEntitlements();
   const locked = (id: string) => me.plan !== "pro" && !me.freeGameIds.includes(id);
   const [joinUrl, setJoinUrl] = useState("");
@@ -42,7 +52,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
     /*
      * Two shapes, one screen. On a TV everything has to fit at once, because
      * nobody scrolls a television from the sofa. On a phone that same layout
-     * crushes thirteen cards into a fixed height, so below lg it becomes an
+     * crushes fifteen cards into a fixed height, so below lg it becomes an
      * ordinary scrolling page with cards big enough to read.
      */
     <main className="flex min-min-h-dvh lg:h-dvh flex-col gap-3 p-3 lg:h-dvh lg:gap-[1.4vmin] lg:lg:overflow-hidden lg:p-[1.8vmin] pb-16 lg:pb-[1.6vmin]">
@@ -83,6 +93,9 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
                 </button>
               )}
               <AccountLink className="self-center" />
+              {/* Labelled here: the faint corner pair is invisible on a TV across the room. */}
+              <SoundControl prominent className="px-3 py-1 text-xs" />
+              <ThemeToggle prominent className="px-3 py-1 text-xs" />
               <button
                 onClick={onNight}
                 className="btn-ghost px-3 py-1 text-xs"

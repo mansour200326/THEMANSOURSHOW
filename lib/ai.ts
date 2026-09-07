@@ -12,6 +12,8 @@ import type { BuzzItem } from "@/lib/games/buzzEngine";
 import type { LiveItem } from "@/lib/games/liveEngine";
 import { type Difficulty, difficultyBrief, varietyBrief } from "@/lib/difficulty";
 import { normalise as normaliseAnswer } from "@/lib/feud/match";
+import type { Prompt } from "@/lib/games/roundEngine";
+import { roundGamePacks } from "@/lib/games/roundGames";
 
 /**
  * Server-side AI content generation. Every generator here returns the same
@@ -450,6 +452,130 @@ export async function generateMostLikely({
     .map((text) => ({ text }));
   // Anything on the avoid list is dropped here, whatever the model did.
   const content = enforceAvoid(drafted, avoid, (p) => p.text).slice(0, count);
+  return { content, isPersonal: parsed.isPersonal };
+}
+
+/* ------------------------------------------------- Punchline setups */
+
+const GeneratedSetups = z.object({
+  setups: z.array(
+    z.string().describe(
+      "One joke setup that stops just before the punchline, ending with a colon or an ellipsis.",
+    ),
+  ),
+  ...isPersonalField,
+});
+
+export async function generatePunchlines({
+  themes,
+  count,
+  avoid = [],
+}: {
+  themes: string[];
+  count: number;
+  avoid?: string[];
+}): Promise<Written<Prompt[]>> {
+  const client = new Anthropic();
+  const response = await client.messages.parse({
+    model: MODELS.packs,
+    max_tokens: 2500,
+    system:
+      "You write setups for a party game where everyone in the room writes " +
+      "the punchline and votes for the best. A setup is a situation with the " +
+      "joke left off — \"The worst thing to hear from your dentist:\", " +
+      "\"The airline's new policy:\", \"My therapist finally admitted…\". " +
+      "Each should invite ten different jokes, not one obvious one. Short. " +
+      "No punchline of your own. Clean enough for a living room with " +
+      "everyone's parents in it." + PERSONAL,
+    output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedSetups), "low"),
+    messages: [
+      { role: "user", content: `Write ${overAsk(count, avoid)} setups.${themeLine(themes)}` + alreadyAsked(avoid) },
+    ],
+  });
+  const parsed = response.parsed_output;
+  if (!parsed) throw new Error("Couldn't write those setups.");
+  const drafted = parsed.setups.map((t) => t.trim()).filter(Boolean).map((text) => ({ text }));
+  const content = enforceAvoid(drafted, avoid, (p) => p.text).slice(0, count);
+  return { content, isPersonal: parsed.isPersonal };
+}
+
+/* --------------------------------------------- Caption This pictures */
+
+const GeneratedSubjects = z.object({
+  subjects: z.array(
+    z.string().describe(
+      "A short, literal description of a photo worth captioning, in the plain words a photo's filename would use: 'goat on a roof', 'dog wearing sunglasses'. Two to five words.",
+    ),
+  ),
+  ...isPersonalField,
+});
+
+/** A few at a time: Commons is someone else's bandwidth. */
+async function inBatches<T, R>(items: T[], size: number, fn: (t: T) => Promise<R>): Promise<R[]> {
+  const out: R[] = [];
+  for (let i = 0; i < items.length; i += size) {
+    out.push(...(await Promise.all(items.slice(i, i + size).map(fn))));
+  }
+  return out;
+}
+
+/**
+ * The model can't hand over a picture, so it hands over what the picture
+ * should be of and Commons is searched for a real one, with the same refusals
+ * Big Board's picture clues use. Subjects that turn up nothing are dropped;
+ * if the shelf comes up short, the bundled pictures top it up, minus any this
+ * host has already seen.
+ */
+export async function generateCaptionPictures({
+  themes,
+  count,
+  avoid = [],
+}: {
+  themes: string[];
+  count: number;
+  avoid?: string[];
+}): Promise<Written<Prompt[]>> {
+  const client = new Anthropic();
+  const response = await client.messages.parse({
+    model: MODELS.packs,
+    max_tokens: 2000,
+    system:
+      "You pick photos for a party game where everyone writes a caption and " +
+      "votes for the funniest. Describe photos that are funny before anyone " +
+      "says a word: an animal doing something human, a creature somewhere it " +
+      "shouldn't be, an expression that says everything. Use the literal, " +
+      "searchable words a photo archive would title the file with — " +
+      "'raccoon in a bin', 'cat on a keyboard' — never a joke, never a " +
+      "person's name, never a brand, and nothing sad or unkind." + PERSONAL,
+    output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedSubjects), "low"),
+    messages: [
+      {
+        role: "user",
+        content: `Describe ${overAsk(count * 3, avoid)} photos.${themeLine(themes)}` + alreadyAsked(avoid),
+      },
+    ],
+  });
+  const parsed = response.parsed_output;
+  if (!parsed) throw new Error("Couldn't pick those pictures.");
+
+  const subjects = enforceAvoid(
+    parsed.subjects.map((s) => s.trim().toLowerCase()).filter((s) => s.length > 3),
+    avoid,
+    (s) => s,
+  );
+  const found = (
+    await inBatches(subjects, 6, async (subject): Promise<Prompt | null> => {
+      const image = await findPicture(subject);
+      return image ? { text: "Caption this", subject, image } : null;
+    })
+  ).filter((p): p is Prompt => p !== null);
+
+  // Not enough real pictures: the bundled ones fill in, unseen ones first.
+  const seen = new Set(avoid.map((a) => a.toLowerCase()));
+  const spare = roundGamePacks["caption-this"].filter(
+    (p) => p.subject && !seen.has(p.subject.toLowerCase()) && !found.some((f) => f.subject === p.subject),
+  );
+  const content = [...found, ...spare].slice(0, count);
   return { content, isPersonal: parsed.isPersonal };
 }
 

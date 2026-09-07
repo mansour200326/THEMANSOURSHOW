@@ -106,6 +106,8 @@ export default function HostPage({
     "emoji-riddles": "Emoji Riddles",
     "bluff-trivia": "Bluff Trivia",
     "most-likely-to": "Most Likely To",
+    punchline: "Punchline",
+    "caption-this": "Caption This",
   };
 
   const launch = async (

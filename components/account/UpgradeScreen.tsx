@@ -51,7 +51,7 @@ export function UpgradeScreen({
           price="AED 25/month · 149/year"
           highlight
           lines={[
-            "All thirteen games",
+            "All fifteen games",
             "Write as many boards as you like",
             `${ENTITLEMENTS.pro.players} phones`,
             "Your own themes and questions",

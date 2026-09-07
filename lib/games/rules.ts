@@ -2,7 +2,7 @@
  * How each game works, in the words you'd use to explain it to the room.
  *
  * These go on screen before anything starts, because the host shouldn't have
- * to remember the rules to thirteen games — and because half the room has
+ * to remember the rules to fifteen games — and because half the room has
  * never played any of them. Written to be read aloud off a TV: short lines,
  * no jargon, and the scoring said plainly rather than left to be discovered.
  */
@@ -114,6 +114,30 @@ export const RULES: Record<string, GameRules> = {
     needs: "This screen only.",
     example:
       "The category is “Countries in Africa”. One team says seven, the other says nine, the first says eleven and the second gives up. The first team now has thirty seconds to name eleven. Ten of them, and the point goes to the other side.",
+  },
+  punchline: {
+    summary: "The setup goes up. You write the punchline.",
+    how: [
+      "A setup goes up on the TV — 'the worst thing to hear from your dentist:'.",
+      "Everyone writes their punchline on their phone.",
+      "The punchlines go up with no names on them. Vote for the best one — not your own.",
+    ],
+    scoring:
+      "The most votes takes a thousand, ties included. Anyone who got a vote at all takes five hundred.",
+    needs: "Three phones or more.",
+    example:
+      "The setup is “The airline's new policy:”. Five punchlines go up. The one about the emotional-support goose gets three votes and a thousand points; the two that got one vote each take five hundred.",
+  },
+  "caption-this": {
+    summary: "A picture goes up. Write the caption.",
+    how: [
+      "A photo goes up on the TV — a goat on a roof, a dog in sunglasses.",
+      "Everyone writes a caption on their phone.",
+      "The captions go up with no names on them. Vote for the best one — not your own.",
+    ],
+    scoring:
+      "The most votes takes a thousand, ties included. Anyone who got a vote at all takes five hundred.",
+    needs: "Three phones or more.",
   },
   "last-one-standing": {
     summary: "Get one wrong and you're out.",

@@ -19,6 +19,16 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
   const mySubmission = state.submissions[me.id];
   const myVote = state.votes[me.id];
   const isGuessWho = room.gameId === "who-said-it";
+  /** Punchline and Caption This: you're voting on what people wrote. */
+  const picksBest = room.gameId === "punchline" || room.gameId === "caption-this";
+  const picture = prompt?.image ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={prompt.image.url}
+      alt=""
+      className="mx-auto max-h-56 rounded-xl border border-line/10 object-contain"
+    />
+  ) : null;
 
   // Fresh box every round.
   useEffect(() => setDraft(""), [state.round, state.phase]);
@@ -49,12 +59,19 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
     }
     return (
       <Shell title={prompt?.text ?? ""}>
+        {picture}
         <textarea
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           rows={3}
           autoFocus
-          placeholder="Type your answer"
+          placeholder={
+            room.gameId === "punchline"
+              ? "Type your punchline"
+              : room.gameId === "caption-this"
+                ? "Type your caption"
+                : "Type your answer"
+          }
           className="field text-lg"
         />
         <button
@@ -84,7 +101,8 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
     }
 
     return (
-      <Shell title={isGuessWho ? "Who wrote this?" : prompt?.text ?? ""}>
+      <Shell title={isGuessWho ? "Who wrote this?" : picksBest ? "Pick the best one" : prompt?.text ?? ""}>
+        {picksBest && picture}
         {isGuessWho && focusText && (
           <p className="rounded-xl border border-line/15 bg-line/[0.04] px-5 py-4 text-center text-lg text-moon">
             “{focusText}”

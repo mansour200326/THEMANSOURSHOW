@@ -21,6 +21,8 @@
 export const ROUND_CHOICES: Record<string, number[]> = {
   "most-likely-to": [4, 6, 8, 12],
   "who-said-it": [4, 6, 8, 10],
+  punchline: [4, 6, 8, 10],
+  "caption-this": [4, 6, 8, 10],
   "bluff-trivia": [4, 6, 8, 10],
   "last-one-standing": [6, 8, 10, 12],
   timeline: [3, 4, 5, 6],
@@ -33,6 +35,8 @@ export const ROUND_CHOICES: Record<string, number[]> = {
 export const ROUND_DEFAULTS: Record<string, number> = {
   "most-likely-to": 8,
   "who-said-it": 6,
+  punchline: 6,
+  "caption-this": 6,
   "bluff-trivia": 6,
   "last-one-standing": 12,
   timeline: 6,
