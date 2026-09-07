@@ -21,7 +21,7 @@ type Props = {
 /**
  * The rules, read off the TV before anything starts.
  *
- * Fifteen games is more than any host can hold in their head, and most of the
+ * Seventeen games is more than any host can hold in their head, and most of the
  * room has never played any of them. This is the thirty seconds where somebody
  * reads it out and everyone nods.
  */

@@ -14,6 +14,7 @@ import {
   generateMostLikely,
   generatePunchlines,
   generateCaptionPictures,
+  generateStrokePairs,
   generateImpostorPlaces,
   generateSpectrums,
   generateStandingQuestions,
@@ -37,6 +38,8 @@ const RequestSchema = z.object({
     "most-likely-to",
     "punchline",
     "caption-this",
+    "act-it-out",
+    "one-stroke",
   ]),
   themes: z.array(z.string().max(80)).max(6).optional(),
   difficulty: z.enum(["easy", "medium", "hard"]).optional(),
@@ -127,6 +130,15 @@ export async function POST(request: Request) {
     "caption-this": {
       key: "prompts",
       write: () => generateCaptionPictures({ themes: spread, avoid, count: many(6) }),
+    },
+    "act-it-out": {
+      key: "words",
+      // A turn burns through six or eight words; write for every turn.
+      write: () => generateWordPack({ kind: "charades", themes: spread, avoid, count: 8 * many(8) }),
+    },
+    "one-stroke": {
+      key: "pairs",
+      write: () => generateStrokePairs({ themes: spread, avoid, count: many(3) }),
     },
     "bluff-trivia": {
       key: "pairs",

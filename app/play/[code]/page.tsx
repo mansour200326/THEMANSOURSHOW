@@ -7,6 +7,10 @@ import { OddPlayer } from "@/components/play/OddPlayer";
 import { LivePlayer } from "@/components/play/LivePlayer";
 import { SketchPlayer } from "@/components/play/SketchPlayer";
 import { RoundPlayer } from "@/components/play/RoundPlayer";
+import { ActPlayer } from "@/components/play/ActPlayer";
+import { StrokePlayer } from "@/components/play/StrokePlayer";
+import type { ActState } from "@/lib/games/actOut";
+import type { StrokeState } from "@/lib/games/oneStroke";
 import type { BuzzState } from "@/lib/games/buzzEngine";
 import type { ImpostorState } from "@/lib/games/impostor";
 import type { OddState } from "@/lib/games/oddOne";
@@ -186,7 +190,7 @@ export default function PlayPage({
         | ImpostorState | OddState
        
         | SketchState
-      ) &
+      | ActState | StrokeState ) &
         ViewerExtras)
     | null;
 
@@ -264,6 +268,39 @@ export default function PlayPage({
           onLift={() => send("lift", undefined, me.id)}
           onUndo={() => send("undo", undefined, me.id)}
           onClear={() => send("clear", undefined, me.id)}
+          onGuess={(text) => send("guess", { text }, me.id)}
+        />
+      </>
+    );
+  }
+
+  if (room.gameId && state?.kind === "act") {
+    return (
+      <>
+        <LeaveButton onLeave={leave} />
+        <ActPlayer
+          room={room}
+          state={state}
+          me={me}
+          onStart={() => send("start", undefined, me.id)}
+          onGot={(by) => send("got", { by }, me.id)}
+          onPass={() => send("pass", undefined, me.id)}
+        />
+      </>
+    );
+  }
+
+  if (room.gameId && state?.kind === "stroke") {
+    return (
+      <>
+        <LeaveButton onLeave={leave} />
+        <StrokePlayer
+          room={room}
+          state={state}
+          me={me}
+          onStroke={(points, colour, width) => send("draw", { points, colour, width }, me.id)}
+          onLift={() => send("lift", undefined, me.id)}
+          onVote={(playerId) => send("vote", { playerId }, me.id)}
           onGuess={(text) => send("guess", { text }, me.id)}
         />
       </>

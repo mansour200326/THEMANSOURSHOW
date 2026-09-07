@@ -579,6 +579,52 @@ export async function generateCaptionPictures({
   return { content, isPersonal: parsed.isPersonal };
 }
 
+/* --------------------------------------------- One Stroke categories */
+
+const GeneratedStrokePairs = z.object({
+  pairs: z.array(
+    z.object({
+      category: z.string().describe("A category everyone would draw differently: Animal, Kitchen, Vehicle."),
+      word: z.string().describe("One concrete thing in that category that a few lines can start to suggest."),
+    }),
+  ),
+  ...isPersonalField,
+});
+
+export async function generateStrokePairs({
+  themes,
+  count,
+  avoid = [],
+}: {
+  themes: string[];
+  count: number;
+  avoid?: string[];
+}): Promise<Written<Array<{ category: string; word: string }>>> {
+  const client = new Anthropic();
+  const response = await client.messages.parse({
+    model: MODELS.packs,
+    max_tokens: 1500,
+    system:
+      "You write rounds for a drawing game where everyone adds one line to a " +
+      "shared picture and one player secretly doesn't know the word, only the " +
+      "category. Each round is a category plus one thing in it. The category " +
+      "must be broad enough that the fake has something to draw — 'Animal', " +
+      "not 'Animals with long necks' — and the thing must have a recognisable " +
+      "shape. Nothing abstract, no brands, no people's names." + PERSONAL,
+    output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedStrokePairs), "low"),
+    messages: [
+      { role: "user", content: `Write ${overAsk(count, avoid)} rounds.${themeLine(themes)}` + alreadyAsked(avoid) },
+    ],
+  });
+  const parsed = response.parsed_output;
+  if (!parsed) throw new Error("Couldn't write those rounds.");
+  const drafted = parsed.pairs
+    .map((p) => ({ category: p.category.trim(), word: p.word.trim() }))
+    .filter((p) => p.category && p.word);
+  const content = enforceAvoid(drafted, avoid, (p) => p.word).slice(0, count);
+  return { content, isPersonal: parsed.isPersonal };
+}
+
 /* ------------------------------------------------ Bluff Trivia pairs */
 
 const GeneratedPairs = z.object({
@@ -1111,7 +1157,7 @@ export async function generateWordPack({
   count,
   avoid = [],
 }: {
-  kind: "grid" | "sketch";
+  kind: "grid" | "sketch" | "charades";
   themes?: string[];
   count: number;
   /** Answers this host has already been served. Off-limits. */
@@ -1123,9 +1169,14 @@ export async function generateWordPack({
       ? "Every word must carry more than one meaning or sit in more than one " +
         "world — 'Bank', 'Star', 'Spring'. A word with a single obvious sense " +
         "is a wasted square. One word each, no phrases."
-      : "Every word must be a thing with a shape that somebody who cannot " +
-        "draw could still attempt in ninety seconds. Concrete objects and " +
-        "scenes, never abstract ideas. One or two words each.";
+      : kind === "charades"
+        ? "Every entry is something one person can act out with their body in " +
+          "under a minute for a room to shout: an action, an animal, a job, a " +
+          "situation, a well-known film. No words that need a prop or a " +
+          "sentence. Two to four words each, in the form people would shout it."
+        : "Every word must be a thing with a shape that somebody who cannot " +
+          "draw could still attempt in ninety seconds. Concrete objects and " +
+          "scenes, never abstract ideas. One or two words each.";
   const response = await client.messages.parse({
     model: MODELS.packs,
     max_tokens: 2000,

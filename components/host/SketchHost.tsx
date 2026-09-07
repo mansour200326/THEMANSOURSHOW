@@ -78,12 +78,12 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
         <SketchCanvas
           strokes={state.strokes}
           live={state.live}
-          className="h-full max-h-[78vh] w-auto"
+          className={state.phase === "reveal" ? "h-full max-h-[62vh] w-auto" : "h-full max-h-[78vh] w-auto"}
         />
         {state.phase === "reveal" && (
           <motion.p
-            initial={{ opacity: 0, scale: 0.94 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ scale: 0.94 }}
+            animate={{ scale: 1 }}
             className="accent-text t-answer font-display font-bold uppercase"
           >
             {state.words[state.round]}

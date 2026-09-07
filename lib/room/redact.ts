@@ -1,6 +1,8 @@
 import type { ImpostorState } from "@/lib/games/impostor";
 import type { OddState } from "@/lib/games/oddOne";
 import type { SketchState } from "@/lib/games/sketch";
+import type { ActState } from "@/lib/games/actOut";
+import type { StrokeState } from "@/lib/games/oneStroke";
 import type { Room } from "@/lib/room/types";
 
 /**
@@ -23,8 +25,10 @@ export type ViewerExtras = {
   youAreImpostor?: boolean;
   yourPlace?: string;
   yourRole?: string;
-  /** Sketch & Guess: the word, for whoever is drawing it. */
+  /** Sketch & Guess, Act It Out, One Stroke: the word, for whoever may know it. */
   yourWord?: string;
+  /** One Stroke: you're the one without the word. */
+  youAreFake?: boolean;
   /** Bluff Trivia: the question this phone was asked — the decoy, for one of them. */
   yourQuestion?: string;
   youAreOdd?: boolean;
@@ -120,6 +124,10 @@ export function redactFor(room: Room, viewerId: string | null): Room {
       return { ...room, game: redactSketch(game as SketchState, viewerId) };
     case "odd":
       return { ...room, game: redactOdd(game as OddState, viewerId) };
+    case "act":
+      return { ...room, game: redactAct(game as ActState, viewerId) };
+    case "stroke":
+      return { ...room, game: redactStroke(game as StrokeState, viewerId) };
     default:
       return room;
   }
@@ -146,5 +154,40 @@ function redactOdd(s: OddState, viewerId: string | null): OddState & ViewerExtra
     pairs: s.pairs.map(() => ({ question: "", decoy: "" })),
     ...(asked !== undefined ? { yourQuestion: asked } : {}),
     ...(isOdd ? { youAreOdd: true } : {}),
+  };
+}
+
+/**
+ * Act It Out. The deck never leaves the server: the TV is in front of the
+ * whole room and every phone but one belongs to somebody guessing. The actor
+ * gets the current word and nothing else; the words already got or passed are
+ * public by then and stay.
+ */
+function redactAct(s: ActState, viewerId: string | null): ActState & ViewerExtras {
+  const actor = viewerId !== null && s.actorId === viewerId;
+  const word = s.words.length ? s.words[s.cursor % s.words.length] : "";
+  return {
+    ...s,
+    words: [],
+    ...(actor && s.phase === "acting" ? { yourWord: word } : {}),
+  };
+}
+
+/**
+ * One Stroke. Two secrets: the word, which every phone but the fake's gets,
+ * and who the fake is, which nobody gets until they're caught. The category
+ * is public — it's the fake's only foothold and it's on the TV on purpose.
+ */
+function redactStroke(s: StrokeState, viewerId: string | null): StrokeState & ViewerExtras {
+  if (OPEN_PHASES.includes(s.phase)) return s;
+  const isFake = viewerId !== null && s.fakeId === viewerId;
+  const pair = s.pairs[s.round];
+  return {
+    ...s,
+    // Once caught, who it is stops being a secret; what the word is does not.
+    fakeId: s.phase === "guess" ? s.fakeId : null,
+    pairs: s.pairs.map((p) => ({ category: p.category, word: "" })),
+    ...(viewerId === null || isFake ? {} : { yourWord: pair?.word }),
+    ...(isFake ? { youAreFake: true } : {}),
   };
 }

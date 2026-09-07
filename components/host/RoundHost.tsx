@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Tally } from "@/components/Tally";
 import { useCue, useCueWhen } from "@/components/useCue";
-import type { RoundState } from "@/lib/games/roundEngine";
+import type { PromptImage, RoundState } from "@/lib/games/roundEngine";
 import { type Room, connectedPlayers, playerById } from "@/lib/room/types";
 import { ScoreNudge } from "@/components/ScoreNudge";
 import { useRoundCard } from "@/components/RoundCard";
@@ -82,22 +82,13 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
         >
           {prompt?.text}
         </motion.p>
-        {/* Add a Caption: the picture is the prompt. Smaller once the captions are up. */}
-        {prompt?.image && (
-          <figure key={prompt.image.url} className="mt-[1vmin] flex flex-col items-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={prompt.image.url}
-              alt=""
-              className={[
-                "rounded-xl border border-line/10 object-contain shadow-tile",
-                state.phase === "collect" ? "max-h-[44vh]" : "max-h-[22vh]",
-              ].join(" ")}
-            />
-            <figcaption className="mt-1 text-[clamp(0.55rem,0.8vw,0.85rem)] text-moon-deep">
-              {prompt.image.credit} · {prompt.image.licence} · Wikimedia Commons
-            </figcaption>
-          </figure>
+        {/*
+          * Add a Caption: the picture is the prompt, and while people are
+          * writing it is the whole screen. Once the captions are up it moves
+          * beside them — still big, because they only make sense next to it.
+          */}
+        {prompt?.image && state.phase === "collect" && (
+          <Picture image={prompt.image} className="max-h-[64vh]" />
         )}
       </div>
 
@@ -131,8 +122,10 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
             </div>
           </>
         ) : (
-          /* vote + reveal share the same board */
-          <div className="w-full max-w-5xl space-y-[1vmin]">
+          /* vote + reveal share the same board; a picture sits beside it */
+          <div className={prompt?.image ? "flex w-full max-w-7xl items-center gap-[2vmin]" : "w-full max-w-5xl"}>
+          {prompt?.image && <Picture image={prompt.image} className="max-h-[58vh] w-[40%] shrink-0" />}
+          <div className="min-w-0 flex-1 space-y-[1vmin]">
             {(
               state.options.map((option, i) => {
                 const count = voteCounts[option.id] ?? 0;
@@ -226,6 +219,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
               </p>
             )}
           </div>
+          </div>
         )}
       </div>
 
@@ -261,6 +255,23 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
  * displayed as two — the board contradicted the scoreboard. Both sides count
  * the same way now, and the label is the wording the most people used.
  */
+
+function Picture({ image, className }: { image: PromptImage; className: string }) {
+  return (
+    <figure className={`flex flex-col items-center ${className}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={image.url}
+        alt=""
+        className="max-h-[inherit] w-auto max-w-full rounded-xl border border-line/10 object-contain shadow-tile"
+        style={{ maxHeight: "inherit" }}
+      />
+      <figcaption className="mt-1 text-[clamp(0.55rem,0.8vw,0.85rem)] text-moon-deep">
+        {image.credit} · {image.licence} · Wikimedia Commons
+      </figcaption>
+    </figure>
+  );
+}
 
 function Standings({ room }: { room: Room }) {
   const ranked = [...room.players].sort((a, b) => b.score - a.score);

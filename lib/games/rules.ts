@@ -2,7 +2,7 @@
  * How each game works, in the words you'd use to explain it to the room.
  *
  * These go on screen before anything starts, because the host shouldn't have
- * to remember the rules to fifteen games — and because half the room has
+ * to remember the rules to seventeen games — and because half the room has
  * never played any of them. Written to be read aloud off a TV: short lines,
  * no jargon, and the scoring said plainly rather than left to be discovered.
  */
@@ -138,6 +138,31 @@ export const RULES: Record<string, GameRules> = {
     scoring:
       "The most votes takes a thousand, ties included. Anyone who got a vote at all takes five hundred.",
     needs: "Three phones or more.",
+  },
+  "act-it-out": {
+    summary: "Charades. The phone is the hat.",
+    how: [
+      "One person's phone hands them a word. They act it — no talking, no pointing.",
+      "Everyone else shouts. When someone gets it, the actor taps Got it and who said it.",
+      "Pass if it's hopeless. Sixty seconds a turn, then the next person is up.",
+    ],
+    scoring: "Five hundred to the actor and five hundred to whoever shouted it, for every word that lands.",
+    needs: "Three phones or more, and room to stand up.",
+    example:
+      "The phone says “Milking a cow”. Twenty seconds of increasingly specific hand movements later, Riley shouts it. Riley and the actor take five hundred each, and the phone shows the next word.",
+  },
+  "one-stroke": {
+    summary: "Everyone draws one line. One of you doesn't know what.",
+    how: [
+      "The TV shows a category. Every phone shows the word — except one, which just says you're the fake.",
+      "Round the room, one line each, twice. The fake draws too, and tries to look like they know.",
+      "Then everyone votes for the fake. Caught, they get one guess at the word to win it back.",
+    ],
+    scoring:
+      "The fake takes a thousand for getting away with it, or for guessing the word when caught. Otherwise the artists take five hundred each.",
+    needs: "Three phones or more.",
+    example:
+      "Category: Animal. The word is Giraffe. Two lines in there's a long neck on the TV, so the fake draws a leg and hopes. Sam draws a second neck. Everyone votes Sam.",
   },
   "last-one-standing": {
     summary: "Get one wrong and you're out.",

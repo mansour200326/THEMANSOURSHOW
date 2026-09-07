@@ -12,9 +12,13 @@ import { impostorPack } from "@/lib/games/impostorPack";
 import { createSketchGame } from "@/lib/games/sketch";
 import { SKETCH_WORDS } from "@/lib/games/wordPacks";
 import { oddOneOut } from "@/lib/games/oddOne";
+import { ACT_WORDS, createActGame } from "@/lib/games/actOut";
+import { STROKE_PAIRS, createStrokeGame } from "@/lib/games/oneStroke";
 
 const impostor = createImpostorGame(impostorPack);
 const sketchAndGuess = createSketchGame(SKETCH_WORDS);
+const actItOut = createActGame(ACT_WORDS);
+const oneStroke = createStrokeGame(STROKE_PAIRS);
 
 /**
  * Every phone-controlled segment the room knows how to run. Big Board isn't
@@ -34,6 +38,8 @@ export const games: Record<string, GameModule> = {
   [dialItIn.id]: dialItIn,
   [impostor.id]: impostor,
   [sketchAndGuess.id]: sketchAndGuess,
+  [actItOut.id]: actItOut,
+  [oneStroke.id]: oneStroke,
 };
 
 export const gameList = Object.values(games);

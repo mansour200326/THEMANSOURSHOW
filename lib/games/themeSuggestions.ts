@@ -185,6 +185,28 @@ export const THEME_SUGGESTIONS: Record<string, string[]> = {
     "Animals in water",
     "Baby animals",
   ],
+  /* --- Act It Out: things you can do with your body --- */
+  "act-it-out": [
+    "Animals",
+    "Sports",
+    "Jobs",
+    "Films",
+    "Household chores",
+    "Holidays",
+    "Superheroes",
+    "Embarrassing moments",
+  ],
+  /* --- One Stroke: categories with lots of drawable things in them --- */
+  "one-stroke": [
+    "Animals",
+    "Things in a kitchen",
+    "Vehicles",
+    "Food",
+    "Sports",
+    "Fairy tales",
+    "Things at the beach",
+    "Musical instruments",
+  ],
   categories: [
     "Things in a supermarket",
     "Countries",

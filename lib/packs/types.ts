@@ -7,8 +7,8 @@
  * still there next month. That reusability is the whole point; a one-off form
  * you fill in and lose isn't a template.
  *
- * There are nine content shapes across fifteen games, and they collapse into
- * far fewer than fifteen editors — most games want a list of rows with two or
+ * There are nine content shapes across seventeen games, and they collapse into
+ * far fewer than seventeen editors — most games want a list of rows with two or
  * three fields.
  */
 
@@ -76,6 +76,8 @@ export const PACK_KIND: Record<string, PackKind> = {
   "dial-it-in": "spectrum",
   impostor: "places",
   "sketch-and-guess": "words",
+  "act-it-out": "words",
+  "one-stroke": "words",
   categories: "prompts",
   "most-likely-to": "prompts",
   "who-said-it": "prompts",

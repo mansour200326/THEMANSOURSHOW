@@ -24,6 +24,10 @@ import { PackWorkshop } from "@/components/packs/PackWorkshop";
 import { packToStartPayload } from "@/lib/packs/convert";
 import { Lobby } from "@/components/host/Lobby";
 import { RoundHost } from "@/components/host/RoundHost";
+import { ActHost } from "@/components/host/ActHost";
+import { StrokeHost } from "@/components/host/StrokeHost";
+import type { ActState } from "@/lib/games/actOut";
+import type { StrokeState } from "@/lib/games/oneStroke";
 import type { BuzzState } from "@/lib/games/buzzEngine";
 import type { ImpostorState } from "@/lib/games/impostor";
 import type { OddState } from "@/lib/games/oddOne";
@@ -108,6 +112,8 @@ export default function HostPage({
     "most-likely-to": "Most Likely To",
     punchline: "Punchline",
     "caption-this": "Add a Caption",
+    "act-it-out": "Act It Out",
+    "one-stroke": "One Stroke",
   };
 
   const launch = async (
@@ -328,7 +334,7 @@ export default function HostPage({
   }
 
   const state = room.game as
-    | (RoundState | BuzzState | LiveState | ImpostorState | SketchState | OddState)
+    | (RoundState | BuzzState | LiveState | ImpostorState | SketchState | OddState | ActState | StrokeState)
     | null;
 
   const inGame = (() => {
@@ -396,6 +402,31 @@ export default function HostPage({
       );
     }
 
+    if (state?.kind === "act") {
+      return (
+        <ActHost
+          room={room}
+          state={state}
+          onStart={() => send("start")}
+          onTimeUp={() => send("timeup")}
+          onNext={() => send("next")}
+          onQuit={() => send("game:end")}
+        />
+      );
+    }
+
+    if (state?.kind === "stroke") {
+      return (
+        <StrokeHost
+          room={room}
+          state={state}
+          onForce={() => send("force")}
+          onNext={() => send("next")}
+          onQuit={() => send("game:end")}
+        />
+      );
+    }
+
     if (state?.kind === "round") {
       return (
         <RoundHost
@@ -437,7 +468,7 @@ export default function HostPage({
         }
         // Only the game that shows no scores of its own needs the fallback.
         scores={
-          state?.kind === "sketch"
+          state?.kind === "sketch" || state?.kind === "act" || state?.kind === "stroke"
             ? connectedPlayers(room).map((p) => ({
                 id: p.id,
                 name: `${p.emoji} ${p.name}`,

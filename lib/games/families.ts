@@ -13,6 +13,7 @@ export const FAMILY_OF: Record<string, Family> = {
   "last-one-standing": "trivia",
   /* Someone in the room is lying. */
   impostor: "deception",
+  "one-stroke": "deception",
   /* The game is about the people playing it. */
   "most-likely-to": "social",
   "who-said-it": "social",
@@ -24,6 +25,7 @@ export const FAMILY_OF: Record<string, Family> = {
   timeline: "word",
   "dial-it-in": "word",
   "sketch-and-guess": "word",
+  "act-it-out": "word",
   categories: "word",
 };
 

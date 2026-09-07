@@ -29,6 +29,10 @@ export const ROUND_CHOICES: Record<string, number[]> = {
   "dial-it-in": [4, 6, 8],
   "sketch-and-guess": [4, 6, 8, 12],
   "emoji-riddles": [6, 10, 14, 20],
+  /** Turns, one actor each. */
+  "act-it-out": [4, 6, 8, 12],
+  /** Pictures. */
+  "one-stroke": [2, 3, 4, 6],
 };
 
 /** What the game plays if the host doesn't touch it. */
@@ -43,6 +47,8 @@ export const ROUND_DEFAULTS: Record<string, number> = {
   "dial-it-in": 8,
   "sketch-and-guess": 8,
   "emoji-riddles": 14,
+  "act-it-out": 8,
+  "one-stroke": 3,
 };
 
 /** Clamped to what's on offer, so a hand-made request can't ask for 900. */

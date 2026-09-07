@@ -2,6 +2,8 @@ import type { ImpostorState } from "@/lib/games/impostor";
 import type { LiveState } from "@/lib/games/liveEngine";
 import type { RoundState } from "@/lib/games/roundEngine";
 import type { SketchState } from "@/lib/games/sketch";
+import type { ActState } from "@/lib/games/actOut";
+import type { StrokeState } from "@/lib/games/oneStroke";
 import type { Player, Room } from "@/lib/room/types";
 import { connectedPlayers } from "@/lib/room/types";
 
@@ -87,7 +89,9 @@ type GameState =
   | RoundState
   | LiveState
   | ImpostorState
-  | SketchState;
+  | SketchState
+  | ActState
+  | StrokeState;
 
 /**
  * One move for one bot, or null if none of them can act. Split out per game so
@@ -185,6 +189,19 @@ function nextBotMove(room: Room, state: GameState): Act | null {
           payload: { playerId: pick.id },
         };
       }
+    }
+    return null;
+  }
+
+  // One Stroke: bots don't draw, but they do vote, and they vote at random.
+  if (state.kind === "stroke") {
+    if (state.phase !== "vote") return null;
+    for (const bot of bots) {
+      if (state.votes[bot.id] !== undefined) continue;
+      const others = connectedPlayers(room).filter((p) => p.id !== bot.id);
+      if (!others.length) continue;
+      const pick = others[Math.floor(Math.random() * others.length)];
+      return { type: "vote", playerId: bot.id, payload: { playerId: pick.id } };
     }
     return null;
   }

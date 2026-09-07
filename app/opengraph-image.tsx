@@ -47,7 +47,7 @@ export default function Image() {
             display: "flex",
           }}
         >
-          Fifteen games · one TV · everyone&apos;s phones
+          Seventeen games · one TV · everyone&apos;s phones
         </div>
       </div>
     ),

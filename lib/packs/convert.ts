@@ -169,7 +169,13 @@ export function packToStartPayload(
     case "impostor":
       return { places: packToPlaces(data as Place[]) };
     case "sketch-and-guess":
+    case "act-it-out":
       return { words: packToWords(data as string[]) };
+    case "one-stroke":
+      // A hand-written pack is words only; the category is whatever the host said.
+      return {
+        pairs: packToWords(data as string[]).map((word) => ({ category: "Anything", word })),
+      };
     case "bluff-trivia":
       // The "qa" editor's two columns are everyone's question and the odd
       // one's question. Same shape, different meaning; see lib/games/oddOne.
