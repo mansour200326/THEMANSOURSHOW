@@ -92,7 +92,7 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
       </section>
 
       <aside className="flex w-[26vw] min-w-[240px] shrink-0 flex-col gap-[1.5vmin]">
-        <span className="font-display text-sm uppercase tracking-[0.2em] text-moon-deep">
+        <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.2em] text-moon-deep">
           Round {state.round + 1}/{state.totalRounds ?? state.words.length}
         </span>
 
@@ -105,7 +105,7 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
           {state.phase === "drawing" ? left : "—"}
         </p>
 
-        <p className="text-center font-display text-sm uppercase tracking-wide text-moon-dim">
+        <p className="text-center font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-wide text-moon-dim">
           {drawer?.emoji} {drawer?.name} is drawing
         </p>
 
@@ -119,7 +119,7 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
                   key={p.id}
                   layout
                   className={[
-                    "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm",
+                    "flex items-center gap-2 rounded-lg border px-3 py-2 text-[clamp(0.95rem,1.4vw,1.7rem)]",
                     place >= 0
                       ? "border-emerald-400/60 bg-emerald-500/10 text-emerald-200"
                       : "border-line/10 bg-line/[0.02] text-moon-dim",

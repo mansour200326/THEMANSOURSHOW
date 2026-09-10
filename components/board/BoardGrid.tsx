@@ -68,7 +68,7 @@ export function BoardGrid({
                   className="flex items-center justify-center rounded-lg border border-line/5 bg-dusk/40"
                 >
                   {wasDaily && (
-                    <span className="font-display text-xs uppercase tracking-widest text-accent/50">
+                    <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-widest text-accent/50">
                       DD
                     </span>
                   )}

@@ -155,7 +155,7 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
       <div className="shrink-0 space-y-[1vmin]">
         <div className="flex justify-center gap-3">
           {(state.phase === "answer" || state.phase === "vote") && (
-            <button onClick={onForce} className="btn-ghost text-sm">
+            <button onClick={onForce} className="btn-ghost text-[clamp(0.95rem,1.4vw,1.7rem)]">
               {state.phase === "answer" ? "Stop waiting" : "Close the vote"}
             </button>
           )}

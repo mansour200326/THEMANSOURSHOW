@@ -64,7 +64,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
     <main className="flex min-h-dvh lg:h-dvh flex-col gap-[1.2vmin] lg:overflow-hidden p-[1.6vmin] pb-16 lg:pb-[1.6vmin]">
       {roundCard}
       <header className="flex shrink-0 items-center justify-between">
-        <span className="font-display text-xs uppercase tracking-[0.25em] text-moon-deep">
+        <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-deep">
           {state.mode === "sequence"
             ? `Riddle ${Math.min(state.index + 1, state.items.length)} of ${state.items.length}`
             : "Pick a tile, then race for it"}
@@ -143,7 +143,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
                   <span className="accent-text font-display text-[clamp(2rem,5vw,5rem)] font-bold uppercase">
                     {buzzer.name}
                   </span>
-                  <span className="font-display text-sm uppercase tracking-[0.25em] text-moon-deep">
+                  <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.25em] text-moon-deep">
                     Answer out loud
                   </span>
                 </motion.div>
@@ -181,7 +181,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
             )}
 
             {state.lockedOut.length > 0 && state.phase === "open" && (
-              <p className="font-display text-sm uppercase tracking-[0.2em] text-rose-400">
+              <p className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.2em] text-rose-400">
                 Out: {state.lockedOut.map((id) => playerById(room, id)?.name).join(", ")}
               </p>
             )}
@@ -199,7 +199,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
             <button onClick={() => send("judge", { correct: false })} className="btn-bad px-10 py-3 text-lg">
               ✗ Wrong
             </button>
-            <button onClick={() => send("reopen")} className="btn-ghost text-sm">
+            <button onClick={() => send("reopen")} className="btn-ghost text-[clamp(0.95rem,1.4vw,1.7rem)]">
               Misfire — reopen
             </button>
           </>
@@ -218,7 +218,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
         )}
 
         {(state.phase === "open" || state.phase === "buzzed") && (
-          <button onClick={() => send("skip")} className="btn-ghost text-sm">
+          <button onClick={() => send("skip")} className="btn-ghost text-[clamp(0.95rem,1.4vw,1.7rem)]">
             Nobody got it — next
           </button>
         )}
@@ -228,13 +228,13 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPeek((v) => !v)}
-              className="btn-ghost px-3 py-1.5 text-xs"
+              className="btn-ghost px-3 py-1.5 text-[clamp(0.8rem,1.15vw,1.35rem)]"
             >
               {peek ? "Hide" : "Peek"}
             </button>
             <span
               className={[
-                "font-display text-xs uppercase tracking-wider transition-opacity",
+                "font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-wider transition-opacity",
                 peek ? "text-accent/80 opacity-100" : "select-none opacity-0",
               ].join(" ")}
             >

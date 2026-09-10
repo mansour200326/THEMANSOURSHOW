@@ -140,12 +140,12 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
       {roundCard}
       {(state.phase === "collect" || state.phase === "brief") && <CountIn startedAt={state.startedAt} />}
       <header className="flex shrink-0 items-center justify-between px-2">
-        <span className="font-display text-sm uppercase tracking-[0.2em] text-moon-deep">
+        <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.2em] text-moon-deep">
           {TITLES[state.variant]} · Round {state.round + 1}/{state.items.length}
         </span>
         <div className="flex gap-2">
           {state.phase !== "reveal" && (
-            <button onClick={onForce} className="btn-ghost px-3 py-1.5 text-xs">
+            <button onClick={onForce} className="btn-ghost px-3 py-1.5 text-[clamp(0.8rem,1.15vw,1.35rem)]">
               Stop waiting
             </button>
           )}
@@ -296,7 +296,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
                 {Math.ceil(left)}
               </motion.span>
               {state.phase === "collect" && (
-                <p className="font-display text-sm uppercase tracking-[0.2em] text-moon-deep">
+                <p className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.2em] text-moon-deep">
                   {Object.keys(state.answers).length} in ·{" "}
                   {
                     players.filter(

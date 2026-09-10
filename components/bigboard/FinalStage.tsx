@@ -65,7 +65,7 @@ export function FinalStage({
                   <p className="truncate font-display text-[clamp(0.9rem,1.3vw,1.6rem)] uppercase tracking-wider text-accent-bright">
                     {team.name}
                   </p>
-                  <p className="mt-1 text-sm text-moon-deep">
+                  <p className="mt-1 text-[clamp(0.95rem,1.4vw,1.7rem)] text-moon-deep">
                     Score {team.score.toLocaleString()} · max{" "}
                     {cap.toLocaleString()}
                   </p>
@@ -159,7 +159,7 @@ export function FinalStage({
                   <p className="mt-1 font-display text-[clamp(1.3rem,2vw,2.5rem)] font-bold tabular-nums text-moon">
                     {team.score.toLocaleString()}
                   </p>
-                  <p className="mb-3 text-sm text-moon-deep">
+                  <p className="mb-3 text-[clamp(0.95rem,1.4vw,1.7rem)] text-moon-deep">
                     Wagered {(final.wagers[team.id] ?? 0).toLocaleString()}
                   </p>
                   <div className="flex gap-2">

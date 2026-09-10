@@ -52,6 +52,12 @@ function BigBoardStage() {
   const [saved, setSaved] = useState<GameState | null>(null);
   const [isFullscreen, setFullscreen] = useState(false);
   const [pending, setPending] = useState<SetupConfig | null>(null);
+  /** True while the board being written is for a rematch, so the screen says so. */
+  const [rematching, setRematching] = useState(false);
+  /** A line for the board screen when a rematch had to fall back to the old board. */
+  const [notice, setNotice] = useState<string | null>(null);
+  /** What the last written board was asked for, so a rematch can ask again. */
+  const lastConfig = useRef<SetupConfig | null>(null);
   const [genError, setGenError] = useState<string | null>(null);
   const hydrated = useRef(false);
   const abortRef = useRef<AbortController | null>(null);
@@ -130,8 +136,9 @@ function BigBoardStage() {
     });
   };
 
-  const handleStart = async (config: SetupConfig) => {
+  const handleStart = async (config: SetupConfig, rematch = false) => {
     setGenError(null);
+    setNotice(null);
 
     if (config.source === "sample") {
       begin(config, sampleBoard, sampleFinalClue);
@@ -143,6 +150,8 @@ function BigBoardStage() {
       return;
     }
 
+    lastConfig.current = config;
+    setRematching(rematch);
     setPending(config);
     const controller = new AbortController();
     abortRef.current = controller;
@@ -164,20 +173,60 @@ function BigBoardStage() {
     } catch (error) {
       if (controller.signal.aborted) return;
       setPending(null);
-      setGenError(
-        error instanceof Error ? error.message : "Board generation failed.",
-      );
+      const message = error instanceof Error ? error.message : "Board generation failed.";
+      if (rematch) {
+        // The room is standing there. Play the old board rather than a form.
+        dispatch({ type: "REMATCH" });
+        setNotice(`Couldn't write a new board (${message}). Same board, fresh scores.`);
+        return;
+      }
+      setGenError(message);
     } finally {
       abortRef.current = null;
+      setRematching(false);
     }
+  };
+
+  /*
+   * Rematch used to mean the same board with the scores wiped, which is
+   * fine for a sample board and useless for a written one: the room has
+   * just heard every answer. A written board is written again — same
+   * categories, same difficulty, same teams — and the library keeps the
+   * new clues clear of the old ones. After a reload the original request
+   * is gone, so it's rebuilt from the board on screen.
+   */
+  const rematch = () => {
+    const names = state.teams.map((t) => t.name);
+    const remembered = lastConfig.current;
+    const config: SetupConfig | null = remembered
+      ? { ...remembered, teamNames: names }
+      : state.board.categories.length >= 3
+        ? {
+            teamNames: names,
+            categories: state.board.categories.map((c) => c.title),
+            vibe: "",
+            rules: state.rules,
+            difficulty: "medium",
+            source: "ai",
+          }
+        : null;
+    if (!config || config.source !== "ai" || state.board === sampleBoard) {
+      dispatch({ type: "REMATCH" });
+      return;
+    }
+    void handleStart(config, true);
   };
 
   if (pending) {
     return (
       <Generating
-        title="Writing the board"
+        title={rematching ? "Writing a fresh board" : "Writing the board"}
         items={pending.categories}
-        note="Five clues for every category, plus one Final Round."
+        note={
+          rematching
+            ? "New clues, same categories, same teams. Nothing from the last game comes back."
+            : "Five clues for every category, plus one Final Round."
+        }
         onCancel={() => {
           abortRef.current?.abort();
           setPending(null);
@@ -276,6 +325,14 @@ function BigBoardStage() {
             transition={{ duration: 0.18 }}
             className="absolute inset-0"
           >
+            {notice && (
+              <p
+                onClick={() => setNotice(null)}
+                className="mx-auto mb-[1vmin] max-w-3xl rounded-lg border border-rose-500/40 bg-rose-950/50 px-4 py-2 text-center text-[clamp(0.9rem,1.3vw,1.5rem)] text-rose-100"
+              >
+                {notice}
+              </p>
+            )}
             {state.phase === "board" && (
               <div className="flex h-full flex-col gap-[1.2vmin]">
                 <p className="shrink-0 text-center font-display text-[clamp(0.85rem,1.5vw,1.9rem)] uppercase tracking-[0.25em] text-moon-dim">
@@ -348,7 +405,8 @@ function BigBoardStage() {
             {state.phase === "winner" && (
               <WinnerScreen
                 teams={state.teams}
-                onRematch={() => dispatch({ type: "REMATCH" })}
+                onRematch={rematch}
+                rewrites={state.board !== sampleBoard && (Boolean(lastConfig.current) || state.board.categories.length >= 3)}
                 onNewGame={() => {
                   clearGame();
                   setSaved(null);

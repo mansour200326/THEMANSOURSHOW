@@ -67,7 +67,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
     <main className="flex min-h-dvh lg:h-dvh flex-col gap-[1.5vmin] lg:overflow-hidden p-[2vmin] pb-16 lg:pb-[1.6vmin]">
       {roundCard}
       <header className="flex shrink-0 items-center justify-between">
-        <span className="font-display text-xs uppercase tracking-[0.25em] text-moon-deep">
+        <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-deep">
           Round {state.round + 1} of {state.prompts.length}
         </span>
       </header>
@@ -88,7 +88,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
           * beside them — still big, because they only make sense next to it.
           */}
         {prompt?.image && state.phase === "collect" && (
-          <Picture image={prompt.image} className="max-h-[64vh]" />
+          <Picture image={prompt.image} className="w-full max-h-[66vh]" />
         )}
       </div>
 
@@ -123,8 +123,9 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
           </>
         ) : (
           /* vote + reveal share the same board; a picture sits beside it */
-          <div className={prompt?.image ? "flex w-full max-w-7xl items-center gap-[2vmin]" : "w-full max-w-5xl"}>
-          {prompt?.image && <Picture image={prompt.image} className="max-h-[58vh] w-[40%] shrink-0" />}
+          <div className={prompt?.image ? "flex w-full max-w-7xl flex-col items-center gap-[2vmin] lg:flex-row" : "w-full max-w-5xl"}>
+          {/* Stacked and full-width on a phone or a narrow window; beside the captions on a TV. */}
+          {prompt?.image && <Picture image={prompt.image} className="w-full max-h-[36vh] shrink-0 lg:w-[46%] lg:max-h-[66vh]" />}
           <div className="min-w-0 flex-1 space-y-[1vmin]">
             {(
               state.options.map((option, i) => {
@@ -162,7 +163,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
                         className={[
                           "font-display tracking-wide text-moon",
                           written
-                            ? "line-clamp-2 text-[clamp(0.9rem,1.6vw,1.7rem)]"
+                            ? "line-clamp-2 text-[clamp(1.1rem,2.1vw,2.4rem)]"
                             : "truncate text-[clamp(1rem,2vw,2.2rem)] uppercase",
                         ].join(" ")}
                       >
@@ -170,12 +171,12 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
                       </span>
                       <span className="flex shrink-0 items-center gap-3">
                         {revealed && isTruth && (
-                          <span className="font-display text-sm uppercase tracking-widest text-emerald-300">
+                          <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-widest text-emerald-300">
                             The truth
                           </span>
                         )}
                         {revealed && author && (
-                          <span className="font-display text-sm uppercase tracking-widest text-moon-dim">
+                          <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-widest text-moon-dim">
                             {author.emoji} {author.name}
                           </span>
                         )}
@@ -227,7 +228,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
       <div className="shrink-0 space-y-[1vmin]">
         <div className="flex justify-center gap-3">
           {(state.phase === "collect" || state.phase === "vote") && (
-            <button onClick={onForce} className="btn-ghost text-sm">
+            <button onClick={onForce} className="btn-ghost text-[clamp(0.95rem,1.4vw,1.7rem)]">
               Skip the stragglers
             </button>
           )}
@@ -266,7 +267,7 @@ function Picture({ image, className }: { image: PromptImage; className: string }
         className="max-h-[inherit] w-auto max-w-full rounded-xl border border-line/10 object-contain shadow-tile"
         style={{ maxHeight: "inherit" }}
       />
-      <figcaption className="mt-1 text-[clamp(0.55rem,0.8vw,0.85rem)] text-moon-deep">
+      <figcaption className="mt-1 text-[clamp(0.7rem,0.95vw,1.1rem)] text-moon-deep">
         {image.credit} · {image.licence} · Wikimedia Commons
       </figcaption>
     </figure>
@@ -351,7 +352,7 @@ function ScoreStrip({
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: -14 }}
                   exit={{ opacity: 0 }}
-                  className="absolute right-2 font-display text-xs font-bold text-emerald-300"
+                  className="absolute right-2 font-display text-[clamp(0.8rem,1.15vw,1.35rem)] font-bold text-emerald-300"
                 >
                   +{gained}
                 </motion.span>

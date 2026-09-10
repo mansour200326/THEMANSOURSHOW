@@ -26,7 +26,7 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
     <img
       src={prompt.image.url}
       alt=""
-      className="mx-auto max-h-56 rounded-xl border border-line/10 object-contain"
+      className="mx-auto w-full max-h-[46vh] rounded-xl border border-line/10 object-contain"
     />
   ) : null;
 

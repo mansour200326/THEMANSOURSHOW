@@ -269,7 +269,7 @@ export function FeudBoard({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="font-display text-sm uppercase tracking-wider text-moon-deep"
+                  className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-wider text-moon-deep"
                 >
                   Checking the board…
                 </motion.p>
@@ -281,7 +281,7 @@ export function FeudBoard({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
                   className={[
-                    "font-display text-sm uppercase tracking-wider",
+                    "font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-wider",
                     feedback.matched !== null
                       ? "text-emerald-300"
                       : feedback.repeat
@@ -306,7 +306,7 @@ export function FeudBoard({
             <div className="flex items-center justify-end gap-2">
               <button
                 onClick={() => onClock(!state.clock)}
-                className="btn-ghost px-4 py-3 text-sm"
+                className="btn-ghost px-4 py-3 text-[clamp(0.95rem,1.4vw,1.7rem)]"
               >
                 {state.clock ? "Stop clock" : "Start clock"}
               </button>

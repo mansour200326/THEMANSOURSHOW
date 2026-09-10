@@ -78,7 +78,7 @@ export function WagerStage({
                 key={v}
                 type="button"
                 onClick={() => setAmount(clamp(v))}
-                className="btn-ghost px-4 py-2 text-sm"
+                className="btn-ghost px-4 py-2 text-[clamp(0.95rem,1.4vw,1.7rem)]"
               >
                 {v}
               </button>
@@ -86,13 +86,13 @@ export function WagerStage({
             <button
               type="button"
               onClick={() => setAmount(clamp(maxWager))}
-              className="btn-ghost px-4 py-2 text-sm"
+              className="btn-ghost px-4 py-2 text-[clamp(0.95rem,1.4vw,1.7rem)]"
             >
               All in
             </button>
           </div>
 
-          <p className="text-sm text-moon-deep">
+          <p className="text-[clamp(0.95rem,1.4vw,1.7rem)] text-moon-deep">
             Current score {score.toLocaleString()}
           </p>
         </div>

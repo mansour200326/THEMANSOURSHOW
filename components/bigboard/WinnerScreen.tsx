@@ -64,9 +64,11 @@ type Props = {
   teams: Team[];
   onRematch: () => void;
   onNewGame: () => void;
+  /** A written board is rewritten on rematch; a sample or hand-made one is replayed. */
+  rewrites?: boolean;
 };
 
-export function WinnerScreen({ teams, onRematch, onNewGame }: Props) {
+export function WinnerScreen({ teams, onRematch, onNewGame, rewrites = false }: Props) {
   const table = standings(teams);
   const champs = winners(teams);
   const tie = champs.length > 1;
@@ -128,7 +130,7 @@ export function WinnerScreen({ teams, onRematch, onNewGame }: Props) {
 
       <div className="relative z-10 mt-2 flex flex-wrap justify-center gap-3">
         <button onClick={onRematch} className="btn-brand px-8 py-4 text-lg">
-          Rematch · same teams
+          {rewrites ? "Rematch · new questions" : "Rematch · same teams"}
         </button>
         <button onClick={onNewGame} className="btn-ghost px-8 py-4 text-lg">
           New game

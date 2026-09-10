@@ -76,7 +76,7 @@ export function NightScreen({
         </div>
         <div className="flex gap-2">
           {night.length > 0 && (
-            <button onClick={onClear} className="btn-ghost px-4 py-2 text-sm">
+            <button onClick={onClear} className="btn-ghost px-4 py-2 text-[clamp(0.95rem,1.4vw,1.7rem)]">
               Start a new night
             </button>
           )}
@@ -97,18 +97,18 @@ export function NightScreen({
           <table className="w-full text-left">
             <thead className="sticky top-0 bg-dusk">
               <tr className="text-moon-deep">
-                <th className="px-5 py-3 font-display text-sm uppercase tracking-widest">
+                <th className="px-5 py-3 font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-widest">
                   Who
                 </th>
                 {night.map((g, i) => (
                   <th
                     key={i}
-                    className="px-4 py-3 text-right font-display text-sm uppercase tracking-widest"
+                    className="px-4 py-3 text-right font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-widest"
                   >
                     {g.label}
                   </th>
                 ))}
-                <th className="px-5 py-3 text-right font-display text-sm uppercase tracking-widest text-accent">
+                <th className="px-5 py-3 text-right font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-widest text-accent">
                   Night
                 </th>
               </tr>
@@ -145,7 +145,7 @@ export function NightScreen({
                           <span className="font-display text-[clamp(1rem,1.8vw,1.6rem)] tabular-nums text-moon">
                             {cell.place}
                           </span>
-                          <span className="ml-2 font-display text-xs tabular-nums text-moon-deep">
+                          <span className="ml-2 font-display text-[clamp(0.8rem,1.15vw,1.35rem)] tabular-nums text-moon-deep">
                             {cell.raw.toLocaleString()}
                           </span>
                         </>

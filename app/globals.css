@@ -128,7 +128,7 @@ html[data-theme="light"] .g-word { --accent-rgb: 94 155 20; --accent-bright-rgb:
     line-height: 1;
   }
   .t-category {
-    font-size: clamp(0.7rem, 1.1vw, 1.75rem);
+    font-size: clamp(0.9rem, 1.35vw, 2.1rem);
     line-height: 1.1;
   }
   .t-score {
@@ -136,7 +136,7 @@ html[data-theme="light"] .g-word { --accent-rgb: 94 155 20; --accent-bright-rgb:
     line-height: 1;
   }
   .t-label {
-    font-size: clamp(0.65rem, 0.85vw, 1.15rem);
+    font-size: clamp(0.8rem, 1.05vw, 1.4rem);
     letter-spacing: 0.22em;
   }
 

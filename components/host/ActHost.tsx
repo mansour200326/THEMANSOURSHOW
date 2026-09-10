@@ -88,10 +88,10 @@ export function ActHost({ room, state, onStart, onTimeUp, onNext, onQuit }: Prop
       {roundCard}
       {state.phase === "acting" && <CountIn startedAt={state.startedAt} />}
       <header className="flex w-full shrink-0 items-center justify-between">
-        <span className="font-display text-xs uppercase tracking-[0.25em] text-moon-deep">
+        <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-deep">
           Turn {state.turn + 1} of {state.turns}
         </span>
-        <span className="font-display text-xs uppercase tracking-[0.25em] text-moon-deep">
+        <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-deep">
           {state.got.length} got
         </span>
       </header>

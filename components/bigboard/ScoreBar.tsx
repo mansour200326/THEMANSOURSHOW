@@ -50,7 +50,7 @@ export function ScoreBar({
             <span
               className={[
                 "truncate font-display uppercase tracking-wider",
-                compact ? "text-sm" : "text-[clamp(0.8rem,1.2vw,1.6rem)]",
+                compact ? "text-[clamp(0.95rem,1.4vw,1.7rem)]" : "text-[clamp(0.8rem,1.2vw,1.6rem)]",
                 active ? "text-accent-bright" : "text-moon-dim",
               ].join(" ")}
             >

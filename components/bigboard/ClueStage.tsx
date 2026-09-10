@@ -228,12 +228,12 @@ export function ClueStage({
           <button
             type="button"
             onClick={() => setRevealed((v) => !v)}
-            className="btn-ghost text-sm sm:text-base"
+            className="btn-ghost text-[clamp(0.95rem,1.4vw,1.7rem)] sm:text-base"
           >
             {revealed ? "Hide answer" : "Reveal answer"}
           </button>
 
-          <p className="hidden font-display text-xs uppercase tracking-[0.18em] text-moon-deep/70 lg:block">
+          <p className="hidden font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.18em] text-moon-deep/70 lg:block">
             Space reveal · 1–{teams.length} correct · Shift+number wrong · Esc no
             one
           </p>
@@ -241,7 +241,7 @@ export function ClueStage({
           <button
             type="button"
             onClick={onSkip}
-            className="btn-ghost text-sm sm:text-base"
+            className="btn-ghost text-[clamp(0.95rem,1.4vw,1.7rem)] sm:text-base"
           >
             No one — next
           </button>

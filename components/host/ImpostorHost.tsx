@@ -93,17 +93,17 @@ export function ImpostorHost({
   return (
     <main className="flex min-h-dvh lg:h-dvh flex-col gap-[2vmin] p-[2vmin] pb-16 lg:pb-[1.6vmin]">
       <header className="flex shrink-0 items-center justify-between px-2">
-        <span className="font-display text-sm uppercase tracking-[0.2em] text-moon-deep">
+        <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.2em] text-moon-deep">
           Impostor · Round {state.round + 1}
         </span>
         <div className="flex gap-2">
           {state.phase === "deal" && (
-            <button onClick={onStart} className="btn-ghost px-3 py-1.5 text-xs">
+            <button onClick={onStart} className="btn-ghost px-3 py-1.5 text-[clamp(0.8rem,1.15vw,1.35rem)]">
               Start without them
             </button>
           )}
           {state.phase === "vote" && (
-            <button onClick={onForce} className="btn-ghost px-3 py-1.5 text-xs">
+            <button onClick={onForce} className="btn-ghost px-3 py-1.5 text-[clamp(0.8rem,1.15vw,1.35rem)]">
               Close the vote
             </button>
           )}
@@ -146,7 +146,7 @@ export function ImpostorHost({
           >
             {clock}
           </p>
-          <p className="shrink-0 font-display text-sm uppercase tracking-[0.25em] text-moon-deep">
+          <p className="shrink-0 font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.25em] text-moon-deep">
             Ask each other questions · anyone can call a vote from their phone
           </p>
           <div className="grid min-h-0 flex-1 w-full grid-cols-2 content-start gap-[1vmin] overflow-auto px-[4vw] sm:grid-cols-3 lg:grid-cols-5">
