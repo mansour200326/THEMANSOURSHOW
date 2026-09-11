@@ -27,6 +27,31 @@ const pool = db();
 const hasEmailProvider = Boolean(process.env.AUTH_RESEND_KEY?.trim());
 
 /**
+ * The sender, made acceptable to Resend whatever was pasted into the variable.
+ *
+ * Resend wants `email@example.com` or `Name <email@example.com>`, exactly.
+ * A value pasted with quotes round it, or a name with the brackets dropped,
+ * is rejected with a 422 and the host sees "misconfigured" — which is what
+ * happened. So: quotes stripped, and a bare "Name email@example.com" gets its
+ * brackets back. Anything still unrecognisable falls back to Resend's own
+ * test sender, which always works for the account's own address.
+ */
+function senderAddress(raw: string | undefined): string {
+  const FALLBACK = "Big Night <onboarding@resend.dev>";
+  let v = (raw ?? "").trim().replace(/^["'`]+|["'`]+$/g, "").trim();
+  if (!v) return FALLBACK;
+  if (/^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/.test(v)) return v;
+  if (/^[^<>]+<[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+>$/.test(v)) return v;
+  const m = v.match(/^(.*?)\s*<?\s*([^\s<>@"']+@[^\s<>@"']+\.[^\s<>@"']+)\s*>?$/);
+  if (m) {
+    const name = m[1].replace(/^["'`]+|["'`]+$/g, "").trim();
+    return name ? `${name} <${m[2]}>` : m[2];
+  }
+  console.warn(`[auth] AUTH_EMAIL_FROM isn't an email address; using ${FALLBACK}`);
+  return FALLBACK;
+}
+
+/**
  * No email provider, so the link goes to the server log instead of an inbox.
  *
  * Sending email needs a third party — Railway doesn't do it and neither does
@@ -87,7 +112,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           // The provider still needs a value here even when we're not using
           // it; the override below decides whether an email is ever sent.
           apiKey: process.env.AUTH_RESEND_KEY ?? "not-configured",
-          from: process.env.AUTH_EMAIL_FROM ?? "Big Night <hello@bignight.games>",
+          from: senderAddress(process.env.AUTH_EMAIL_FROM),
           ...(hasEmailProvider
             ? {}
             : { sendVerificationRequest: logTheLinkInstead }),
