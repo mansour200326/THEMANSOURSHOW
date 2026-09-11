@@ -259,7 +259,9 @@ function Card({
               ? "text-[0.62rem] text-moon-deep"
               // Amber, full strength, a size up, with a phone on it: the one
               // line on a greyed-out card that has to be read from the sofa.
-              : "rounded-full border border-amber-400/50 bg-amber-500/15 px-2.5 py-1 text-[clamp(0.7rem,1.1vw,1.1rem)] text-amber-200 [html[data-theme=light]_&]:border-amber-600/60 [html[data-theme=light]_&]:bg-amber-500/25 [html[data-theme=light]_&]:text-amber-900",
+              // One line and the full card width, so "1 phone" and "3 phones"
+              // make the same pill; a wrapped one and an unwrapped one didn't.
+              : "mx-auto block w-full whitespace-nowrap rounded-full border border-amber-400/50 bg-amber-500/15 px-2.5 py-1 text-center text-[clamp(0.7rem,1.1vw,1.1rem)] text-amber-200 [html[data-theme=light]_&]:border-amber-600/60 [html[data-theme=light]_&]:bg-amber-500/25 [html[data-theme=light]_&]:text-amber-900",
         ].join(" ")}
       >
         {!ready && status !== "Pro" ? `📱 ${status}` : status}
