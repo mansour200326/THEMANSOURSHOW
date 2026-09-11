@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { currentHost, generationsTonight } from "@/lib/plan/host";
 import { FREE_GAME_IDS } from "@/lib/plan/limits";
+import { hasDatabase } from "@/lib/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,6 +19,9 @@ export async function GET() {
   return NextResponse.json({
     plan: host.plan,
     open: host.open,
+    // Plans can be off while accounts are on: an account remembers what a
+    // host has played, on every device they sign in on, plan or no plan.
+    canSignIn: hasDatabase(),
     signedIn: Boolean(host.userId),
     freeGameIds: FREE_GAME_IDS,
     entitlements: host.entitlements,

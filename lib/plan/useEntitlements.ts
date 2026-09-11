@@ -10,8 +10,10 @@ import {
 
 export type Me = {
   plan: Plan;
-  /** No database attached, so nothing is enforced. */
+  /** Nothing is enforced — plans are off, or there's no database. */
   open: boolean;
+  /** There's a database, so an account can exist. Independent of `open`. */
+  canSignIn: boolean;
   signedIn: boolean;
   freeGameIds: string[];
   entitlements: Entitlements;
@@ -30,6 +32,7 @@ export function useEntitlements(): Me {
   const [me, setMe] = useState<Me>({
     plan: "pro",
     open: true,
+    canSignIn: false,
     signedIn: false,
     freeGameIds: FREE_GAME_IDS,
     entitlements: ENTITLEMENTS.pro,

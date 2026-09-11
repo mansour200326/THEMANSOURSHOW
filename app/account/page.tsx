@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth, signOut } from "@/auth";
 import { ShowMark } from "@/components/ShowMark";
 import { ENTITLEMENTS } from "@/lib/plan/limits";
+import { plansEnforced } from "@/lib/plan/enforcement";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +40,17 @@ export default async function AccountPage() {
 
       <div className="rounded-3xl border border-line/12 bg-line/[0.03] p-6">
         <p className="font-display text-2xl uppercase tracking-wide text-accent-bright">
+          Host account
+        </p>
+        <p className="mt-2 text-moon/80">
+          Every board and pack written for you is remembered here, on any
+          device you sign in on. Nothing you&apos;ve played comes back.
+        </p>
+      </div>
+
+      {plansEnforced() && (
+      <div className="rounded-3xl border border-line/12 bg-line/[0.03] p-6">
+        <p className="font-display text-2xl uppercase tracking-wide text-accent-bright">
           {plan === "pro" ? "Pro Host" : "Free"}
         </p>
         {planExpiresAt && (
@@ -56,9 +68,10 @@ export default async function AccountPage() {
           <li>{limits.players} phones in a room</li>
         </ul>
       </div>
+      )}
 
       <div className="flex gap-3">
-        {plan === "free" && (
+        {plansEnforced() && plan === "free" && (
           <Link href="/account/upgrade" className="btn-brand px-6 py-4">
             See Pro
           </Link>

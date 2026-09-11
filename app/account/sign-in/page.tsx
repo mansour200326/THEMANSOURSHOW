@@ -33,8 +33,9 @@ export default async function SignInPage({
           Sign in
         </h1>
         <p className="mt-2 text-moon-dim">
-          Only hosts need this, and only for Pro. Everyone else just joins with
-          the code on the TV.
+          Only the host needs this. Signed in, the questions you&apos;ve played
+          follow you from the TV to the laptop to your phone, so nothing
+          repeats. Everyone else just joins with the code on the TV.
         </p>
       </div>
 

@@ -86,7 +86,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
                   Clear bots
                 </button>
               )}
-              <AccountLink className="self-center" />
+              <AccountLink className="px-3 py-1 text-xs" />
               {/* Labelled here: the faint corner pair is invisible on a TV across the room. */}
               <SoundControl prominent className="px-3 py-1 text-xs" />
               <ThemeToggle prominent className="px-3 py-1 text-xs" />
