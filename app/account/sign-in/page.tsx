@@ -50,7 +50,10 @@ export default async function SignInPage({
             "use server";
             await signIn("resend", {
               email: String(formData.get("email") ?? ""),
-              redirectTo: "/account",
+              // Straight back to the games: the account page is a receipt,
+              // not a destination, and a host who has just signed in wants
+              // to host, not to read about it.
+              redirectTo: "/",
             });
           }}
           className="flex flex-col gap-3"

@@ -70,7 +70,11 @@ export default async function AccountPage() {
       </div>
       )}
 
-      <div className="flex gap-3">
+      {/* The way out, first and biggest. Signing out is the rare case. */}
+      <div className="flex flex-wrap gap-3">
+        <Link href="/" className="btn-brand px-8 py-4 text-lg">
+          Back to the games
+        </Link>
         {plansEnforced() && plan === "free" && (
           <Link href="/account/upgrade" className="btn-brand px-6 py-4">
             See Pro
