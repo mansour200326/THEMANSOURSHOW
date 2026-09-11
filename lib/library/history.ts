@@ -25,8 +25,8 @@ import { normalizeTheme } from "@/lib/library/theme";
  */
 
 /** Boards to look back through, and answers to carry into the prompt. */
-const BOARDS_BACK = 30;
-const MAX_ANSWERS = 250;
+const BOARDS_BACK = 80;
+const MAX_ANSWERS = 600;
 
 /**
  * Pull every answer-shaped string out of stored content.

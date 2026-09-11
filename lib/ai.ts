@@ -112,6 +112,21 @@ const GeneratedClue = z.object({
   clue: z.string().describe("The clue, written as a statement — never a question."),
   answer: z.string().describe("The answer, as short as possible."),
   /*
+   * The model's own rating of where the clue sits on the ladder. Asked for
+   * explicitly, because "easiest first" on its own produced categories where
+   * the 200 was harder than the 500: the model wrote five clues it liked and
+   * put them in the order it wrote them. Rated, the code can sort them and
+   * keep one of each rung.
+   */
+  difficulty: z
+    .number()
+    .int()
+    .min(1)
+    .max(5)
+    .describe(
+      "1 = anyone at the table gets it instantly; 2 = most people know it after a moment; 3 = the room has to think and someone gets it; 4 = only the person who knows this topic gets it; 5 = a genuine enthusiast's fact, fair but properly hard.",
+    ),
+  /*
    * What a photograph of this clue would be *of*. The model can't hand over
    * an image — ask one for a URL and it invents a plausible address that
    * 404s — so it names the subject and the server goes and finds a real
@@ -142,7 +157,7 @@ const GeneratedCategory = z.object({
   clues: z
     .array(GeneratedClue)
     .describe(
-      "Exactly five clues, easiest first, hardest last, all inside the difficulty band you were given.",
+      "Exactly seven clues covering every rung of the ladder — at least one rated 1, one 2, one 3, one 4 and one 5 — all inside the difficulty band you were given. The two extra are spares.",
     ),
 });
 
@@ -161,10 +176,20 @@ const SYSTEM = `You write clues for a party game played by a group of friends ar
 Rules:
 - Produce exactly one category per requested title, in the order given. Keep the
   host's topic; you may tidy the wording into a punchy CAPS board title.
-- Exactly five clues per category, ordered easiest to hardest WITHIN the
-  difficulty band you are given below. The band is absolute: a 100 on a hard
-  board is harder than a 500 on a medium one. Do not write a general spread and
-  then re-sort it — write to the band.
+- Seven clues per category, and each one rated 1 to 5 on the ladder below.
+  Five make the board — one per rung, 100 to 500 — and two are spares. The
+  ladder is the point of the game: a table that gets the 500 and misses the
+  200 has been cheated, so the rungs must genuinely climb.
+    1 → 100: the easiest thing in the category. Anyone at the table gets it
+      instantly, no thinking.
+    2 → 200: easy to medium. Most people know it after a moment.
+    3 → 300: medium to hard. The room has to think, and someone gets it.
+    4 → 400: hard. Only the person at the table who knows this topic gets it.
+    5 → 500: harder still. A genuine enthusiast's fact — obscure, but real,
+      fair and checkable, never a trick.
+  The difficulty band you are given shifts the whole ladder: a 100 on a hard
+  board is harder than a 500 on an easy one. Write to the band, then rate
+  honestly within it.
 - A clue is a statement, never a question. The answer is short: a name, a title,
   a year, a place. No full sentences in the answer.
 - Every clue must be factually correct and have exactly one defensible answer.
@@ -220,12 +245,35 @@ function alreadyAsked(avoid: string[]): string {
   if (!avoid.length) return "";
   return (
     "\n\nALREADY USED — this host has been asked these before. Not one of " +
-    "them may be an answer on this board, and do not write a clue whose " +
-    "answer is a near-synonym of one either. If a category's most obvious " +
-    "clue is on this list, that category needs a different clue, not a " +
-    "reworded one:\n" +
+    "them may be an answer, and do not write one whose answer is a " +
+    "near-synonym of one either. A fact is used up in BOTH directions: if " +
+    "'Lesotho' is on this list, nothing may be about Lesotho at all — not " +
+    "'this country surrounds Lesotho', not 'Lesotho's capital'. If a " +
+    "category's most obvious clue is on this list, that category needs a " +
+    "different clue, not a reworded one:\n" +
     avoid.map((a) => `- ${a}`).join("\n")
   );
+}
+
+/**
+ * Does this clue name something the host has already been asked?
+ *
+ * The answer list catches "Lesotho" as an answer. It does not catch "This
+ * country surrounds Lesotho — South Africa", which is the same fact read
+ * from the other end, and which is exactly what the model produced when
+ * told not to ask about Lesotho. So the clue text is checked too: a clue
+ * that mentions a used answer, as a whole word, is the used fact again.
+ * Short and numeric answers are left out — "1999" and "Nile" show up in
+ * clues about other things.
+ */
+function mentionsUsed(text: string, avoid: string[]): boolean {
+  const lower = text.toLowerCase();
+  return avoid.some((a) => {
+    const w = a.trim().toLowerCase();
+    if (w.length < 4 || /^[\d\s.,]+$/.test(w)) return false;
+    const escaped = w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`(^|[^\\p{L}\\p{N}])${escaped}(?=[^\\p{L}\\p{N}]|$)`, "u").test(lower);
+  });
 }
 
 /**
@@ -320,7 +368,44 @@ export async function generateTriviaBoard({
   const parsed = response.parsed_output;
   if (!parsed) throw new Error("The generator returned an unreadable board.");
 
-  const usable = parsed.categories.filter((cat) => cat.clues.length >= VALUES.length);
+  /*
+   * Five from seven, one per rung. Anything the host has already been asked
+   * goes first — by its answer, or by naming a used answer in the clue — then
+   * the survivors are sorted by the model's own rating and one is taken for
+   * each rung, spares filling any rung the model skipped. A category left
+   * with fewer than five is dropped; a board left with fewer than three is
+   * rewritten.
+   */
+  const banned = new Set(avoid.map(normaliseAnswer));
+  const ladder = (clues: typeof parsed.categories[number]["clues"]) => {
+    const clean = clues.filter(
+      (c) => !banned.has(normaliseAnswer(c.answer)) && !mentionsUsed(c.clue, avoid),
+    );
+    if (clean.length < VALUES.length) return null;
+    const sorted = [...clean].sort((a, b) => a.difficulty - b.difficulty);
+    const taken = new Set<number>();
+    const chosen: typeof sorted = [];
+    for (let rung = 1; rung <= VALUES.length; rung++) {
+      const i = sorted.findIndex((c, idx) => !taken.has(idx) && c.difficulty === rung);
+      if (i >= 0) {
+        taken.add(i);
+        chosen.push(sorted[i]);
+      }
+    }
+    // Rungs the model skipped: fill from whatever's left, in difficulty order.
+    for (let idx = 0; chosen.length < VALUES.length && idx < sorted.length; idx++) {
+      if (!taken.has(idx)) {
+        taken.add(idx);
+        chosen.push(sorted[idx]);
+      }
+    }
+    return chosen.sort((a, b) => a.difficulty - b.difficulty).slice(0, VALUES.length);
+  };
+  const usable = parsed.categories
+    .map((cat) => ({ title: cat.title, clues: ladder(cat.clues) }))
+    .filter((cat): cat is { title: string; clues: NonNullable<ReturnType<typeof ladder>> } => cat.clues !== null);
+  const droppedCats = parsed.categories.length - usable.length;
+  if (droppedCats) console.log(`[board] dropped ${droppedCats} categor${droppedCats === 1 ? "y" : "ies"} that couldn't fill five fresh rungs`);
   if (usable.length < 3) {
     throw new Error("The generator came back short. Give it another go.");
   }
@@ -329,7 +414,7 @@ export async function generateTriviaBoard({
     title: categories.join(" · "),
     categories: usable.map((cat) => ({
       title: cat.title.trim().toUpperCase(),
-      clues: cat.clues.slice(0, VALUES.length).map((clue, i) => ({
+      clues: cat.clues.map((clue, i) => ({
         value: VALUES[i],
         clue: clue.clue.trim(),
         answer: clue.answer.trim(),

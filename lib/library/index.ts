@@ -41,7 +41,13 @@ const RETIRE_AFTER_SERVES = 5;
 const RETIRE_SKIP_RATIO = 0.5;
 
 /** A stored board this much made of questions the host has seen is not new. */
-const FAMILIAR_LIMIT = 0.25;
+/*
+ * Was a quarter: a shelf board could arrive with six of its twenty-five
+ * answers already asked of this host, and it did — the same Cleopatra, the
+ * same Lesotho. Now effectively zero for a board (one repeat in twenty-five
+ * is over the line) and one-in-forty for the long packs.
+ */
+const FAMILIAR_LIMIT = 0.03;
 
 type Row = {
   id: string;
