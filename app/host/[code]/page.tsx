@@ -113,7 +113,7 @@ export default function HostPage({
     punchline: "Punchline",
     "caption-this": "Add a Caption",
     "act-it-out": "Act It Out",
-    "one-stroke": "One Stroke",
+    "one-stroke": "Something Sketchy",
   };
 
   const launch = async (

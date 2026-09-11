@@ -67,7 +67,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
     <main className="flex min-h-dvh lg:h-dvh flex-col gap-[1.5vmin] lg:overflow-hidden p-[2vmin] pb-16 lg:pb-[1.6vmin]">
       {roundCard}
       <header className="flex shrink-0 items-center justify-between">
-        <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-deep">
+        <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-dim">
           Round {state.round + 1} of {state.prompts.length}
         </span>
       </header>
@@ -111,7 +111,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
                       "flex items-center gap-2 rounded-full border px-4 py-2 font-display text-[clamp(0.8rem,1.2vw,1.3rem)] uppercase tracking-wide transition-colors",
                       done
                         ? "border-emerald-400/60 bg-emerald-500/15 text-emerald-200"
-                        : "border-line/10 bg-line/[0.03] text-moon-deep",
+                        : "border-line/10 bg-line/[0.03] text-moon-dim",
                     ].join(" ")}
                   >
                     <span>{p.emoji}</span>
@@ -213,7 +213,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
             )}
 
             {state.phase === "vote" && (
-              <p className="pt-[1vmin] text-center font-display text-[clamp(0.8rem,1.2vw,1.3rem)] uppercase tracking-[0.2em] text-moon-deep">
+              <p className="pt-[1vmin] text-center font-display text-[clamp(0.8rem,1.2vw,1.3rem)] uppercase tracking-[0.2em] text-moon-dim">
                 {waitingOn.length
                   ? `Waiting on ${waitingOn.map((p) => p.name).join(", ")}`
                   : "Counting…"}
@@ -259,7 +259,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
 
 function Picture({ image, className }: { image: PromptImage; className: string }) {
   return (
-    <figure className={`flex flex-col items-center ${className}`}>
+    <figure className={`relative flex flex-col items-center ${className}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={image.url}
@@ -267,7 +267,8 @@ function Picture({ image, className }: { image: PromptImage; className: string }
         className="max-h-[inherit] w-auto max-w-full rounded-xl border border-line/10 object-contain shadow-tile"
         style={{ maxHeight: "inherit" }}
       />
-      <figcaption className="mt-1 text-[clamp(0.7rem,0.95vw,1.1rem)] text-moon-deep">
+      {/* The licence asks for a credit; the picture gets the height. Corner overlay. */}
+      <figcaption className="absolute bottom-2 right-2 rounded bg-midnight/75 px-2 py-0.5 text-[clamp(0.65rem,0.85vw,1rem)] text-moon-dim backdrop-blur">
         {image.credit} · {image.licence} · Wikimedia Commons
       </figcaption>
     </figure>
@@ -301,7 +302,7 @@ function Standings({ room }: { room: Room }) {
           ].join(" ")}
         >
           <span className="flex items-center gap-3 font-display text-xl uppercase tracking-wide text-moon">
-            <span className="w-6 tabular-nums text-moon-deep">{i + 1}</span>
+            <span className="w-6 tabular-nums text-moon-dim">{i + 1}</span>
             <span>{p.emoji}</span>
             {p.name}
           </span>

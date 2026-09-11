@@ -37,7 +37,7 @@ export function FinalStage({
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col items-center"
       >
-        <p className="t-label font-display uppercase text-moon-deep">
+        <p className="t-label font-display uppercase text-moon-dim">
           Final Round
         </p>
         <h2 className="accent-text font-display text-[clamp(2rem,5vw,6rem)] font-bold uppercase tracking-tight">
@@ -65,7 +65,7 @@ export function FinalStage({
                   <p className="truncate font-display text-[clamp(0.9rem,1.3vw,1.6rem)] uppercase tracking-wider text-accent-bright">
                     {team.name}
                   </p>
-                  <p className="mt-1 text-[clamp(0.95rem,1.4vw,1.7rem)] text-moon-deep">
+                  <p className="mt-1 text-[clamp(0.95rem,1.4vw,1.7rem)] text-moon-dim">
                     Score {team.score.toLocaleString()} · max{" "}
                     {cap.toLocaleString()}
                   </p>
@@ -105,7 +105,7 @@ export function FinalStage({
             <CountdownRing seconds={60} resetKey="final" />
           )}
 
-          <p className="text-[clamp(0.85rem,1.2vw,1.25rem)] uppercase tracking-[0.2em] text-moon-deep">
+          <p className="text-[clamp(0.85rem,1.2vw,1.25rem)] uppercase tracking-[0.2em] text-moon-dim">
             Write your answers
           </p>
 
@@ -121,7 +121,7 @@ export function FinalStage({
             {final.clue.clue}
           </p>
           <div className="flex flex-col items-center gap-1">
-            <span className="t-label font-display uppercase text-moon-deep">
+            <span className="t-label font-display uppercase text-moon-dim">
               Answer
             </span>
             <motion.p
@@ -159,7 +159,7 @@ export function FinalStage({
                   <p className="mt-1 font-display text-[clamp(1.3rem,2vw,2.5rem)] font-bold tabular-nums text-moon">
                     {team.score.toLocaleString()}
                   </p>
-                  <p className="mb-3 text-[clamp(0.95rem,1.4vw,1.7rem)] text-moon-deep">
+                  <p className="mb-3 text-[clamp(0.95rem,1.4vw,1.7rem)] text-moon-dim">
                     Wagered {(final.wagers[team.id] ?? 0).toLocaleString()}
                   </p>
                   <div className="flex gap-2">

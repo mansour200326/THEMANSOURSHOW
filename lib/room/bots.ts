@@ -193,7 +193,7 @@ function nextBotMove(room: Room, state: GameState): Act | null {
     return null;
   }
 
-  // One Stroke: bots don't draw, but they do vote, and they vote at random.
+  // Something Sketchy: bots don't draw, but they do vote, and they vote at random.
   if (state.kind === "stroke") {
     if (state.phase !== "vote") return null;
     for (const bot of bots) {

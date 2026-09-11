@@ -134,7 +134,7 @@ export function createStrokeGame(pool: StrokePair[]): GameModule {
 
   return {
     id: "one-stroke",
-    name: "One Stroke",
+    name: "Something Sketchy",
     minPlayers: 3,
     needsPhones: true,
 

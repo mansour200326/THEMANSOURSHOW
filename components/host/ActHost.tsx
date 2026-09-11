@@ -66,7 +66,7 @@ export function ActHost({ room, state, onStart, onTimeUp, onNext, onQuit }: Prop
               ].join(" ")}
             >
               <span className="flex items-center gap-3 font-display text-xl uppercase tracking-wide text-moon">
-                <span className="w-6 tabular-nums text-moon-deep">{i + 1}</span>
+                <span className="w-6 tabular-nums text-moon-dim">{i + 1}</span>
                 <span>{p.emoji}</span>
                 {p.name}
               </span>
@@ -88,10 +88,10 @@ export function ActHost({ room, state, onStart, onTimeUp, onNext, onQuit }: Prop
       {roundCard}
       {state.phase === "acting" && <CountIn startedAt={state.startedAt} />}
       <header className="flex w-full shrink-0 items-center justify-between">
-        <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-deep">
+        <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-dim">
           Turn {state.turn + 1} of {state.turns}
         </span>
-        <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-deep">
+        <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-dim">
           {state.got.length} got
         </span>
       </header>
@@ -99,7 +99,7 @@ export function ActHost({ room, state, onStart, onTimeUp, onNext, onQuit }: Prop
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[2vmin] text-center">
         <p className="font-display text-[clamp(1.4rem,3.2vw,3.6rem)] uppercase tracking-wide text-moon">
           {actor?.emoji} {actor?.name}
-          <span className="text-moon-deep">
+          <span className="text-moon-dim">
             {state.phase === "ready" ? " is up" : state.phase === "acting" ? " is acting" : " — time"}
           </span>
         </p>
@@ -151,7 +151,7 @@ export function ActHost({ room, state, onStart, onTimeUp, onNext, onQuit }: Prop
               state.passed.map((word, i) => (
                 <span
                   key={`p-${i}`}
-                  className="rounded-full border border-line/10 px-4 py-2 font-display text-[clamp(0.9rem,1.5vw,1.6rem)] uppercase tracking-wide text-moon-deep line-through"
+                  className="rounded-full border border-line/10 px-4 py-2 font-display text-[clamp(0.9rem,1.5vw,1.6rem)] uppercase tracking-wide text-moon-dim line-through"
                 >
                   {word}
                 </span>

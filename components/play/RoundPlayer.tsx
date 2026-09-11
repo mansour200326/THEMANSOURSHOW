@@ -102,7 +102,17 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
 
     return (
       <Shell title={isGuessWho ? "Who wrote this?" : picksBest ? "Pick the best one" : prompt?.text ?? ""}>
-        {picksBest && picture}
+        {/* Pinned, so a long list of captions scrolls under the thing they're about. */}
+        {picksBest && prompt?.image && (
+          <div className="sticky top-0 z-10 -mx-5 bg-midnight/95 px-5 pb-3 backdrop-blur">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={prompt.image.url}
+              alt=""
+              className="mx-auto w-full max-h-[32vh] rounded-xl border border-line/10 object-contain"
+            />
+          </div>
+        )}
         {isGuessWho && focusText && (
           <p className="rounded-xl border border-line/15 bg-line/[0.04] px-5 py-4 text-center text-lg text-moon">
             “{focusText}”

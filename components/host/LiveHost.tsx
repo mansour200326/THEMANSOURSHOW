@@ -110,7 +110,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
     const survivors = players.filter((p) => !state.benched.includes(p.id));
     return (
       <main className="flex min-h-dvh lg:h-dvh flex-col items-center justify-center gap-[3vmin] p-[3vmin] text-center pb-16 lg:pb-[1.6vmin]">
-        <p className="t-label font-display uppercase text-moon-deep">
+        <p className="t-label font-display uppercase text-moon-dim">
           {TITLES[state.variant]} — that&apos;s the lot
         </p>
         <WinnerMoment>
@@ -140,7 +140,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
       {roundCard}
       {(state.phase === "collect" || state.phase === "brief") && <CountIn startedAt={state.startedAt} />}
       <header className="flex shrink-0 items-center justify-between px-2">
-        <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.2em] text-moon-deep">
+        <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.2em] text-moon-dim">
           {TITLES[state.variant]} · Round {state.round + 1}/{state.items.length}
         </span>
         <div className="flex gap-2">
@@ -180,7 +180,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
                     className={[
                       "flex items-center gap-2 rounded-full border px-4 py-2 font-display uppercase tracking-wide transition-colors",
                       out
-                        ? "border-line/10 text-moon-deep line-through opacity-50"
+                        ? "border-line/10 text-moon-dim line-through opacity-50"
                         : state.phase === "reveal" && right
                           ? "border-emerald-400/60 bg-emerald-500/10 text-emerald-200"
                           : answered
@@ -296,7 +296,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
                 {Math.ceil(left)}
               </motion.span>
               {state.phase === "collect" && (
-                <p className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.2em] text-moon-deep">
+                <p className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.2em] text-moon-dim">
                   {Object.keys(state.answers).length} in ·{" "}
                   {
                     players.filter(

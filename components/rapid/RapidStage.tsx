@@ -76,7 +76,7 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
       {roundCard}
       {state.phase === "running" && <CountIn startedAt={stamp} />}
       <div>
-        <p className="t-label font-display uppercase text-moon-deep">
+        <p className="t-label font-display uppercase text-moon-dim">
           Round {state.round + 1} of {state.prompts.length}
           {state.phase === "bidding" ? " · up for bids" : ` · ${team?.name}`}
           {state.mode === "categories" && state.phase !== "bidding" && state.bid
@@ -102,7 +102,7 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
             exit={{ y: -8, transition: { duration: 0.15 } }}
             className="flex flex-col items-center gap-[2vmin]"
           >
-            <p className="font-display text-[clamp(0.9rem,1.5vw,1.6rem)] uppercase tracking-[0.25em] text-moon-deep">
+            <p className="font-display text-[clamp(0.9rem,1.5vw,1.6rem)] uppercase tracking-[0.25em] text-moon-dim">
               Bid against each other — how many can you name?
             </p>
 
@@ -149,7 +149,7 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
             >
               {state.teams[bidTeam]?.name} takes it at {bid}
             </button>
-            <p className="max-w-[60ch] text-[clamp(0.75rem,1.1vw,1rem)] text-moon-deep">
+            <p className="max-w-[60ch] text-[clamp(0.75rem,1.1vw,1rem)] text-moon-dim">
               Whoever bids highest plays the category alone. Reach the number
               and you win the category; fall short and the other side takes it.
               One point either way.
@@ -165,7 +165,7 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
             exit={{ y: -8, transition: { duration: 0.15 } }}
             className="flex flex-col items-center gap-[2vmin]"
           >
-            <p className="font-display text-[clamp(0.9rem,1.5vw,1.6rem)] uppercase tracking-[0.25em] text-moon-deep">
+            <p className="font-display text-[clamp(0.9rem,1.5vw,1.6rem)] uppercase tracking-[0.25em] text-moon-dim">
               {state.mode === "categories"
                 ? `${team?.name} — name ${state.bid} or more`
                 : RAPID_RULE[state.mode]}
@@ -220,7 +220,7 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
 
             {state.mode === "categories" ? (
               <>
-                <p className="t-label font-display uppercase text-moon-deep">
+                <p className="t-label font-display uppercase text-moon-dim">
                   How many did {team?.name} get? They called {state.bid}.
                 </p>
                 <div className="flex items-center gap-5">
@@ -254,7 +254,7 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
               </>
             ) : (
               <>
-                <p className="t-label font-display uppercase text-moon-deep">
+                <p className="t-label font-display uppercase text-moon-dim">
                   Did {team?.name} name all three?
                 </p>
                 <div className="flex gap-4">

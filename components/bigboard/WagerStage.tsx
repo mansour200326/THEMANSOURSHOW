@@ -48,7 +48,7 @@ export function WagerStage({
         </p>
 
         <div className="panel flex flex-col items-center gap-5 px-8 py-7">
-          <p className="t-label font-display uppercase text-moon-deep">
+          <p className="t-label font-display uppercase text-moon-dim">
             Wager — up to {maxWager.toLocaleString()}
           </p>
 
@@ -92,7 +92,7 @@ export function WagerStage({
             </button>
           </div>
 
-          <p className="text-[clamp(0.95rem,1.4vw,1.7rem)] text-moon-deep">
+          <p className="text-[clamp(0.95rem,1.4vw,1.7rem)] text-moon-dim">
             Current score {score.toLocaleString()}
           </p>
         </div>

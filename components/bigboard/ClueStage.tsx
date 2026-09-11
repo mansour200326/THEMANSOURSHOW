@@ -73,7 +73,7 @@ export function ClueStage({
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0">
-          <p className="t-label font-display uppercase text-moon-deep">
+          <p className="t-label font-display uppercase text-moon-dim">
             {isDaily ? "Double Down" : category}
           </p>
           <p className="truncate font-display text-[clamp(1.1rem,2vw,2.5rem)] uppercase tracking-wide text-moon/90">
@@ -83,7 +83,7 @@ export function ClueStage({
 
         <div className="flex items-center gap-5">
           <div className="text-right">
-            <p className="t-label font-display uppercase text-moon-deep">
+            <p className="t-label font-display uppercase text-moon-dim">
               {isDaily ? "Wagered" : "For"}
             </p>
             <p className="accent-text font-display text-[clamp(1.6rem,3vw,4rem)] font-bold tabular-nums">
@@ -149,14 +149,14 @@ export function ClueStage({
               transition={{ duration: 0.3 }}
               className="flex flex-col items-center gap-2"
             >
-              <span className="t-label font-display uppercase text-moon-deep">
+              <span className="t-label font-display uppercase text-moon-dim">
                 Answer
               </span>
               <p className="accent-text t-answer text-balance font-display font-semibold uppercase">
                 {answer}
               </p>
               {image && (
-                <p className="t-label text-moon-deep/70">
+                <p className="t-label text-moon-dim/70">
                   {image.credit} · {image.licence} · Wikimedia Commons
                 </p>
               )}
@@ -233,7 +233,7 @@ export function ClueStage({
             {revealed ? "Hide answer" : "Reveal answer"}
           </button>
 
-          <p className="hidden font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.18em] text-moon-deep/70 lg:block">
+          <p className="hidden font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.18em] text-moon-dim/70 lg:block">
             Space reveal · 1–{teams.length} correct · Shift+number wrong · Esc no
             one
           </p>

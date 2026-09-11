@@ -71,7 +71,7 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
     const ranked = [...players].sort((a, b) => b.score - a.score);
     return (
       <main className="flex min-h-dvh lg:h-dvh flex-col items-center justify-center gap-[3vmin] p-[4vmin] text-center pb-16 lg:pb-[1.6vmin]">
-        <p className="t-label font-display uppercase text-moon-deep">That&apos;s the game</p>
+        <p className="t-label font-display uppercase text-moon-dim">That&apos;s the game</p>
         <WinnerMoment>
           {ranked[0]?.name ?? "Nobody"} wins
         </WinnerMoment>
@@ -88,7 +88,7 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
       {roundCard}
       {state.phase === "answer" && <CountIn startedAt={state.startedAt} />}
       <header className="flex shrink-0 items-center justify-between">
-        <span className="font-display text-[clamp(0.8rem,1.4vw,1.4rem)] uppercase tracking-[0.25em] text-moon-deep">
+        <span className="font-display text-[clamp(0.8rem,1.4vw,1.4rem)] uppercase tracking-[0.25em] text-moon-dim">
           Bluff Trivia · round {state.round + 1} of {state.pairs.length}
         </span>
       </header>
@@ -97,7 +97,7 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
         {/* ---- answering: no question on this screen, on purpose ---- */}
         {state.phase === "answer" && (
           <>
-            <p className="t-label font-display uppercase text-moon-deep">Look at your phone</p>
+            <p className="t-label font-display uppercase text-moon-dim">Look at your phone</p>
             <h2 className="t-clue text-balance font-display uppercase tracking-wide text-moon">
               Everyone has a question. One of you has a different one.
             </h2>
@@ -105,7 +105,7 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
               Answer yours. Then work out who was answering something else.
             </p>
             <Clock left={left} seconds={state.seconds} />
-            <p className="font-display text-[clamp(0.9rem,1.5vw,1.5rem)] uppercase tracking-[0.2em] text-moon-deep">
+            <p className="font-display text-[clamp(0.9rem,1.5vw,1.5rem)] uppercase tracking-[0.2em] text-moon-dim">
               {waiting.length
                 ? `Waiting on ${waiting.map((p) => p.name).join(", ")}`
                 : "Everyone's in"}
@@ -120,7 +120,7 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
               Whose answer doesn&apos;t fit?
             </h2>
             <Answers state={state} room={room} />
-            <p className="font-display text-[clamp(0.9rem,1.5vw,1.5rem)] uppercase tracking-[0.2em] text-moon-deep">
+            <p className="font-display text-[clamp(0.9rem,1.5vw,1.5rem)] uppercase tracking-[0.2em] text-moon-dim">
               {waiting.length
                 ? `Vote on your phone · waiting on ${waiting.map((p) => p.name).join(", ")}`
                 : "Counting…"}
@@ -194,7 +194,7 @@ function Clock({ left, seconds }: { left: number; seconds: number }) {
 function Question({ label, text, odd }: { label: string; text: string; odd?: boolean }) {
   return (
     <div className={["rounded-2xl border p-[2vmin] text-left", odd ? "border-rose-400/50 bg-rose-500/10" : "border-line/12 bg-line/[0.03]"].join(" ")}>
-      <p className={["t-label font-display uppercase", odd ? "text-rose-300" : "text-moon-deep"].join(" ")}>{label}</p>
+      <p className={["t-label font-display uppercase", odd ? "text-rose-300" : "text-moon-dim"].join(" ")}>{label}</p>
       <p className="mt-1 text-[clamp(1rem,2vw,2rem)] leading-snug text-moon">{text}</p>
     </div>
   );
@@ -217,7 +217,7 @@ function Answers({ state, room, revealOdd }: { state: OddState; room: Room; reve
             >
               <span className="text-[clamp(1.4rem,2.6vw,2.8rem)]">{p?.emoji}</span>
               <div className="min-w-0 flex-1">
-                <p className="font-display text-[clamp(0.8rem,1.3vw,1.3rem)] uppercase tracking-widest text-moon-deep">{p?.name}</p>
+                <p className="font-display text-[clamp(0.8rem,1.3vw,1.3rem)] uppercase tracking-widest text-moon-dim">{p?.name}</p>
                 <p className="truncate font-display text-[clamp(1.1rem,2.2vw,2.3rem)] uppercase tracking-wide text-moon">{state.answers[id]}</p>
               </div>
               {revealOdd && count[id] ? (

@@ -579,7 +579,7 @@ export async function generateCaptionPictures({
   return { content, isPersonal: parsed.isPersonal };
 }
 
-/* --------------------------------------------- One Stroke categories */
+/* --------------------------------------------- Something Sketchy categories */
 
 const GeneratedStrokePairs = z.object({
   pairs: z.array(

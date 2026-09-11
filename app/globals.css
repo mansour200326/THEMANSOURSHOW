@@ -128,7 +128,7 @@ html[data-theme="light"] .g-word { --accent-rgb: 94 155 20; --accent-bright-rgb:
     line-height: 1;
   }
   .t-category {
-    font-size: clamp(0.9rem, 1.35vw, 2.1rem);
+    font-size: clamp(1rem, 1.7vw, 2.6rem);
     line-height: 1.1;
   }
   .t-score {

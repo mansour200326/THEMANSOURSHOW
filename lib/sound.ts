@@ -431,66 +431,8 @@ export function unlockAudio() {
 export const audioState = () => ctx?.state ?? "none";
 
 
-/* ------------------------------------------------------------- the bed */
-
-let bed: { stop: () => void } | null = null;
-
-/**
- * Something quiet between games.
- *
- * Two detuned tones a fifth apart under a slow low-pass sweep, at a gain low
- * enough to sit under conversation. It starts when the lobby is on screen
- * and stops the moment a game does, and it's silent when the host has muted
- * the room. Nothing about it should ever be noticed directly; the room
- * should only notice when it stops.
+/*
+ * There used to be a lobby "bed" here — a low pad that played under the
+ * lobby. It read as a hum that never stopped, so it's gone. The room's sound
+ * is cues only: something happened, you hear it, it ends.
  */
-export function startBed() {
-  if (bed || muted) return;
-  const c = audio();
-  if (!c || !master || c.state !== "running") return;
-
-  const out = c.createGain();
-  out.gain.setValueAtTime(0, c.currentTime);
-  out.gain.linearRampToValueAtTime(0.06, c.currentTime + 4);
-
-  const filter = c.createBiquadFilter();
-  filter.type = "lowpass";
-  filter.frequency.setValueAtTime(420, c.currentTime);
-  filter.Q.value = 0.7;
-
-  const lfo = c.createOscillator();
-  lfo.frequency.value = 0.045;
-  const lfoGain = c.createGain();
-  lfoGain.gain.value = 180;
-  lfo.connect(lfoGain).connect(filter.frequency);
-
-  const voices = [110, 110.7, 164.8, 165.4].map((f) => {
-    const o = c.createOscillator();
-    o.type = "triangle";
-    o.frequency.value = f;
-    o.connect(filter);
-    o.start();
-    return o;
-  });
-  filter.connect(out).connect(master);
-  lfo.start();
-
-  bed = {
-    stop: () => {
-      const t = c.currentTime;
-      out.gain.cancelScheduledValues(t);
-      out.gain.setValueAtTime(out.gain.value, t);
-      out.gain.linearRampToValueAtTime(0, t + 1.2);
-      window.setTimeout(() => {
-        voices.forEach((o) => o.stop());
-        lfo.stop();
-        out.disconnect();
-      }, 1400);
-    },
-  };
-}
-
-export function stopBed() {
-  bed?.stop();
-  bed = null;
-}

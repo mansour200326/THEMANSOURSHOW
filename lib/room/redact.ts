@@ -25,9 +25,9 @@ export type ViewerExtras = {
   youAreImpostor?: boolean;
   yourPlace?: string;
   yourRole?: string;
-  /** Sketch & Guess, Act It Out, One Stroke: the word, for whoever may know it. */
+  /** Sketch & Guess, Act It Out, Something Sketchy: the word, for whoever may know it. */
   yourWord?: string;
-  /** One Stroke: you're the one without the word. */
+  /** Something Sketchy: you're the one without the word. */
   youAreFake?: boolean;
   /** Bluff Trivia: the question this phone was asked — the decoy, for one of them. */
   yourQuestion?: string;
@@ -174,7 +174,7 @@ function redactAct(s: ActState, viewerId: string | null): ActState & ViewerExtra
 }
 
 /**
- * One Stroke. Two secrets: the word, which every phone but the fake's gets,
+ * Something Sketchy. Two secrets: the word, which every phone but the fake's gets,
  * and who the fake is, which nobody gets until they're caught. The category
  * is public — it's the fake's only foothold and it's on the TV on purpose.
  */

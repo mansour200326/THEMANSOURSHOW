@@ -77,7 +77,7 @@ export function ImpostorHost({
     const standings = [...players].sort((a, b) => b.score - a.score);
     return (
       <main className="flex min-h-dvh lg:h-dvh flex-col items-center justify-center gap-[3vmin] p-[3vmin] text-center pb-16 lg:pb-[1.6vmin]">
-        <p className="t-label font-display uppercase text-moon-deep">
+        <p className="t-label font-display uppercase text-moon-dim">
           Impostor — that&apos;s the lot
         </p>
         <WinnerMoment>
@@ -93,7 +93,7 @@ export function ImpostorHost({
   return (
     <main className="flex min-h-dvh lg:h-dvh flex-col gap-[2vmin] p-[2vmin] pb-16 lg:pb-[1.6vmin]">
       <header className="flex shrink-0 items-center justify-between px-2">
-        <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.2em] text-moon-deep">
+        <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.2em] text-moon-dim">
           Impostor · Round {state.round + 1}
         </span>
         <div className="flex gap-2">
@@ -126,7 +126,7 @@ export function ImpostorHost({
                   "rounded-full border px-4 py-2 font-display uppercase tracking-wide",
                   state.ready.includes(p.id)
                     ? "border-accent/60 bg-accent/10 text-accent-bright"
-                    : "border-line/10 text-moon-deep",
+                    : "border-line/10 text-moon-dim",
                 ].join(" ")}
               >
                 {p.emoji} {p.name}
@@ -146,7 +146,7 @@ export function ImpostorHost({
           >
             {clock}
           </p>
-          <p className="shrink-0 font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.25em] text-moon-deep">
+          <p className="shrink-0 font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.25em] text-moon-dim">
             Ask each other questions · anyone can call a vote from their phone
           </p>
           <div className="grid min-h-0 flex-1 w-full grid-cols-2 content-start gap-[1vmin] overflow-auto px-[4vw] sm:grid-cols-3 lg:grid-cols-5">
@@ -179,7 +179,7 @@ export function ImpostorHost({
                   "rounded-full border px-4 py-2 font-display uppercase tracking-wide",
                   state.votes[p.id]
                     ? "border-accent/60 bg-accent/10 text-accent-bright"
-                    : "border-line/10 text-moon-deep",
+                    : "border-line/10 text-moon-dim",
                 ].join(" ")}
               >
                 {p.emoji} {p.name}
@@ -194,7 +194,7 @@ export function ImpostorHost({
           <motion.p
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="t-label font-display uppercase text-moon-deep"
+            className="t-label font-display uppercase text-moon-dim"
           >
             {state.outcome === "impostor-caught"
               ? "Caught"

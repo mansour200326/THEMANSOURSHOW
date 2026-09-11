@@ -55,7 +55,7 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
     const standings = [...players].sort((a, b) => b.score - a.score);
     return (
       <main className="flex min-h-dvh lg:h-dvh flex-col items-center justify-center gap-[3vmin] p-[3vmin] text-center pb-16 lg:pb-[1.6vmin]">
-        <p className="t-label font-display uppercase text-moon-deep">
+        <p className="t-label font-display uppercase text-moon-dim">
           Sketch &amp; Guess — pens down
         </p>
         <WinnerMoment>
@@ -78,13 +78,13 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
         <SketchCanvas
           strokes={state.strokes}
           live={state.live}
-          className={state.phase === "reveal" ? "h-full max-h-[62vh] w-auto" : "h-full max-h-[78vh] w-auto"}
+          className={state.phase === "reveal" ? "h-full max-h-[62vh] w-auto lg:max-h-[78vh]" : "h-full max-h-[78vh] w-auto"}
         />
         {state.phase === "reveal" && (
           <motion.p
             initial={{ scale: 0.94 }}
             animate={{ scale: 1 }}
-            className="accent-text t-answer font-display font-bold uppercase"
+            className="accent-text t-answer font-display font-bold uppercase lg:hidden"
           >
             {state.words[state.round]}
           </motion.p>
@@ -92,7 +92,7 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
       </section>
 
       <aside className="flex w-[26vw] min-w-[240px] shrink-0 flex-col gap-[1.5vmin]">
-        <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.2em] text-moon-deep">
+        <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.2em] text-moon-dim">
           Round {state.round + 1}/{state.totalRounds ?? state.words.length}
         </span>
 
@@ -138,6 +138,14 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
           </AnimatePresence>
         </div>
 
+        {state.phase === "reveal" && (
+          <div className="hidden lg:block">
+            <p className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-dim">It was</p>
+            <p className="accent-text font-display text-[clamp(1.6rem,3.2vw,3.4rem)] font-bold uppercase leading-none">
+              {state.words[state.round]}
+            </p>
+          </div>
+        )}
         {state.phase === "reveal" && (
           <button onClick={onNext} className="btn-accent w-full py-4 text-lg">
             Next drawing

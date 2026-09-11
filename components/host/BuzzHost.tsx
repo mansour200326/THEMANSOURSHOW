@@ -64,7 +64,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
     <main className="flex min-h-dvh lg:h-dvh flex-col gap-[1.2vmin] lg:overflow-hidden p-[1.6vmin] pb-16 lg:pb-[1.6vmin]">
       {roundCard}
       <header className="flex shrink-0 items-center justify-between">
-        <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-deep">
+        <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-dim">
           {state.mode === "sequence"
             ? `Riddle ${Math.min(state.index + 1, state.items.length)} of ${state.items.length}`
             : "Pick a tile, then race for it"}
@@ -143,7 +143,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
                   <span className="accent-text font-display text-[clamp(2rem,5vw,5rem)] font-bold uppercase">
                     {buzzer.name}
                   </span>
-                  <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.25em] text-moon-deep">
+                  <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.25em] text-moon-dim">
                     Answer out loud
                   </span>
                 </motion.div>
@@ -162,7 +162,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
                     key="arming"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="font-display text-[clamp(1.1rem,2.4vw,2.6rem)] uppercase tracking-[0.3em] text-moon-deep"
+                    className="font-display text-[clamp(1.1rem,2.4vw,2.6rem)] uppercase tracking-[0.3em] text-moon-dim"
                   >
                     Read it…
                   </motion.p>
@@ -317,7 +317,7 @@ function Standings({ room }: { room: Room }) {
           ].join(" ")}
         >
           <span className="flex items-center gap-3 font-display text-xl uppercase tracking-wide text-moon">
-            <span className="w-6 tabular-nums text-moon-deep">{i + 1}</span>
+            <span className="w-6 tabular-nums text-moon-dim">{i + 1}</span>
             <span>{p.emoji}</span>
             {p.name}
           </span>

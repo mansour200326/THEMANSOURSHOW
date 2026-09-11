@@ -196,7 +196,7 @@ export const THEME_SUGGESTIONS: Record<string, string[]> = {
     "Superheroes",
     "Embarrassing moments",
   ],
-  /* --- One Stroke: categories with lots of drawable things in them --- */
+  /* --- Something Sketchy: categories with lots of drawable things in them --- */
   "one-stroke": [
     "Animals",
     "Things in a kitchen",

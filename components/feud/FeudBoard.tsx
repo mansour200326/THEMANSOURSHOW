@@ -101,7 +101,7 @@ export function FeudBoard({
                 "flex h-[4vmin] max-h-12 min-h-8 w-[4vmin] min-w-8 max-w-12 items-center justify-center rounded-lg border font-display text-[clamp(1rem,1.8vw,2rem)] font-bold",
                 i < state.strikes
                   ? "border-rose-500/70 bg-rose-500/20 text-rose-300"
-                  : "border-line/10 text-moon-deep/40",
+                  : "border-line/10 text-moon-dim/40",
               ].join(" ")}
             >
               ✗
@@ -190,7 +190,7 @@ export function FeudBoard({
                 ) : (
                   <motion.span
                     key="closed"
-                    className="flex w-full items-center justify-center font-display text-[clamp(1.2rem,2.2vw,2.6rem)] font-bold tabular-nums text-moon-deep/70"
+                    className="flex w-full items-center justify-center font-display text-[clamp(1.2rem,2.2vw,2.6rem)] font-bold tabular-nums text-moon-dim/70"
                   >
                     {i + 1}
                   </motion.span>
@@ -216,7 +216,7 @@ export function FeudBoard({
           <button onClick={onNextRound} className="btn-accent px-12 py-4 text-xl">
             {lastRound ? "Final standings" : "Next round"}
           </button>
-          <p className="t-label font-display uppercase text-moon-deep">
+          <p className="t-label font-display uppercase text-moon-dim">
             Round {state.round + 1}/{state.questions.length}
           </p>
         </motion.div>
@@ -233,7 +233,7 @@ export function FeudBoard({
       {!over && (
       <div className="flex shrink-0 flex-wrap items-end gap-3 px-[2vw] sm:flex-nowrap sm:gap-[1.5vw]">
         <div className="order-1 shrink-0 text-left">
-          <p className="t-label font-display uppercase text-moon-deep">Pot</p>
+          <p className="t-label font-display uppercase text-moon-dim">Pot</p>
           <p className="accent-text font-display text-[clamp(1.6rem,3vw,3.6rem)] font-bold tabular-nums">
             {state.pot}
           </p>
@@ -269,7 +269,7 @@ export function FeudBoard({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-wider text-moon-deep"
+                  className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-wider text-moon-dim"
                 >
                   Checking the board…
                 </motion.p>
@@ -315,7 +315,7 @@ export function FeudBoard({
               </button>
             </div>
           )}
-          <p className="t-label mt-1 font-display uppercase text-moon-deep">
+          <p className="t-label mt-1 font-display uppercase text-moon-dim">
             Round {state.round + 1}/{state.questions.length}
           </p>
         </div>
