@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { type BuzzState, buzzArmed } from "@/lib/games/buzzEngine";
 import type { Player, Room } from "@/lib/room/types";
 import { haptic } from "@/lib/haptics";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   room: Room;
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
+  const t = useT();
   const iAmOut = state.lockedOut.includes(me.id);
 
   /*
@@ -57,17 +59,13 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
     if (state.picker !== me.id) {
       return (
         <Wrap>
-          <p className="text-center text-lg text-moon-dim">
-            Waiting for the board pick…
-          </p>
+          <p className="text-center text-lg text-moon-dim">{t(t(t("Waiting for the board pick…")))}</p>
         </Wrap>
       );
     }
     return (
       <div className="flex min-h-dvh flex-col gap-3 p-4">
-        <p className="pt-2 text-center font-display text-lg uppercase tracking-wide text-accent">
-          Your pick
-        </p>
+        <p className="pt-2 text-center font-display text-lg uppercase tracking-wide text-accent">{t(t(t("Your pick")))}</p>
         <div className="grid flex-1 grid-cols-3 gap-2">
           {state.board.categories.map((cat, c) => (
             <div key={cat.title} className="flex flex-col gap-2">
@@ -109,8 +107,8 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
             : someoneElse
               ? "Someone beat you to it"
               : state.phase === "open" && !armed
-                ? "Wait for it…"
-                : "Watch the TV"}
+                ? t("Wait for it…")
+                : t(t(t("Watch the TV")))}
       </p>
 
       <motion.button
@@ -135,7 +133,7 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
                   : "border-line/10 bg-line/[0.03] text-moon-deep/70",
         ].join(" ")}
       >
-        {iBuzzed ? "YOU!" : iAmOut ? "OUT" : live ? "BUZZ" : "WAIT"}
+        {iBuzzed ? "YOU!" : iAmOut ? "OUT" : live ? t(t(t("BUZZ"))) : t(t("WAIT"))}
       </motion.button>
 
       <p className="py-3 text-center font-display text-sm uppercase tracking-widest text-accent">

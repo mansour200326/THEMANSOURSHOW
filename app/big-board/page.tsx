@@ -30,6 +30,7 @@ import type { GameState } from "@/lib/bigboard/types";
 import type { Board, FinalClue } from "@/lib/board/types";
 import { backHref } from "@/lib/backHref";
 import { recordNight } from "@/lib/night/report";
+import { useT } from "@/components/LangProvider";
 
 /**
  * Big Board keeps no record of how the host called an answer, so the cue is
@@ -48,6 +49,7 @@ function useJudgementCue(spent: number, teams: { score: number }[]) {
 }
 
 function BigBoardStage() {
+  const t = useT();
   const [state, dispatch] = useReducer(reducer, sampleBoard, emptyState);
   const [saved, setSaved] = useState<GameState | null>(null);
   const [isFullscreen, setFullscreen] = useState(false);
@@ -177,7 +179,7 @@ function BigBoardStage() {
       if (rematch) {
         // The room is standing there. Play the old board rather than a form.
         dispatch({ type: "REMATCH" });
-        setNotice(`Couldn't write a new board (${message}). Same board, fresh scores.`);
+        setNotice(t(t(t("Couldn't write a new board ({message}). Same board, fresh scores.")), { message }));
         return;
       }
       setGenError(message);
@@ -220,12 +222,12 @@ function BigBoardStage() {
   if (pending) {
     return (
       <Generating
-        title={rematching ? "Writing a fresh board" : "Writing the board"}
+        title={rematching ? t(t(t("Writing a fresh board"))) : t(t("Writing the board"))}
         items={pending.categories}
         note={
           rematching
-            ? "New clues, same categories, same teams. Nothing from the last game comes back."
-            : "Five clues for every category, plus one Final Round."
+            ? t("New clues, same categories, same teams. Nothing from the last game comes back.")
+            : t("Five clues for every category, plus one Final Round.")
         }
         onCancel={() => {
           abortRef.current?.abort();
@@ -240,7 +242,7 @@ function BigBoardStage() {
       <HowToPlay
         gameId="big-board"
         name="Big Board"
-        startLabel="Set it up"
+        startLabel={t(t(t(t("Set it up"))))}
         onStart={() => setExplained(true)}
         onBack={() => {
           window.location.href = backHref();
@@ -299,18 +301,14 @@ function BigBoardStage() {
             onClick={() => dispatch({ type: "UNDO" })}
             disabled={!state.past.length}
             className="btn-ghost px-3 py-1.5 text-xs"
-          >
-            Undo
-          </button>
+          >{t(t(t(t("Undo"))))}</button>
           <button
             onClick={toggleFullscreen}
             className="btn-ghost px-3 py-1.5 text-xs"
           >
-            {isFullscreen ? "Exit full screen" : "Full screen"}
+            {isFullscreen ? t(t(t("Exit full screen"))) : t(t("Full screen"))}
           </button>
-          <button onClick={quit} className="btn-ghost px-3 py-1.5 text-xs">
-            Quit
-          </button>
+          <button onClick={quit} className="btn-ghost px-3 py-1.5 text-xs">{t(t(t("Quit")))}</button>
         </div>
       </header>
 

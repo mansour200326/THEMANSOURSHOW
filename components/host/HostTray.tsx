@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ScoreAdjuster, type Adjustable } from "@/components/ScoreAdjuster";
+import { useT } from "@/components/LangProvider";
 
 /**
  * The host's controls, out of the way until they're wanted.
@@ -25,6 +26,7 @@ export function HostTray({
   scores?: Adjustable[];
   onAdjust?: (id: string, delta: number) => void;
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [fixing, setFixing] = useState(false);
 
@@ -35,7 +37,7 @@ export function HostTray({
           <div className="flex flex-col gap-2 rounded-2xl border border-line/12 bg-midnight/90 p-2 shadow-tile backdrop-blur">
             {sheet && (
               <div className="px-2 py-1 text-right text-xs leading-snug text-moon-deep">
-                <p className="font-display uppercase tracking-widest">Host&apos;s phone</p>
+                <p className="font-display uppercase tracking-widest">{t(t(t("Host's phone")))}</p>
                 <p className="text-moon/70">{sheet.url}</p>
                 <p>
                   key{" "}
@@ -50,9 +52,7 @@ export function HostTray({
                   setOpen(false);
                 }}
                 className="btn-ghost px-4 py-2 text-sm"
-              >
-                Fix scores
-              </button>
+              >{t(t(t(t("Fix scores"))))}</button>
             )}
             {onEnd && (
             <button
@@ -61,15 +61,13 @@ export function HostTray({
                 onEnd();
               }}
               className="btn-bad px-4 py-2 text-sm"
-            >
-              End segment
-            </button>
+            >{t(t(t(t("End segment"))))}</button>
             )}
           </div>
         )}
         <button
           onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Close host controls" : "Host controls"}
+          aria-label={open ? t(t(t("Close host controls"))) : t(t("Host controls"))}
           aria-expanded={open}
           className="flex h-11 w-11 items-center justify-center rounded-full border border-line/12 bg-midnight/70 font-display text-xl text-moon-dim backdrop-blur transition-colors hover:border-accent/50 hover:text-moon"
         >

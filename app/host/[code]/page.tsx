@@ -38,12 +38,14 @@ import { useAccentFamily } from "@/components/useAccentFamily";
 import { games } from "@/lib/games/registry";
 import { useRoom } from "@/lib/room/useRoom";
 import { useCue } from "@/components/useCue";
+import { useT } from "@/components/LangProvider";
 
 export default function HostPage({
   params,
 }: {
   params: Promise<{ code: string }>;
 }) {
+  const t = useT();
   const { code } = use(params);
   const roomCode = code.toUpperCase();
   const { room, status, send } = useRoom(roomCode);
@@ -105,19 +107,19 @@ export default function HostPage({
 
   /** Games that ask what they should be about before they start. */
   const NEEDS_SETUP: Record<string, string> = {
-    "trivia-royale": "Speed Trivia",
-    "last-one-standing": "Last One Standing",
-    timeline: "In Order",
-    "dial-it-in": "Dial It In",
-    impostor: "Impostor",
-    "sketch-and-guess": "Sketch & Guess",
-    "emoji-riddles": "Emoji Riddles",
-    "bluff-trivia": "Bluff Trivia",
-    "most-likely-to": "Most Likely To",
-    punchline: "Punchline",
-    "caption-this": "Add a Caption",
-    "act-it-out": "Act It Out",
-    "one-stroke": "Something Sketchy",
+    "trivia-royale": t(t(t("Speed Trivia"))),
+    "last-one-standing": t(t(t("Last One Standing"))),
+    timeline: t(t("In Order")),
+    "dial-it-in": t(t(t("Dial It In"))),
+    impostor: t(t(t("Impostor"))),
+    "sketch-and-guess": t(t(t("Sketch & Guess"))),
+    "emoji-riddles": t(t(t("Emoji Riddles"))),
+    "bluff-trivia": t(t(t("Bluff Trivia"))),
+    "most-likely-to": t(t(t("Most Likely To"))),
+    punchline: t(t(t("Punchline"))),
+    "caption-this": t(t(t("Add a Caption"))),
+    "act-it-out": t(t(t("Act It Out"))),
+    "one-stroke": t(t(t("Something Sketchy"))),
   };
 
   const launch = async (
@@ -194,14 +196,8 @@ export default function HostPage({
         <h1 className="font-display text-3xl uppercase tracking-wide text-moon/90">
           Room {roomCode} is gone
         </h1>
-        <p className="max-w-md text-moon-dim">
-          Rooms are kept for twelve hours, and a deploy without a mounted
-          volume clears them sooner. Start a fresh one and the phones can
-          rejoin with the new code.
-        </p>
-        <Link href="/" className="btn-brand px-8 py-4 text-lg">
-          Host a new room
-        </Link>
+        <p className="max-w-md text-moon-dim">{t(t(t("Rooms are kept for twelve hours, and a deploy without a mounted volume clears them sooner. Start a fresh one and the phones can rejoin with the new code.")))}</p>
+        <Link href="/" className="btn-brand px-8 py-4 text-lg">{t(t(t("Host a new room")))}</Link>
       </main>
     );
   }
@@ -219,7 +215,7 @@ export default function HostPage({
   if (busy) {
     return (
       <Generating
-        title={`Writing ${setupFor ? NEEDS_SETUP[setupFor] : "it"}`}
+        title={t(t(t("Writing {what}")), { what: setupFor ? t(NEEDS_SETUP[setupFor]) : "…" })}
         items={writingThemes}
         onCancel={() => {
           // Actually stop the request, rather than just hiding the screen and
@@ -254,8 +250,8 @@ export default function HostPage({
     return (
       <HowToPlay
         gameId={explaining}
-        name={game?.name ?? "Next up"}
-        startLabel={NEEDS_SETUP[explaining] ? "Set it up" : "Start the game"}
+        name={game?.name ?? t("Next up")}
+        startLabel={NEEDS_SETUP[explaining] ? t(t(t("Set it up"))) : t(t("Start the game"))}
         onBack={() => setExplaining(null)}
         onWriteOwn={() => {
           const id = explaining;
@@ -276,7 +272,7 @@ export default function HostPage({
   if (setupFor) {
     return (
       <GameSetup
-        gameName={NEEDS_SETUP[setupFor]}
+        gameName={t(NEEDS_SETUP[setupFor])}
         gameId={setupFor}
         needsBoard={setupFor === "trivia-royale"}
         lengths={setupFor === "impostor" ? [4, 6, 8, 10] : undefined}
@@ -447,9 +443,7 @@ export default function HostPage({
 
     return (
       <main className="flex min-h-dvh items-center justify-center">
-        <button onClick={() => send("game:end")} className="btn-ghost">
-          Back to the lobby
-        </button>
+        <button onClick={() => send("game:end")} className="btn-ghost">{t("Back to the lobby")}</button>
       </main>
     );
   })();

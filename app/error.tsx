@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useT } from "@/components/LangProvider";
 
 /**
  * What the room sees when something throws.
@@ -17,29 +18,19 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useT();
   useEffect(() => {
     console.error("[bignight]", error);
   }, [error]);
 
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6 text-center">
-      <p className="font-display text-sm uppercase tracking-[0.3em] text-moon-deep">
-        Well, that&apos;s embarrassing
-      </p>
-      <h1 className="brand-text font-display text-4xl font-bold uppercase tracking-tight sm:text-6xl">
-        Something broke
-      </h1>
-      <p className="max-w-md text-moon-dim">
-        The room is still on the server — nobody has been thrown out. Try that
-        again, and if it keeps happening the code on the TV still works.
-      </p>
+      <p className="font-display text-sm uppercase tracking-[0.3em] text-moon-deep">{t(t(t("Well, that's embarrassing")))}</p>
+      <h1 className="brand-text font-display text-4xl font-bold uppercase tracking-tight sm:text-6xl">{t(t(t("Something broke")))}</h1>
+      <p className="max-w-md text-moon-dim">{t(t(t("The room is still on the server — nobody has been thrown out. Try that again, and if it keeps happening the code on the TV still works.")))}</p>
       <div className="flex gap-3">
-        <button onClick={reset} className="btn-brand px-8 py-4 text-lg">
-          Try again
-        </button>
-        <a href="/" className="btn-ghost px-6 py-4">
-          Back to the start
-        </a>
+        <button onClick={reset} className="btn-brand px-8 py-4 text-lg">{t(t(t("Try again")))}</button>
+        <a href="/" className="btn-ghost px-6 py-4">{t(t(t("Back to the start")))}</a>
       </div>
     </main>
   );

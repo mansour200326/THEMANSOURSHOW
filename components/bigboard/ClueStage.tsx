@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { CountdownRing } from "@/components/bigboard/CountdownRing";
 import type { ClueImage } from "@/lib/board/types";
 import type { Rules, Team } from "@/lib/bigboard/types";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   category: string;
@@ -37,6 +38,7 @@ export function ClueStage({
   onJudge,
   onSkip,
 }: Props) {
+  const t = useT();
   const [revealed, setRevealed] = useState(false);
 
   // On a double down only the picking team plays it — nobody can steal.
@@ -74,7 +76,7 @@ export function ClueStage({
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0">
           <p className="t-label font-display uppercase text-moon-dim">
-            {isDaily ? "Double Down" : category}
+            {isDaily ? t(t(t("Double Down"))) : category}
           </p>
           <p className="truncate font-display text-[clamp(1.1rem,2vw,2.5rem)] uppercase tracking-wide text-moon/90">
             {isDaily ? category : teams[turn]?.name}
@@ -84,7 +86,7 @@ export function ClueStage({
         <div className="flex items-center gap-5">
           <div className="text-right">
             <p className="t-label font-display uppercase text-moon-dim">
-              {isDaily ? "Wagered" : "For"}
+              {isDaily ? t(t(t("Wagered"))) : t(t("For"))}
             </p>
             <p className="accent-text font-display text-[clamp(1.6rem,3vw,4rem)] font-bold tabular-nums">
               {value.toLocaleString()}
@@ -149,9 +151,7 @@ export function ClueStage({
               transition={{ duration: 0.3 }}
               className="flex flex-col items-center gap-2"
             >
-              <span className="t-label font-display uppercase text-moon-dim">
-                Answer
-              </span>
+              <span className="t-label font-display uppercase text-moon-dim">{t(t(t("Answer")))}</span>
               <p className="accent-text t-answer text-balance font-display font-semibold uppercase">
                 {answer}
               </p>
@@ -169,9 +169,7 @@ export function ClueStage({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="font-display text-[clamp(0.9rem,1.4vw,1.6rem)] uppercase tracking-[0.25em] text-rose-400"
-          >
-            Steal is open
-          </motion.p>
+          >{t(t(t(t("Steal is open"))))}</motion.p>
         )}
       </div>
 
@@ -230,7 +228,7 @@ export function ClueStage({
             onClick={() => setRevealed((v) => !v)}
             className="btn-ghost text-[clamp(0.95rem,1.4vw,1.7rem)] sm:text-base"
           >
-            {revealed ? "Hide answer" : "Reveal answer"}
+            {revealed ? t(t(t("Hide answer"))) : t(t("Reveal answer"))}
           </button>
 
           <p className="hidden font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.18em] text-moon-dim/70 lg:block">
@@ -242,9 +240,7 @@ export function ClueStage({
             type="button"
             onClick={onSkip}
             className="btn-ghost text-[clamp(0.95rem,1.4vw,1.7rem)] sm:text-base"
-          >
-            No one — next
-          </button>
+          >{t(t(t(t("No one — next"))))}</button>
         </div>
       </div>
     </div>

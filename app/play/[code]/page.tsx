@@ -21,6 +21,7 @@ import type { ViewerExtras } from "@/lib/room/redact";
 import { AVATARS } from "@/lib/room/types";
 import { useAccentFamily } from "@/components/useAccentFamily";
 import { useRoom } from "@/lib/room/useRoom";
+import { useT } from "@/components/LangProvider";
 
 /** Survives a refresh or a phone locking itself, so you keep your score. */
 const idKey = (code: string) => `bignight:player:${code}`;
@@ -30,6 +31,7 @@ export default function PlayPage({
 }: {
   params: Promise<{ code: string }>;
 }) {
+  const t = useT();
   const { code } = use(params);
   const roomCode = code.toUpperCase();
   const [playerId, setPlayerId] = useState<string | null>(null);
@@ -83,9 +85,7 @@ export default function PlayPage({
         <h1 className="font-display text-2xl uppercase text-moon/90">
           No room called {roomCode}
         </h1>
-        <p className="text-moon-dim">
-          Check the code on the TV — it might have been restarted.
-        </p>
+        <p className="text-moon-dim">{t(t(t("Check the code on the TV — it might have been restarted.")))}</p>
       </Centered>
     );
   }
@@ -93,9 +93,7 @@ export default function PlayPage({
   if (!room) {
     return (
       <Centered>
-        <p className="font-display uppercase tracking-[0.25em] text-moon-deep">
-          Connecting…
-        </p>
+        <p className="font-display uppercase tracking-[0.25em] text-moon-deep">{t(t(t("Connecting…")))}</p>
       </Centered>
     );
   }
@@ -106,9 +104,7 @@ export default function PlayPage({
     return (
       <div className="flex min-h-dvh flex-col justify-center gap-6 p-6">
         <div className="text-center">
-          <p className="font-display text-xs uppercase tracking-[0.3em] text-moon-deep">
-            Room
-          </p>
+          <p className="font-display text-xs uppercase tracking-[0.3em] text-moon-deep">{t(t(t("Room")))}</p>
           <p className="accent-text font-display text-6xl font-bold tracking-[0.1em]">
             {roomCode}
           </p>
@@ -117,7 +113,7 @@ export default function PlayPage({
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && join()}
-          placeholder="Your name"
+          placeholder={t(t(t(t("Your name"))))}
           maxLength={14}
           autoFocus
           className="field text-center text-2xl"
@@ -130,9 +126,7 @@ export default function PlayPage({
           * not random, so it's the same every time you look.
           */}
         <div>
-          <p className="t-label mb-2 text-center font-display uppercase text-moon-deep">
-            Pick your emoji
-          </p>
+          <p className="t-label mb-2 text-center font-display uppercase text-moon-deep">{t(t(t("Pick your emoji")))}</p>
           <div className="grid grid-cols-8 gap-2">
             {AVATARS.map((a) => {
               const taken = room.players.some((p) => p.emoji === a && p.connected);
@@ -143,7 +137,7 @@ export default function PlayPage({
                   type="button"
                   disabled={taken}
                   onClick={() => setEmoji(a)}
-                  aria-label={taken ? `${a} taken` : a}
+                  aria-label={taken ? `${a} {t(t("taken"))}` : a}
                   aria-pressed={chosen}
                   className={[
                     "flex aspect-square items-center justify-center rounded-xl border text-2xl transition-transform",
@@ -166,7 +160,7 @@ export default function PlayPage({
           disabled={!name.trim()}
           className="btn-accent w-full py-6 text-2xl"
         >
-          Join as {emoji || firstFree}
+          {t(t("Join as {emoji}"), { emoji: emoji || firstFree })}
         </button>
       </div>
     );
@@ -333,7 +327,7 @@ export default function PlayPage({
       <h1 className="font-display text-3xl uppercase tracking-wide text-moon">
         {me.name}
       </h1>
-      <p className="text-moon-dim">You&apos;re in. Watch the TV.</p>
+      <p className="text-moon-dim">{t(t(t("You're in. Watch the TV.")))}</p>
       <p className="font-display text-sm uppercase tracking-widest text-accent">
         {me.score.toLocaleString()} points
       </p>
@@ -343,13 +337,12 @@ export default function PlayPage({
 
 /** Always reachable, never in the way of a buzzer. */
 function LeaveButton({ onLeave }: { onLeave: () => void }) {
+  const t = useT();
   return (
     <button
       onClick={onLeave}
       className="fixed right-3 top-3 z-50 rounded-full border border-line/10 bg-midnight/70 px-3 py-1.5 font-display text-[0.65rem] uppercase tracking-widest text-moon-deep opacity-50 transition-opacity hover:opacity-100"
-    >
-      Leave
-    </button>
+    >{t(t(t(t("Leave"))))}</button>
   );
 }
 

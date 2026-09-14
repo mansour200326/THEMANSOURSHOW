@@ -3,7 +3,8 @@ import { Cairo, Inter, Oswald } from "next/font/google";
 import { ConnectionBar } from "@/components/ConnectionBar";
 import { SoundControl } from "@/components/SoundControl";
 import { THEME_BOOT, ThemeToggle } from "@/components/ThemeToggle";
-import { LANG_BOOT } from "@/lib/lang";
+import { LangProvider } from "@/components/LangProvider";
+import { currentLang } from "@/lib/i18n/server";
 import "./globals.css";
 
 const display = Oswald({
@@ -56,13 +57,14 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const lang = await currentLang();
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${arabic.variable}`} suppressHydrationWarning>
+    <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"} className={`${display.variable} ${body.variable} ${arabic.variable}`} suppressHydrationWarning>
       <head>
         {/*
           * Applies a stored light-mode choice before anything paints. React
@@ -70,11 +72,12 @@ export default function RootLayout({
           * has already been on screen for a frame.
           */}
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
-        <script dangerouslySetInnerHTML={{ __html: LANG_BOOT }} />
       </head>
       <body>
+        <LangProvider lang={lang}>
         {children}
         <ConnectionBar />
+        </LangProvider>
         {/*
           * The bottom-left corner: sound and lights, side by side. Hidden
           * while the lobby is up, because the lobby puts labelled ones in

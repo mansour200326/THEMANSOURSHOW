@@ -15,6 +15,7 @@ import { clockLeft } from "@/lib/games/leadIn";
 import { CountIn } from "@/components/CountIn";
 import { useRoundCard } from "@/components/RoundCard";
 import { WinnerMoment } from "@/components/WinnerMoment";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   /** Host putting a score right by hand. */
@@ -36,6 +37,7 @@ const TITLES: Record<LiveState["variant"], string> = {
 };
 
 export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Props) {
+  const t = useT();
   const item = liveCurrent(state);
   const players = connectedPlayers(room);
   const byId = (id: string) => players.find((p) => p.id === id);
@@ -111,12 +113,12 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
     return (
       <main className="flex min-h-dvh lg:h-dvh flex-col items-center justify-center gap-[3vmin] p-[3vmin] text-center pb-16 lg:pb-[1.6vmin]">
         <p className="t-label font-display uppercase text-moon-dim">
-          {TITLES[state.variant]} — that&apos;s the lot
+          {t(TITLES[state.variant])} — {t(t(t("that's the lot")))}
         </p>
         <WinnerMoment>
           {state.variant === "standing" && survivors.length === 1
             ? survivors[0].name
-            : (standings[0]?.name ?? "Nobody")}
+            : (standings[0]?.name ?? t(t(t("Nobody"))))}
         </WinnerMoment>
         <div className="flex flex-wrap justify-center gap-3">
           {standings.map((p) => (
@@ -128,9 +130,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
             </span>
           ))}
         </div>
-        <button onClick={onQuit} className="btn-brand mt-4 px-10 py-4 text-lg">
-          Back to the lobby
-        </button>
+        <button onClick={onQuit} className="btn-brand mt-4 px-10 py-4 text-lg">{t(t(t("Back to the lobby")))}</button>
       </main>
     );
   }
@@ -141,13 +141,11 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
       {(state.phase === "collect" || state.phase === "brief") && <CountIn startedAt={state.startedAt} />}
       <header className="flex shrink-0 items-center justify-between px-2">
         <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.2em] text-moon-dim">
-          {TITLES[state.variant]} · Round {state.round + 1}/{state.items.length}
+          {t(TITLES[state.variant])} · {t(t(t("Round {n} of {total}")), { n: state.round + 1, total: state.items.length })}
         </span>
         <div className="flex gap-2">
           {state.phase !== "reveal" && (
-            <button onClick={onForce} className="btn-ghost px-3 py-1.5 text-[clamp(0.8rem,1.15vw,1.35rem)]">
-              Stop waiting
-            </button>
+            <button onClick={onForce} className="btn-ghost px-3 py-1.5 text-[clamp(0.8rem,1.15vw,1.35rem)]">{t(t(t("Stop waiting")))}</button>
           )}
         </div>
       </header>
@@ -274,7 +272,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
               {state.phase === "brief"
                 ? `${lead?.name ?? "Someone"} is thinking of a clue…`
                 : state.clue
-                  ? `“${state.clue}” — ${lead?.name}`
+                  ? t(t(t("“{clue}” — {name}")), { clue: state.clue ?? "", name: lead?.name ?? "" })
                   : ""}
             </p>
           </div>
@@ -320,9 +318,7 @@ export function LiveHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pro
             animate={{ opacity: 1, y: 0 }}
             className="flex shrink-0 items-center justify-center gap-6"
           >
-            <button onClick={onNext} className="btn-accent px-12 py-4 text-xl">
-              Next round
-            </button>
+            <button onClick={onNext} className="btn-accent px-12 py-4 text-xl">{t(t(t("Next round")))}</button>
           </motion.div>
         )}
       </AnimatePresence>

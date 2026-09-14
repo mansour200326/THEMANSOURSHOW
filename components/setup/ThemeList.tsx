@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { Difficulty } from "@/lib/difficulty";
 import { suggestionsFor } from "@/lib/games/themeSuggestions";
 import { useLang } from "@/components/LangToggle";
+import { useT } from "@/components/LangProvider";
 
 export const MIN_THEMES = 1;
 export const MAX_THEMES = 6;
@@ -44,6 +45,7 @@ export function ThemeList({
   noun = "theme",
   gameId,
 }: Props) {
+  const t = useT();
   const lang = useLang();
   const SUGGESTIONS = suggestionsFor(gameId, lang);
   const [busy, setBusy] = useState(false);
@@ -95,7 +97,7 @@ export function ThemeList({
             disabled={busy}
             className="btn-ghost px-3 py-1.5 text-xs"
           >
-            {busy ? "Thinking…" : "✦ Suggest for me"}
+            {busy ? t(t(t("Thinking…"))) : t(t("✦ Suggest for me"))}
           </button>
           <span className="font-display text-xs tabular-nums text-moon-deep">
             {filled.length}/{themes.length}
@@ -122,7 +124,7 @@ export function ThemeList({
               onClick={() => onChange(themes.filter((_, j) => j !== i))}
               disabled={themes.length <= min}
               className="btn-ghost h-10 w-10 shrink-0 px-0 py-0 text-lg"
-              aria-label={`Remove ${noun} ${i + 1}`}
+              aria-label={t(t(t("Remove {noun} {n}")), { noun: t(noun), n: i + 1 })}
             >
               ×
             </button>
@@ -145,9 +147,7 @@ export function ThemeList({
       )}
 
       <div className="mt-5">
-        <p className="t-label font-display uppercase text-moon-deep/70">
-          Or tap one
-        </p>
+        <p className="t-label font-display uppercase text-moon-deep/70">{t(t(t("Or tap one")))}</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {SUGGESTIONS.map((topic) => {
             const used = filled.some(

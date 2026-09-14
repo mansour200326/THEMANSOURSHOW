@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useT } from "@/components/LangProvider";
 
 /**
  * Lights on, lights off.
@@ -26,6 +27,7 @@ export function ThemeToggle({
   /** A real button with a label, for the one place it should be noticed. */
   prominent?: boolean;
 }) {
+  const t = useT();
   const [theme, setTheme] = useState<Theme>("dark");
   useEffect(() => {
     const current = document.documentElement.dataset.theme;
@@ -48,10 +50,10 @@ export function ThemeToggle({
       <button
         type="button"
         onClick={flip}
-        aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        aria-label={theme === "dark" ? t("Switch to light mode") : t("Switch to dark mode")}
         className={`btn-ghost opacity-100 ${className || "px-4 py-2.5 text-sm"}`}
       >
-        {theme === "dark" ? "☀️ Light mode" : "🌙 Dark mode"}
+        {theme === "dark" ? t("☀️ Light mode") : t("🌙 Dark mode")}
       </button>
     );
   }
@@ -60,8 +62,8 @@ export function ThemeToggle({
     <button
       type="button"
       onClick={flip}
-      aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-      title={theme === "dark" ? "Lights on" : "Lights off"}
+      aria-label={theme === "dark" ? t("Switch to light mode") : t("Switch to dark mode")}
+      title={theme === "dark" ? t("Lights on") : t("Lights off")}
       className={[
         "flex h-11 w-11 items-center justify-center rounded-full border border-line/10 bg-midnight/70 text-lg",
         "opacity-35 transition-all duration-200 hover:border-accent/50 hover:opacity-100",

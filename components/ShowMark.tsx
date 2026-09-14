@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+import { useT } from "@/components/LangProvider";
 
 const WORDS = ["Big", "Night"];
 const LETTERS = WORDS.join("").length;
@@ -48,22 +49,19 @@ const entry = (i: number) => ({
  * party starting, not a screensaver.
  */
 export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
+  const t = useT();
   const still = useReducedMotion();
 
   if (size === "sm") {
     return (
-      <span className="brand-text whitespace-nowrap font-display text-base uppercase tracking-[0.2em] sm:text-lg sm:tracking-[0.24em]">
-        Big Night
-      </span>
+      <span className="brand-text whitespace-nowrap font-display text-base uppercase tracking-[0.2em] sm:text-lg sm:tracking-[0.24em]">{t(t(t("Big Night")))}</span>
     );
   }
 
   if (still) {
     return (
       <div className="flex flex-col items-center font-display uppercase">
-        <h1 className="brand-text t-hero tracking-[0.08em] drop-shadow-[0_0_50px_rgba(255,107,87,0.35)]">
-          Big Night
-        </h1>
+        <h1 className="brand-text t-hero tracking-[0.08em] drop-shadow-[0_0_50px_rgba(255,107,87,0.35)]">{t(t(t("Big Night")))}</h1>
         <Rule />
       </div>
     );
@@ -193,14 +191,13 @@ export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
 
 /** The strapline and its two rules, snapping outward on the recoil. */
 function Rule({ animated }: { animated?: boolean }) {
+  const t = useT();
   const line = "h-px flex-1 bg-gradient-to-r from-transparent to-accent/50";
   if (!animated) {
     return (
       <div className="mt-2 flex w-full items-center gap-4">
         <span className={line} />
-        <span className="t-label whitespace-nowrap text-moon-dim">
-          Games for the room
-        </span>
+        <span className="t-label whitespace-nowrap text-moon-dim">{t(t(t("Games for the room")))}</span>
         <span className={`${line} rotate-180`} />
       </div>
     );
@@ -218,9 +215,7 @@ function Rule({ animated }: { animated?: boolean }) {
         initial={{ opacity: 0, letterSpacing: "0.8em" }}
         animate={{ opacity: 1, letterSpacing: "0.22em" }}
         transition={{ duration: 0.6, delay: IMPACT + 0.08, ease: [0.2, 1, 0.3, 1] }}
-      >
-        Games for the room
-      </motion.span>
+      >{t(t(t(t("Games for the room"))))}</motion.span>
       <motion.span
         className={`${line} origin-left rotate-180`}
         initial={{ scaleX: 0 }}

@@ -10,6 +10,7 @@ import { ThemeList, usableThemes } from "@/components/setup/ThemeList";
 import type { Difficulty } from "@/lib/difficulty";
 import { type Rules, defaultRules } from "@/lib/bigboard/types";
 import { backHref } from "@/lib/backHref";
+import { useLang, useT } from "@/components/LangProvider";
 
 const MIN_CATEGORIES = 3;
 const MAX_CATEGORIES = 6;
@@ -92,6 +93,8 @@ export function SetupScreen({
   generating,
   error,
 }: Props) {
+  const t = useT();
+  const lang = useLang();
   const [names, setNames] = useState<string[]>(startingTeams);
   const [categories, setCategories] = useState<string[]>(["", "", ""]);
   const [vibe, setVibe] = useState("");
@@ -122,18 +125,12 @@ export function SetupScreen({
         <Link
           href={backHref()}
           className="font-display text-xs uppercase tracking-[0.2em] text-moon-deep hover:text-moon/75"
-        >
-          ← Back
-        </Link>
+        >{t(t(t(t("← Back"))))}</Link>
       </header>
 
       <div className="mt-10">
-        <p className="t-label font-display uppercase text-moon-deep">
-          Big Night presents
-        </p>
-        <h1 className="accent-text mt-1 font-display text-5xl font-bold uppercase tracking-tight sm:text-7xl">
-          Big Board
-        </h1>
+        <p className="t-label font-display uppercase text-moon-deep">{t(t(t("Big Night presents")))}</p>
+        <h1 className="accent-text mt-1 font-display text-5xl font-bold uppercase tracking-tight sm:text-7xl">{t(t(t("Big Board")))}</h1>
       </div>
 
       {canResume && (
@@ -142,12 +139,8 @@ export function SetupScreen({
           animate={{ opacity: 1, y: 0 }}
           className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-accent/40 bg-accent/[0.08] px-5 py-4"
         >
-          <p className="text-moon/90">
-            There&apos;s a game in progress on this screen.
-          </p>
-          <button onClick={onResume} className="btn-brand">
-            Resume game
-          </button>
+          <p className="text-moon/90">{t(t(t("There's a game in progress on this screen.")))}</p>
+          <button onClick={onResume} className="btn-brand">{t(t(t("Resume game")))}</button>
         </motion.div>
       )}
 
@@ -156,25 +149,23 @@ export function SetupScreen({
         <section className="space-y-8">
           <ThemeList
           gameId={"big-board"}
-            title="Categories"
-            hint="You pick the topics — anything from Game of Thrones to roasting your friends. We write five clues for each."
+            title={t(t(t(t("Categories"))))}
+            hint={t(t(t(t("You pick the topics — anything from Game of Thrones to roasting your friends. We write five clues for each."))))}
             themes={categories}
             onChange={setCategories}
             difficulty={difficulty}
             vibe={vibe}
             min={MIN_CATEGORIES}
             max={MAX_CATEGORIES}
-            noun="category"
+            noun={t(t(t(t("category"))))}
           />
 
           <div>
-            <label className="t-label block font-display uppercase text-moon-deep/70">
-              Extra instructions (optional)
-            </label>
+            <label className="t-label block font-display uppercase text-moon-deep/70">{t(t(t("Extra instructions (optional)")))}</label>
             <input
               value={vibe}
               onChange={(e) => setVibe(e.target.value)}
-              placeholder="make it hard · keep it light · no spoilers past season 4"
+              placeholder={t(t(t(t("make it hard · keep it light · no spoilers past season 4"))))}
               maxLength={200}
               className="field mt-2"
             />
@@ -185,48 +176,44 @@ export function SetupScreen({
 
         {/* Rules */}
         <section>
-          <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
-            Difficulty
-          </h2>
+          <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">{t(t(t("Difficulty")))}</h2>
           <div className="mt-3">
             <DifficultyBar value={difficulty} onChange={setDifficulty} />
           </div>
 
-          <h2 className="mt-8 font-display text-xl uppercase tracking-widest text-moon/75">
-            House rules
-          </h2>
+          <h2 className="mt-8 font-display text-xl uppercase tracking-widest text-moon/75">{t(t(t("House rules")))}</h2>
           <div className="mt-4 space-y-3">
             <Toggle
-              label="Steals"
-              hint="A wrong answer opens the clue to the other teams."
+              label={t(t(t(t("Steals"))))}
+              hint={t(t(t(t("A wrong answer opens the clue to the other teams."))))}
               checked={rules.steal}
               onChange={(v) => setRule("steal", v)}
             />
             <Toggle
-              label="Deduct on wrong"
-              hint="Wrong answers cost the clue's value. Off means no penalty."
+              label={t(t(t(t("Deduct on wrong"))))}
+              hint={t(t(t(t("Wrong answers cost the clue's value. Off means no penalty."))))}
               checked={rules.deduct}
               onChange={(v) => setRule("deduct", v)}
             />
             <Toggle
-              label="Double downs"
-              hint="Two hidden tiles. The team wagers before seeing the clue."
+              label={t(t(t(t("Double downs"))))}
+              hint={t(t(t(t("Two hidden tiles. The team wagers before seeing the clue."))))}
               checked={rules.dailyDoubles}
               onChange={(v) => setRule("dailyDoubles", v)}
             />
             <Toggle
-              label="Final Round"
-              hint="One last clue after the board clears. Everyone wagers and writes."
+              label={t(t(t(t("Final Round"))))}
+              hint={t(t(t(t("One last clue after the board clears. Everyone wagers and writes."))))}
               checked={rules.finalRound}
               onChange={(v) => setRule("finalRound", v)}
             />
             <div>
               <Toggle
-                label="Clue timer"
+                label={t(t(t(t("Clue timer"))))}
                 hint={
                   rules.timer
                     ? `${rules.timerSeconds}s countdown on every clue.`
-                    : "Give every clue a countdown."
+                    : t("Give every clue a countdown.")
                 }
                 checked={rules.timer}
                 onChange={(v) => setRule("timer", v)}
@@ -263,8 +250,8 @@ export function SetupScreen({
               </div>
             </div>
             <Toggle
-              label="Winner picks next"
-              hint="Whoever got it right picks. Off means the turn just rotates."
+              label={t(t(t(t("Winner picks next"))))}
+              hint={t(t(t(t("Whoever got it right picks. Off means the turn just rotates."))))}
               checked={rules.turnMode === "winner-picks"}
               onChange={(v) => setRule("turnMode", v ? "winner-picks" : "rotate")}
             />
@@ -292,7 +279,7 @@ export function SetupScreen({
           disabled={!canGenerate || generating}
           className="btn-brand px-16 py-5 text-2xl"
         >
-          {generating ? "Building the board…" : "Build my board"}
+          {generating ? t(t(t("Building the board…"))) : t(t("Build my board"))}
         </button>
         {!canGenerate && (
           <p className="text-sm text-moon-deep">
@@ -306,17 +293,14 @@ export function SetupScreen({
             onClick={() => start("mine")}
             disabled={generating}
             className="btn-accent px-6 py-2.5 text-sm"
-          >
-            ✎ Write my own board
-          </button>
-          <button
+          >{t(t(t(t("✎ Write my own board"))))}</button>
+          {/* The bundled packs are English; an Arabic room writes its own. */}
+{lang !== "ar" && (<button
             type="button"
             onClick={() => start("sample")}
             disabled={generating}
             className="btn-ghost text-sm"
-          >
-            Skip it — play the sample board
-          </button>
+          >{t(t(t(t("Skip it — play the sample board"))))}</button>)}
         </div>
       </div>
     </main>

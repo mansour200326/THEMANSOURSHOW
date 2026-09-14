@@ -1,3 +1,4 @@
+import { RULES_AR } from "@/lib/games/rulesAr";
 /**
  * How each game works, in the words you'd use to explain it to the room.
  *
@@ -225,4 +226,5 @@ export const RULES: Record<string, GameRules> = {
   },
 };
 
-export const rulesFor = (gameId: string): GameRules | undefined => RULES[gameId];
+export const rulesFor = (gameId: string, lang: "en" | "ar" = "en"): GameRules | undefined =>
+  lang === "ar" ? (RULES_AR[gameId] ?? RULES[gameId]) : RULES[gameId];

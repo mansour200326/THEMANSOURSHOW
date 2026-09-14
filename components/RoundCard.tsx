@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { play } from "@/lib/sound";
+import { useT } from "@/components/LangProvider";
 
 /**
  * "Round 3 of 8", full screen, for a second and a bit.
@@ -18,6 +19,7 @@ import { play } from "@/lib/sound";
  * covers the screen for longer than its timeline says.
  */
 export function useRoundCard(round: number, total: number, enabled = true) {
+  const t = useT();
   const [shown, setShown] = useState<number | null>(null);
   const seen = useRef<number | null>(null);
 
@@ -37,15 +39,11 @@ export function useRoundCard(round: number, total: number, enabled = true) {
       className="animate-round-card pointer-events-none fixed inset-0 z-40 flex items-center justify-center bg-midnight/85 backdrop-blur-sm"
     >
       <div className="text-center">
-        <p className="font-display text-[clamp(1rem,2.4vw,2.4rem)] uppercase tracking-[0.4em] text-moon-deep">
-          Round
-        </p>
+        <p className="font-display text-[clamp(1rem,2.4vw,2.4rem)] uppercase tracking-[0.4em] text-moon-deep">{t(t(t("Round")))}</p>
         <p className="accent-text font-display text-[clamp(4rem,18vmin,14rem)] font-bold leading-none">
           {shown + 1}
         </p>
-        <p className="font-display text-[clamp(1rem,2.2vw,2.2rem)] uppercase tracking-[0.3em] text-moon-dim">
-          of {total}
-        </p>
+        <p className="font-display text-[clamp(1rem,2.2vw,2.2rem)] uppercase tracking-[0.3em] text-moon-dim">{t(t(t("of {total}")), { total })}</p>
       </div>
     </div>
   );

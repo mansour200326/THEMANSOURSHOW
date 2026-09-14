@@ -6,6 +6,7 @@ import { standings, winners } from "@/lib/bigboard/engine";
 import { Tally } from "@/components/Tally";
 import type { Team } from "@/lib/bigboard/types";
 import { WinnerMoment } from "@/components/WinnerMoment";
+import { useT } from "@/components/LangProvider";
 
 const COLORS = ["#FF6B57", "#FF8D7C", "#DE4B37", "#F4F2EC", "#C6CADA"];
 
@@ -69,6 +70,7 @@ type Props = {
 };
 
 export function WinnerScreen({ teams, onRematch, onNewGame, rewrites = false }: Props) {
+  const t = useT();
   const table = standings(teams);
   const champs = winners(teams);
   const tie = champs.length > 1;
@@ -84,7 +86,7 @@ export function WinnerScreen({ teams, onRematch, onNewGame, rewrites = false }: 
         className="relative z-10 flex flex-col items-center"
       >
         <p className="t-label font-display uppercase text-moon-deep">
-          {tie ? "It's a tie" : "Champions"}
+          {tie ? t(t(t("It's a tie"))) : t(t("Champions"))}
         </p>
         <WinnerMoment>
           {champs.map((t) => t.name).join(" & ")}
@@ -130,11 +132,9 @@ export function WinnerScreen({ teams, onRematch, onNewGame, rewrites = false }: 
 
       <div className="relative z-10 mt-2 flex flex-wrap justify-center gap-3">
         <button onClick={onRematch} className="btn-brand px-8 py-4 text-lg">
-          {rewrites ? "Rematch · new questions" : "Rematch · same teams"}
+          {rewrites ? t(t(t("Rematch · new questions"))) : t(t("Rematch · same teams"))}
         </button>
-        <button onClick={onNewGame} className="btn-ghost px-8 py-4 text-lg">
-          New game
-        </button>
+        <button onClick={onNewGame} className="btn-ghost px-8 py-4 text-lg">{t(t(t("New game")))}</button>
       </div>
     </div>
   );

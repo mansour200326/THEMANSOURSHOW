@@ -1,6 +1,7 @@
 "use client";
 
 import type { NightEntry } from "@/lib/room/types";
+import { useT } from "@/components/LangProvider";
 
 /**
  * The whole night on one screen.
@@ -44,6 +45,7 @@ export function NightScreen({
   onBack: () => void;
   onClear: () => void;
 }) {
+  const t = useT();
   type Cell = { place: number; raw: number } | null;
   const names = new Map<string, Cell[]>();
   night.forEach((game, g) => {
@@ -69,37 +71,27 @@ export function NightScreen({
     <main className="flex min-h-dvh lg:h-dvh flex-col gap-[2vmin] p-[3vmin]">
       <header className="flex shrink-0 items-baseline justify-between">
         <div>
-          <p className="t-label font-display uppercase text-moon-deep">Tonight</p>
+          <p className="t-label font-display uppercase text-moon-deep">{t(t(t("Tonight")))}</p>
           <h1 className="brand-text font-display text-[clamp(2rem,5vw,4.5rem)] font-bold uppercase leading-none tracking-tight">
             {rows.length ? `${rows[0].name} wins the night` : "Nothing played yet"}
           </h1>
         </div>
         <div className="flex gap-2">
           {night.length > 0 && (
-            <button onClick={onClear} className="btn-ghost px-4 py-2 text-[clamp(0.95rem,1.4vw,1.7rem)]">
-              Start a new night
-            </button>
+            <button onClick={onClear} className="btn-ghost px-4 py-2 text-[clamp(0.95rem,1.4vw,1.7rem)]">{t(t(t("Start a new night")))}</button>
           )}
-          <button onClick={onBack} className="btn-accent px-6 py-2">
-            Back to the lobby
-          </button>
+          <button onClick={onBack} className="btn-accent px-6 py-2">{t(t(t("Back to the lobby")))}</button>
         </div>
       </header>
 
       {!night.length ? (
-        <p className="text-moon-dim">
-          Play a game through to the end and it lands here. The four
-          screen-only games count too, as long as they were opened from this
-          lobby.
-        </p>
+        <p className="text-moon-dim">{t(t(t("Play a game through to the end and it lands here. The four screen-only games count too, as long as they were opened from this lobby.")))}</p>
       ) : (
         <div className="min-h-0 flex-1 overflow-auto rounded-3xl border border-line/10 bg-line/[0.02]">
           <table className="w-full text-left">
             <thead className="sticky top-0 bg-dusk">
               <tr className="text-moon-deep">
-                <th className="px-5 py-3 font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-widest">
-                  Who
-                </th>
+                <th className="px-5 py-3 font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-widest">{t(t(t("Who")))}</th>
                 {night.map((g, i) => (
                   <th
                     key={i}
@@ -108,14 +100,10 @@ export function NightScreen({
                     {g.label}
                   </th>
                 ))}
-                <th className="px-5 py-3 text-right font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-widest text-accent">
-                  Night
-                </th>
+                <th className="px-5 py-3 text-right font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-widest text-accent">{t(t(t("Night")))}</th>
               </tr>
               <tr className="text-moon-deep/70">
-                <th className="px-5 pb-2 text-[0.65rem] font-normal normal-case tracking-normal">
-                  3 · 2 · 1 for first, second, third in each game. Small number is the score in that game.
-                </th>
+                <th className="px-5 pb-2 text-[0.65rem] font-normal normal-case tracking-normal">{t(t(t("3 · 2 · 1 for first, second, third in each game. Small number is the score in that game.")))}</th>
                 {night.map((_, i) => <th key={i} />)}
                 <th />
               </tr>
@@ -129,14 +117,14 @@ export function NightScreen({
                 */}
               {rows.map((row) => (
                 <tr
-                  key={row.name}
+                  key={t(row.name)}
                   className={[
                     "border-t border-line/8",
                     row.total === top && top > 0 ? "bg-accent/[0.07]" : "",
                   ].join(" ")}
                 >
                   <td className="px-5 py-3 font-display text-[clamp(1rem,2vw,1.8rem)] uppercase tracking-wide text-moon">
-                    {row.name}
+                    {t(row.name)}
                   </td>
                   {row.per.map((cell, j) => (
                     <td key={j} className="px-4 py-3 text-right">

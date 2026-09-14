@@ -6,6 +6,7 @@ import { DifficultyBar } from "@/components/DifficultyBar";
 import type { Difficulty } from "@/lib/difficulty";
 import { suggestionsFor } from "@/lib/games/themeSuggestions";
 import { useLang } from "@/components/LangToggle";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   gameName: string;
@@ -52,11 +53,12 @@ export function GameSetup({
   busy,
   error,
 }: Props) {
+  const t = useT();
+  const lang = useLang();
   const [categories, setCategories] = useState<string[]>(Array(SLOTS).fill(""));
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [suggesting, setSuggesting] = useState(false);
   // Topics chosen for this particular game — see lib/games/themeSuggestions.
-  const lang = useLang();
   const picks = suggestionsFor(gameId, lang);
   const [minutes, setMinutes] = useState(lengths?.[Math.floor(lengths.length / 2)]);
 
@@ -84,7 +86,7 @@ export function GameSetup({
   return (
     <main className="mx-auto flex min-min-h-dvh lg:h-dvh w-full max-w-3xl flex-col justify-center gap-6 px-6 py-10">
       <div className="text-center">
-        <p className="t-label font-display uppercase text-moon-deep">Setting up</p>
+        <p className="t-label font-display uppercase text-moon-deep">{t(t(t("Setting up")))}</p>
         <h1 className="accent-text font-display text-4xl font-bold uppercase tracking-tight sm:text-6xl">
           {gameName}
         </h1>
@@ -93,14 +95,14 @@ export function GameSetup({
       <div>
         <div className="flex items-baseline justify-between gap-4">
           <h2 className="font-display text-lg uppercase tracking-widest text-moon/75">
-            {needsBoard ? "Categories" : "Themes"}
+            {needsBoard ? t(t(t("Categories"))) : t(t("Themes"))}
           </h2>
           <button
             onClick={suggest}
             disabled={suggesting || busy}
             className="btn-ghost px-3 py-1.5 text-xs"
           >
-            {suggesting ? "Thinking…" : "✦ Generate for me"}
+            {suggesting ? t(t(t("Thinking…"))) : t(t("✦ Generate for me"))}
           </button>
         </div>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -120,7 +122,7 @@ export function GameSetup({
       </div>
 
       <div>
-        <p className="t-label font-display uppercase text-moon-deep">Or tap one</p>
+        <p className="t-label font-display uppercase text-moon-deep">{t(t(t("Or tap one")))}</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {picks.map((topic) => {
             const taken = categories.some(
@@ -153,17 +155,13 @@ export function GameSetup({
       </div>
 
       <div>
-        <h2 className="mb-3 font-display text-lg uppercase tracking-widest text-moon/75">
-          Difficulty
-        </h2>
+        <h2 className="mb-3 font-display text-lg uppercase tracking-widest text-moon/75">{t(t(t("Difficulty")))}</h2>
         <DifficultyBar value={difficulty} onChange={setDifficulty} />
       </div>
 
       {lengths && (
         <div>
-          <h2 className="mb-3 font-display text-lg uppercase tracking-widest text-moon/75">
-            How long
-          </h2>
+          <h2 className="mb-3 font-display text-lg uppercase tracking-widest text-moon/75">{t(t(t("How long")))}</h2>
           <div className="flex gap-2">
             {lengths.map((n) => (
               <button
@@ -202,32 +200,29 @@ export function GameSetup({
           {busy
             ? "Writing it…"
             : needsBoard
-              ? "Build the board"
-              : "Write it around these"}
+              ? t("Build the board")
+              : t(t(t("Write it around these")))}
         </button>
         {needsBoard && filled.length < 3 && (
-          <p className="text-sm text-moon-deep">Add at least 3 categories.</p>
+          <p className="text-sm text-moon-deep">{t(t(t("Add at least 3 categories.")))}</p>
         )}
         <div className="flex gap-3">
-          <button
+          {/* The bundled packs are English; an Arabic room writes its own. */}
+{lang !== "ar" && (<button
             onClick={() => onStart({ categories: [], difficulty, minutes })}
             disabled={busy}
             className="btn-ghost text-sm"
           >
-            {needsBoard ? "Skip — use the sample board" : "Skip — use the built-in pack"}
-          </button>
+            {needsBoard ? t(t(t("Skip — use the sample board"))) : t(t("Skip — use the built-in pack"))}
+          </button>)}
           {onWriteOwn && (
             <button
               onClick={onWriteOwn}
               disabled={busy}
               className="btn-ghost text-sm"
-            >
-              ✎ Write my own
-            </button>
+            >{t(t(t(t("✎ Write my own"))))}</button>
           )}
-          <button onClick={onCancel} disabled={busy} className="btn-ghost text-sm">
-            Back
-          </button>
+          <button onClick={onCancel} disabled={busy} className="btn-ghost text-sm">{t(t(t("Back")))}</button>
         </div>
       </div>
     </main>

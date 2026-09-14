@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ShowMark } from "@/components/ShowMark";
 import { ENTITLEMENTS, type Gate, GATE_COPY } from "@/lib/plan/limits";
+import { useT } from "@/components/LangProvider";
 
 /**
  * What a host sees when they reach the edge of the free tier.
@@ -20,6 +21,7 @@ export function UpgradeScreen({
   gate: Gate;
   signedIn: boolean;
 }) {
+  const t = useT();
   const copy = GATE_COPY[gate];
 
   return (
@@ -29,7 +31,7 @@ export function UpgradeScreen({
       </Link>
 
       <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}>
-        <p className="t-label font-display uppercase text-moon-deep">Still here</p>
+        <p className="t-label font-display uppercase text-moon-deep">{t(t(t("Still here")))}</p>
         <h1 className="brand-text mt-1 font-display text-[clamp(2rem,6vw,3.6rem)] font-bold uppercase leading-none tracking-tight">
           {copy.title}
         </h1>
@@ -66,13 +68,9 @@ export function UpgradeScreen({
             account gets switched over by hand.
           </p>
         ) : (
-          <Link href="/account/sign-in" className="btn-brand px-8 py-4 text-lg">
-            Sign in to upgrade
-          </Link>
+          <Link href="/account/sign-in" className="btn-brand px-8 py-4 text-lg">{t(t(t("Sign in to upgrade")))}</Link>
         )}
-        <Link href="/" className="btn-ghost px-6 py-4">
-          Keep playing free
-        </Link>
+        <Link href="/" className="btn-ghost px-6 py-4">{t(t(t("Keep playing free")))}</Link>
       </div>
     </main>
   );

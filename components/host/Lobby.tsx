@@ -14,6 +14,7 @@ import { JoinQr } from "@/components/host/JoinQr";
 import { SoundControl } from "@/components/SoundControl";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LangToggle } from "@/components/LangToggle";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   room: Room;
@@ -28,6 +29,7 @@ type Props = {
 
 /** Games that run on this screen alone — no room, no phones. */
 export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight, onLang }: Props) {
+  const t = useT();
   // The corner sound/lights pair steps aside while this header carries them.
   useEffect(() => {
     document.body.dataset.controls = "header";
@@ -57,9 +59,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight, 
         <div className="flex items-center gap-4 rounded-2xl border border-line/10 bg-line/[0.02] px-4 py-3 lg:gap-5 lg:px-6 lg:py-[1.4vmin]">
           <ShowMark size="sm" />
           <div className="border-l border-line/10 pl-5">
-            <p className="t-label font-display uppercase text-moon-deep">
-              Room code
-            </p>
+            <p className="t-label font-display uppercase text-moon-deep">{t(t(t("Room code")))}</p>
             <p className="accent-text font-display text-[clamp(1.75rem,4.2vw,4.5rem)] font-bold leading-none tracking-[0.1em]">
               {room.code}
             </p>
@@ -80,14 +80,12 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight, 
         <div className="flex min-w-0 flex-1 flex-col rounded-2xl border border-line/10 bg-line/[0.02] px-4 py-2.5 lg:px-5 lg:py-[1vmin]">
           <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2">
             <span className="t-label whitespace-nowrap font-display uppercase text-moon-deep">
-              In the room · {live.length}
+              {t(t(t("In the room")))} · {live.length}
             </span>
             {/* Six buttons never fit one phone-width row; they wrap and stay inside the box. */}
             <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
               {bots.length > 0 && (
-                <button onClick={onClearBots} className="btn-ghost px-3 py-1 text-xs">
-                  Clear bots
-                </button>
+                <button onClick={onClearBots} className="btn-ghost px-3 py-1 text-xs">{t(t(t("Clear bots")))}</button>
               )}
               <AccountLink className="px-3 py-1 text-xs" />
               {/* Labelled here: the faint corner pair is invisible on a TV across the room. */}
@@ -97,18 +95,16 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight, 
               <button
                 onClick={onNight}
                 className="btn-ghost px-3 py-1 text-xs"
-                title="Every game played tonight, added up"
+                title={t(t(t(t("Every game played tonight, added up"))))}
               >
-                Leaderboard{room.night?.length ? ` · ${room.night.length}` : ""}
+                {t(t(t("Leaderboard")))}{room.night?.length ? ` · ${room.night.length}` : ""}
               </button>
               <button
                 onClick={onAddBots}
                 disabled={bots.length >= 3}
                 className="btn-ghost px-3 py-1 text-xs"
-                title="Fills the room so you can try a game on your own"
-              >
-                + Practice bots
-              </button>
+                title={t(t(t(t("Fills the room so you can try a game on your own"))))}
+              >{t(t(t(t("+ Practice bots"))))}</button>
             </div>
           </div>
 
@@ -134,8 +130,8 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight, 
                   {/* Somebody who went home shouldn't hold the room up. */}
                   <button
                     onClick={() => onKick(p.id)}
-                    aria-label={`Remove ${p.name} from the room`}
-                    title={`Remove ${p.name}`}
+                    aria-label={t(t(t("Remove {name} from the room")), { name: p.name })}
+                    title={t(t(t("Remove {name}")), { name: p.name })}
                     className="ml-0.5 flex h-6 w-6 items-center justify-center rounded-full text-moon-deep transition-colors hover:bg-rose-500/20 hover:text-rose-300"
                   >
                     ×
@@ -144,10 +140,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight, 
               ))}
             </AnimatePresence>
             {live.length === 0 && (
-              <p className="self-center text-sm text-moon-deep">
-                Waiting for the first phone — the four screen-only games below
-                don&apos;t need one.
-              </p>
+              <p className="self-center text-sm text-moon-deep">{t(t(t("Waiting for the first phone — the four screen-only games below don't need one.")))}</p>
             )}
           </div>
         </div>
@@ -173,7 +166,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight, 
           >
             <Card
               name={game.name}
-              status={locked(game.id) ? "Pro" : "No phones needed"}
+              status={locked(game.id) ? t(t(t("Pro"))) : t(t("No phones needed"))}
               ready={!locked(game.id)}
             />
           </Link>
@@ -199,12 +192,12 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight, 
                 ready={ready}
                 status={
                   shut
-                    ? "Pro"
+                    ? t("Pro")
                     : ready
-                      ? "Ready"
-                      : `Needs ${game.minPlayers} ${
-                          game.minPlayers === 1 ? "phone" : "phones"
-                        }`
+                      ? t("Ready")
+                      : game.minPlayers === 1
+                        ? t(t(t("Needs 1 phone")))
+                        : t(t(t("Needs {n} phones")), { n: game.minPlayers })
                 }
               />
             </button>
@@ -224,6 +217,7 @@ function Card({
   status: string;
   ready: boolean;
 }) {
+  const t = useT();
   return (
     <div
       className={[
@@ -250,7 +244,7 @@ function Card({
             ready ? "text-accent" : "text-moon/45",
           ].join(" ")}
         >
-          {name}
+          {t(name)}
         </h3>
       </div>
 
@@ -268,7 +262,7 @@ function Card({
               : "mx-auto block w-full whitespace-nowrap rounded-full border border-amber-400/50 bg-amber-500/15 px-2.5 py-1 text-center text-[clamp(0.7rem,1.1vw,1.1rem)] text-amber-200 [html[data-theme=light]_&]:border-amber-600/60 [html[data-theme=light]_&]:bg-amber-500/25 [html[data-theme=light]_&]:text-amber-900",
         ].join(" ")}
       >
-        {!ready && status !== "Pro" ? `📱 ${status}` : status}
+        {!ready && status !== "Pro" ? `📱 ${status}` : t(status)}
       </span>
     </div>
   );

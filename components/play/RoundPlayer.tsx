@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import type { RoundState } from "@/lib/games/roundEngine";
 import { type Player, type Room, playerById } from "@/lib/room/types";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   room: Room;
@@ -14,6 +15,7 @@ type Props = {
 };
 
 export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
+  const t = useT();
   const [draft, setDraft] = useState("");
   const prompt = state.prompts[state.round];
   const mySubmission = state.submissions[me.id];
@@ -37,7 +39,7 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
     const ranked = [...room.players].sort((a, b) => b.score - a.score);
     const place = ranked.findIndex((p) => p.id === me.id) + 1;
     return (
-      <Shell title="Segment over">
+      <Shell title={t(t(t(t("Segment over"))))}>
         <p className="text-center font-display text-6xl text-accent">#{place}</p>
         <p className="text-center text-moon-dim">
           {me.score.toLocaleString()} points tonight
@@ -49,11 +51,11 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
   if (state.phase === "collect") {
     if (mySubmission !== undefined) {
       return (
-        <Shell title="Locked in">
+        <Shell title={t(t(t(t("Locked in"))))}>
           <p className="rounded-xl border border-accent/30 bg-accent/[0.07] px-5 py-4 text-center text-lg text-moon">
             {mySubmission}
           </p>
-          <p className="text-center text-moon-deep">Waiting for everyone else…</p>
+          <p className="text-center text-moon-deep">{t(t(t("Waiting for everyone else…")))}</p>
         </Shell>
       );
     }
@@ -67,10 +69,10 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
           autoFocus
           placeholder={
             room.gameId === "punchline"
-              ? "Type your punchline"
+              ? t("Type your punchline")
               : room.gameId === "caption-this"
-                ? "Type your caption"
-                : "Type your answer"
+                ? t("Type your caption")
+                : t("Type your answer")
           }
           className="field text-lg"
         />
@@ -78,9 +80,7 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
           onClick={() => draft.trim() && onSubmit(draft)}
           disabled={!draft.trim()}
           className="btn-accent w-full py-5 text-xl"
-        >
-          Send it
-        </button>
+        >{t(t(t(t("Send it"))))}</button>
       </Shell>
     );
   }
@@ -91,17 +91,17 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
     if (myVote !== undefined) {
       const chosen = state.options.find((o) => o.id === myVote);
       return (
-        <Shell title="Vote in">
+        <Shell title={t(t(t(t("Vote in"))))}>
           <p className="rounded-xl border border-accent/30 bg-accent/[0.07] px-5 py-4 text-center text-lg text-moon">
             {chosen?.label}
           </p>
-          <p className="text-center text-moon-deep">Waiting for everyone else…</p>
+          <p className="text-center text-moon-deep">{t(t(t("Waiting for everyone else…")))}</p>
         </Shell>
       );
     }
 
     return (
-      <Shell title={isGuessWho ? "Who wrote this?" : picksBest ? "Pick the best one" : prompt?.text ?? ""}>
+      <Shell title={isGuessWho ? t(t(t("Who wrote this?"))) : picksBest ? t(t(t("Pick the best one"))) : prompt?.text ?? ""}>
         {/* Pinned, so a long list of captions scrolls under the thing they're about. */}
         {picksBest && prompt?.image && (
           <div className="sticky top-0 z-10 -mx-5 bg-midnight/95 px-5 pb-3 backdrop-blur">
@@ -135,9 +135,7 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
               >
                 {option.label}
                 {mine && (
-                  <span className="mt-1 block font-display text-xs uppercase tracking-widest text-moon-deep/70">
-                    That&apos;s yours
-                  </span>
+                  <span className="mt-1 block font-display text-xs uppercase tracking-widest text-moon-deep/70">{t(t(t("That's yours")))}</span>
                 )}
               </button>
             );
@@ -150,7 +148,7 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
   /* reveal */
   const gained = state.lastScores[me.id] ?? 0;
   return (
-    <Shell title={gained ? "Nice" : "Nothing that round"}>
+    <Shell title={gained ? t(t(t("Nice"))) : t(t("Nothing that round"))}>
       <motion.p
         initial={{ scale: 0.7, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -161,7 +159,7 @@ export function RoundPlayer({ room, state, me, onSubmit, onVote }: Props) {
       >
         {gained ? `+${gained}` : "—"}
       </motion.p>
-      <p className="text-center text-moon-deep">Look at the TV.</p>
+      <p className="text-center text-moon-deep">{t(t(t("Look at the TV.")))}</p>
     </Shell>
   );
 }

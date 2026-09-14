@@ -11,6 +11,7 @@ import type { ActState } from "@/lib/games/actOut";
 import { clockLeft } from "@/lib/games/leadIn";
 import type { ViewerExtras } from "@/lib/room/redact";
 import { type Room, connectedPlayers, playerById } from "@/lib/room/types";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   room: Room;
@@ -27,6 +28,7 @@ type Props = {
  * time, the words already got, and who's up.
  */
 export function ActHost({ room, state, onStart, onTimeUp, onNext, onQuit }: Props) {
+  const t = useT();
   const actor = playerById(room, state.actorId ?? undefined);
   const [left, setLeft] = useState(state.seconds);
   const roundCard = useRoundCard(state.turn, state.turns, state.phase !== "done");
@@ -55,7 +57,7 @@ export function ActHost({ room, state, onStart, onTimeUp, onNext, onQuit }: Prop
     const ranked = [...connectedPlayers(room)].sort((a, b) => b.score - a.score);
     return (
       <main className="flex min-h-dvh lg:h-dvh flex-col items-center justify-center gap-[2vmin] p-[3vmin] text-center pb-16 lg:pb-[1.6vmin]">
-        <WinnerMoment>{ranked[0] ? `${ranked[0].emoji} ${ranked[0].name} wins` : "Nobody"}</WinnerMoment>
+        <WinnerMoment>{ranked[0] ? t(t(t("{name} wins")), { name: `${ranked[0].emoji} ${ranked[0].name}` }) : t(t(t("Nobody")))}</WinnerMoment>
         <div className="w-full max-w-3xl space-y-2">
           {ranked.map((p, i) => (
             <div
@@ -76,9 +78,7 @@ export function ActHost({ room, state, onStart, onTimeUp, onNext, onQuit }: Prop
             </div>
           ))}
         </div>
-        <button onClick={onQuit} className="btn-brand px-10 py-4 text-lg">
-          Back to the lobby
-        </button>
+        <button onClick={onQuit} className="btn-brand px-10 py-4 text-lg">{t(t(t("Back to the lobby")))}</button>
       </main>
     );
   }
@@ -89,10 +89,10 @@ export function ActHost({ room, state, onStart, onTimeUp, onNext, onQuit }: Prop
       {state.phase === "acting" && <CountIn startedAt={state.startedAt} />}
       <header className="flex w-full shrink-0 items-center justify-between">
         <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-dim">
-          Turn {state.turn + 1} of {state.turns}
+          {t(t(t("Turn {n} of {total}")), { n: state.turn + 1, total: state.turns })}
         </span>
         <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-dim">
-          {state.got.length} got
+          {t(t(t("{n} got")), { n: state.got.length })}
         </span>
       </header>
 
@@ -100,19 +100,14 @@ export function ActHost({ room, state, onStart, onTimeUp, onNext, onQuit }: Prop
         <p className="font-display text-[clamp(1.4rem,3.2vw,3.6rem)] uppercase tracking-wide text-moon">
           {actor?.emoji} {actor?.name}
           <span className="text-moon-dim">
-            {state.phase === "ready" ? " is up" : state.phase === "acting" ? " is acting" : " — time"}
+            {" "}{state.phase === "ready" ? t("is up") : state.phase === "acting" ? t("is acting") : t("— time")}
           </span>
         </p>
 
         {state.phase === "ready" && (
           <>
-            <p className="max-w-2xl text-balance text-[clamp(1rem,1.8vw,1.8rem)] text-moon-dim">
-              The word is on their phone. No talking, no pointing at things in the room.
-              Everyone else: shout.
-            </p>
-            <button onClick={onStart} className="btn-accent px-12 py-4 text-xl">
-              Start the clock
-            </button>
+            <p className="max-w-2xl text-balance text-[clamp(1rem,1.8vw,1.8rem)] text-moon-dim">{t(t(t("The word is on their phone. No talking, no pointing at things in the room. Everyone else: shout.")))}</p>
+            <button onClick={onStart} className="btn-accent px-12 py-4 text-xl">{t(t(t("Start the clock")))}</button>
           </>
         )}
 
@@ -161,7 +156,7 @@ export function ActHost({ room, state, onStart, onTimeUp, onNext, onQuit }: Prop
 
         {state.phase === "turnOver" && (
           <button onClick={onNext} className="btn-accent px-10 py-3 text-lg">
-            {state.turn + 1 >= state.turns ? "Final scores" : "Next up"}
+            {state.turn + 1 >= state.turns ? t(t(t("Final scores"))) : t(t("Next up"))}
           </button>
         )}
       </div>

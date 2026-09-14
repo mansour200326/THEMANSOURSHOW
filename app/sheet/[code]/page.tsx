@@ -2,6 +2,7 @@
 
 import { use, useState } from "react";
 import { useRoom } from "@/lib/room/useRoom";
+import { useT } from "@/components/LangProvider";
 
 /**
  * The host's phone, showing what the television must not.
@@ -21,6 +22,7 @@ export default function SheetPage({
 }: {
   params: Promise<{ code: string }>;
 }) {
+  const t = useT();
   const { code } = use(params);
   const [key, setKey] = useState(
     () =>
@@ -63,12 +65,13 @@ export default function SheetPage({
 }
 
 function Sheet({ code, hostKey }: { code: string; hostKey: string }) {
+  const t = useT();
   const { room, status } = useRoom(code, `host:${hostKey}`);
 
   if (status === "missing") {
     return <Centre>That room is gone.</Centre>;
   }
-  if (!room) return <Centre>Connecting…</Centre>;
+  if (!room) return <Centre>{t(t(t(t("Connecting…"))))}</Centre>;
 
   const sheet = room.hostSheet;
   if (!sheet) {

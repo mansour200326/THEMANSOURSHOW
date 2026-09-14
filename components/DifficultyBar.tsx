@@ -1,6 +1,7 @@
 "use client";
 
 import { type Difficulty, DIFFICULTIES, difficultyBlurb, difficultyLabel } from "@/lib/difficulty";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   value: Difficulty;
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export function DifficultyBar({ value, onChange, compact }: Props) {
+  const t = useT();
   return (
     <div>
       <div className="flex gap-2">
@@ -28,13 +30,13 @@ export function DifficultyBar({ value, onChange, compact }: Props) {
                   : "border-line/10 bg-line/[0.03] text-moon-dim hover:border-accent/40 hover:text-accent-bright",
               ].join(" ")}
             >
-              {difficultyLabel[level]}
+              {t(difficultyLabel[level])}
             </button>
           );
         })}
       </div>
       {!compact && (
-        <p className="mt-2 text-sm text-moon-deep">{difficultyBlurb[value]}</p>
+        <p className="mt-2 text-sm text-moon-deep">{t(difficultyBlurb[value])}</p>
       )}
     </div>
   );

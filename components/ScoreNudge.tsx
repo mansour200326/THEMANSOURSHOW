@@ -1,4 +1,5 @@
 "use client";
+import { useT } from "@/components/LangProvider";
 
 /**
  * A minus and a plus, either side of a score.
@@ -24,6 +25,7 @@ export function ScoreNudge({
   size?: "normal" | "small";
   children: React.ReactNode;
 }) {
+  const t = useT();
   const button =
     size === "small"
       ? "h-7 w-7 text-sm"
@@ -38,7 +40,7 @@ export function ScoreNudge({
           e.stopPropagation();
           onAdjust(-step);
         }}
-        aria-label={`Take ${step} away`}
+        aria-label={t(t(t("Take {step} away")), { step })}
         title={`−${step}`}
         className={`${button} shrink-0 rounded-full border border-rose-400/50 font-display leading-none text-rose-300 transition-colors hover:border-rose-400 hover:bg-rose-500/25 active:bg-rose-500/40`}
       >
@@ -53,7 +55,7 @@ export function ScoreNudge({
           e.stopPropagation();
           onAdjust(step);
         }}
-        aria-label={`Add ${step}`}
+        aria-label={t(t(t("Add {step}")), { step })}
         title={`+${step}`}
         className={`${button} shrink-0 rounded-full border border-emerald-400/50 font-display leading-none text-emerald-300 transition-colors hover:border-emerald-400 hover:bg-emerald-500/25 active:bg-emerald-500/40`}
       >

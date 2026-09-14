@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useT } from "@/components/LangProvider";
 
 export default function JoinPage() {
+  const t = useT();
   const router = useRouter();
   const [code, setCode] = useState("");
   const ready = code.trim().length === 4;
@@ -15,12 +17,8 @@ export default function JoinPage() {
   return (
     <main className="flex min-h-dvh flex-col justify-center gap-6 p-6">
       <div className="text-center">
-        <p className="font-display text-xs uppercase tracking-[0.3em] text-moon-deep">
-          Big Night
-        </p>
-        <h1 className="mt-2 font-display text-3xl uppercase tracking-wide text-moon">
-          Enter the room code
-        </h1>
+        <p className="font-display text-xs uppercase tracking-[0.3em] text-moon-deep">{t(t(t("Big Night")))}</p>
+        <h1 className="mt-2 font-display text-3xl uppercase tracking-wide text-moon">{t(t(t("Enter the room code")))}</h1>
       </div>
 
       <input
@@ -41,13 +39,9 @@ export default function JoinPage() {
         onClick={go}
         disabled={!ready}
         className="btn-brand w-full py-6 text-2xl"
-      >
-        Join
-      </button>
+      >{t(t(t(t("Join"))))}</button>
 
-      <p className="text-center text-sm text-moon-deep">
-        The code is on the TV.
-      </p>
+      <p className="text-center text-sm text-moon-deep">{t(t(t("The code is on the TV.")))}</p>
     </main>
   );
 }

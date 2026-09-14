@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { type Connection, watchConnection } from "@/lib/room/useRoom";
+import { useT } from "@/components/LangProvider";
 
 /**
  * Says out loud when the screen has stopped listening.
@@ -14,6 +15,7 @@ import { type Connection, watchConnection } from "@/lib/room/useRoom";
  * to reconnect underneath; this only makes the trying visible.
  */
 export function ConnectionBar() {
+  const t = useT();
   const [status, setStatus] = useState<Connection>("connecting");
   useEffect(() => watchConnection(setStatus), []);
 
@@ -25,9 +27,7 @@ export function ConnectionBar() {
           animate={{ y: 0 }}
           exit={{ y: -48 }}
           className="fixed inset-x-0 top-0 z-50 bg-rose-600/90 px-4 py-2 text-center font-display text-sm uppercase tracking-widest text-white shadow-lg"
-        >
-          Lost the room — reconnecting…
-        </motion.div>
+        >{t(t(t(t("Lost the room — reconnecting…"))))}</motion.div>
       )}
     </AnimatePresence>
   );

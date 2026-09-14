@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   teamName: string;
@@ -20,6 +21,7 @@ export function WagerStage({
   onSubmit,
   onCancel,
 }: Props) {
+  const t = useT();
   const [amount, setAmount] = useState(Math.min(500, maxWager));
 
   const clamp = (n: number) => Math.max(0, Math.min(Math.round(n), maxWager));
@@ -32,9 +34,7 @@ export function WagerStage({
         animate={{ scale: 1, opacity: 1, rotateX: 0 }}
         transition={{ type: "spring", stiffness: 220, damping: 18 }}
       >
-        <p className="accent-text t-hero font-display font-bold uppercase tracking-tight drop-shadow-[0_0_60px_rgb(var(--accent-rgb)/0.35)]">
-          Double Down
-        </p>
+        <p className="accent-text t-hero font-display font-bold uppercase tracking-tight drop-shadow-[0_0_60px_rgb(var(--accent-rgb)/0.35)]">{t(t(t("Double Down")))}</p>
       </motion.div>
 
       <motion.div
@@ -87,9 +87,7 @@ export function WagerStage({
               type="button"
               onClick={() => setAmount(clamp(maxWager))}
               className="btn-ghost px-4 py-2 text-[clamp(0.95rem,1.4vw,1.7rem)]"
-            >
-              All in
-            </button>
+            >{t(t(t(t("All in"))))}</button>
           </div>
 
           <p className="text-[clamp(0.95rem,1.4vw,1.7rem)] text-moon-dim">
@@ -98,16 +96,12 @@ export function WagerStage({
         </div>
 
         <div className="flex gap-3">
-          <button type="button" onClick={onCancel} className="btn-ghost">
-            Cancel
-          </button>
+          <button type="button" onClick={onCancel} className="btn-ghost">{t(t(t("Cancel")))}</button>
           <button
             type="button"
             onClick={() => onSubmit(amount)}
             className="btn-accent px-10 text-lg"
-          >
-            Lock it in
-          </button>
+          >{t(t(t(t("Lock it in"))))}</button>
         </div>
       </motion.div>
     </div>

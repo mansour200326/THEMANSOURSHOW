@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useT } from "@/components/LangProvider";
 
 /**
  * The thirty seconds a first-time host needs.
@@ -55,6 +56,7 @@ export function useFirstVisit(): [boolean, () => void] {
 }
 
 export function Onboarding({ onDone }: { onDone: () => void }) {
+  const t = useT();
   /*
    * Advances on a tap, not a timer. It used to roll through on its own,
    * which meant reading at the animation's pace rather than yours — and
@@ -73,7 +75,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         transition={{ type: "spring", stiffness: 300, damping: 26 }}
         className="w-full max-w-3xl rounded-3xl border border-line/12 bg-dusk p-6 shadow-tile sm:p-8"
       >
-        <p className="t-label font-display uppercase text-moon-deep">How it works</p>
+        <p className="t-label font-display uppercase text-moon-deep">{t(t(t("How it works")))}</p>
 
         <Scene beat={beat} />
 
@@ -87,9 +89,9 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
             >
               <h2 className="font-display text-2xl uppercase tracking-wide text-moon">
                 <span className="mr-3 text-accent">{beat + 1}</span>
-                {BEATS[beat].title}
+                {t(BEATS[beat].title)}
               </h2>
-              <p className="mt-1 text-moon-dim">{BEATS[beat].line}</p>
+              <p className="mt-1 text-moon-dim">{t(BEATS[beat].line)}</p>
             </motion.div>
           </AnimatePresence>
         </div>
@@ -100,7 +102,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
               <button
                 key={i}
                 onClick={() => setBeat(i)}
-                aria-label={`Step ${i + 1}`}
+                aria-label={t(t(t("Step {n}")), { n: i + 1 })}
                 className={[
                   "h-2 rounded-full transition-all",
                   i === beat ? "w-8 bg-accent" : "w-2 bg-line/20",
@@ -110,15 +112,13 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
           </div>
           <div className="flex items-center gap-2">
             {beat > 0 && (
-              <button onClick={() => setBeat(beat - 1)} className="btn-ghost px-5 py-3">
-                Back
-              </button>
+              <button onClick={() => setBeat(beat - 1)} className="btn-ghost px-5 py-3">{t(t(t("Back")))}</button>
             )}
             <button
               onClick={() => (last ? onDone() : setBeat(beat + 1))}
               className="btn-brand px-8 py-3"
             >
-              {last ? "Got it" : "Next"}
+              {last ? t(t(t("Got it"))) : t(t("Next"))}
             </button>
           </div>
         </div>

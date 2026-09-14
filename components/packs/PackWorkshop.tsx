@@ -23,6 +23,7 @@ import {
   type SurveyRound,
   emptyPackData,
 } from "@/lib/packs/types";
+import { useT } from "@/components/LangProvider";
 
 /**
  * Write your own content for a game, save it under a name, and play it.
@@ -43,6 +44,7 @@ export function PackWorkshop({
   onPlay: (kind: PackKind, data: PackData[PackKind]) => void;
   onBack: () => void;
 }) {
+  const t = useT();
   const kind = PACK_KIND[gameId] ?? "prompts";
   const noun = PACK_NOUN[kind];
   const min = PACK_MINIMUM[kind];
@@ -118,9 +120,7 @@ export function PackWorkshop({
             {gameName}
           </h1>
         </div>
-        <button onClick={onBack} className="btn-ghost px-5 py-2 text-sm">
-          ← Back
-        </button>
+        <button onClick={onBack} className="btn-ghost px-5 py-2 text-sm">{t("← Back")}</button>
       </div>
 
       {/* Anything written before */}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useT } from "@/components/LangProvider";
 
 /**
  * The room code, kept on screen for the whole night.
@@ -15,6 +16,7 @@ import { useState } from "react";
  * only thing anybody wants to see.
  */
 export function RoomCodeChip({ code }: { code: string }) {
+  const t = useT();
   const [big, setBig] = useState(false);
 
   if (big) {
@@ -23,15 +25,11 @@ export function RoomCodeChip({ code }: { code: string }) {
         onClick={() => setBig(false)}
         className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-[2vmin] bg-midnight/95 backdrop-blur"
       >
-        <span className="font-display text-[3vmin] uppercase tracking-[0.3em] text-moon-deep">
-          Join at bignight.games
-        </span>
+        <span className="font-display text-[3vmin] uppercase tracking-[0.3em] text-moon-deep">{t(t(t("Join at bignight.games")))}</span>
         <span className="brand-text font-display text-[22vmin] font-bold uppercase leading-none tracking-tight">
           {code}
         </span>
-        <span className="font-display text-[2vmin] uppercase tracking-[0.25em] text-moon-deep">
-          Tap anywhere to go back
-        </span>
+        <span className="font-display text-[2vmin] uppercase tracking-[0.25em] text-moon-deep">{t(t(t("Tap anywhere to go back")))}</span>
       </button>
     );
   }
@@ -39,7 +37,7 @@ export function RoomCodeChip({ code }: { code: string }) {
   return (
     <button
       onClick={() => setBig(true)}
-      title="Show the room code"
+      title={t(t(t(t("Show the room code"))))}
       // Clear of the sound control, which is pinned to the bottom-left corner
       // at a higher layer and was sitting directly on top of this.
       className="fixed bottom-3 left-[7.25rem] z-40 rounded-full border border-line/12 bg-midnight/70 px-4 py-1.5 font-display text-sm uppercase tracking-[0.25em] text-moon-deep backdrop-blur transition-colors hover:border-accent/50 hover:text-moon"

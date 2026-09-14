@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { isMuted, play, setMuted, unlockAudio } from "@/lib/sound";
+import { useT } from "@/components/LangProvider";
 
 /**
  * The sound control, on every screen.
@@ -24,6 +25,7 @@ export function SoundControl({
   prominent?: boolean;
   className?: string;
 } = {}) {
+  const t = useT();
   const [off, setOff] = useState(false);
   const [ready, setReady] = useState(false);
 
@@ -49,10 +51,10 @@ export function SoundControl({
       <button
         type="button"
         onClick={flip}
-        aria-label={off ? "Turn sound on" : "Turn sound off"}
+        aria-label={off ? t(t(t("Turn sound on"))) : t(t(t("Turn sound off")))}
         className={`btn-ghost opacity-100 ${off ? "border-rose-500/40 text-rose-200" : ""} ${className || "px-4 py-2.5 text-sm"}`}
       >
-        {off ? "🔇 Sound off" : "🔊 Sound on"}
+        {off ? t(t(t("🔇 Sound off"))) : t(t(t("🔊 Sound on")))}
       </button>
     );
   }
@@ -61,8 +63,8 @@ export function SoundControl({
     <button
       type="button"
       onClick={flip}
-      aria-label={off ? "Turn sound on" : "Turn sound off"}
-      title={off ? "Sound is off" : "Sound is on"}
+      aria-label={off ? t(t(t("Turn sound on"))) : t(t(t("Turn sound off")))}
+      title={off ? t(t(t("Sound is off"))) : t(t(t("Sound is on")))}
       className={[
         "flex h-11 w-11 items-center justify-center rounded-full",
         "border text-lg transition-all duration-200",

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ScoreNudge } from "@/components/ScoreNudge";
 import { Tally } from "@/components/Tally";
 import type { Team } from "@/lib/bigboard/types";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   teams: Team[];
@@ -22,6 +23,7 @@ export function ScoreBar({
   onAdjust,
   step = 100,
 }: Props) {
+  const t = useT();
   return (
     <div
       className="grid gap-[0.6vmin]"
@@ -43,9 +45,7 @@ export function ScoreBar({
             ].join(" ")}
           >
             {active && (
-              <span className="absolute -top-2 rounded-full bg-accent px-2.5 py-0.5 font-display text-[0.6rem] uppercase tracking-[0.2em] text-midnight-deep">
-                Up
-              </span>
+              <span className="absolute -top-2 rounded-full bg-accent px-2.5 py-0.5 font-display text-[0.6rem] uppercase tracking-[0.2em] text-midnight-deep">{t(t(t("Up")))}</span>
             )}
             <span
               className={[

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { type Stroke, strokeColour, strokeWidth } from "@/lib/games/sketch";
+import { useT } from "@/components/LangProvider";
 
 /**
  * Draws the strokes on a square canvas, in the 0-1000 grid space they're
@@ -27,6 +28,7 @@ export function SketchCanvas({
   onStroke?: (points: number[], colour: number, width: number) => void;
   onLift?: () => void;
 }) {
+  const t = useT();
   const canvas = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
   const pending = useRef<number[]>([]);

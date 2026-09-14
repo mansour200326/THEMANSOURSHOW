@@ -5,6 +5,7 @@ import { hasDatabase, query } from "@/lib/db";
 import { isAdmin } from "@/lib/plan/admin";
 import { setPlanByEmail } from "@/lib/plan/billing";
 import type { Plan } from "@/lib/plan/limits";
+import { useT } from "@/components/LangProvider";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,7 @@ type Row = {
 };
 
 export default async function AdminPage() {
+  const t = useT();
   const session = await auth();
 
   if (!isAdmin(session?.user?.email)) {

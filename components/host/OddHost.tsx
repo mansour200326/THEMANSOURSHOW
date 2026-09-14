@@ -12,6 +12,7 @@ import { clockLeft } from "@/lib/games/leadIn";
 import { CountIn } from "@/components/CountIn";
 import { useRoundCard } from "@/components/RoundCard";
 import { WinnerMoment } from "@/components/WinnerMoment";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   room: Room;
@@ -33,6 +34,7 @@ type Props = {
  * finds out what the odd answer was actually answering.
  */
 export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Props) {
+  const t = useT();
   const players = connectedPlayers(room);
   const pair = oddPair(state);
   const name = (id: string | null | undefined) =>
@@ -71,14 +73,12 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
     const ranked = [...players].sort((a, b) => b.score - a.score);
     return (
       <main className="flex min-h-dvh lg:h-dvh flex-col items-center justify-center gap-[3vmin] p-[4vmin] text-center pb-16 lg:pb-[1.6vmin]">
-        <p className="t-label font-display uppercase text-moon-dim">That&apos;s the game</p>
+        <p className="t-label font-display uppercase text-moon-dim">{t(t(t("That's the game")))}</p>
         <WinnerMoment>
-          {ranked[0]?.name ?? "Nobody"} wins
+          {ranked[0]?.name ?? t(t(t("Nobody")))} wins
         </WinnerMoment>
         <Standings room={room} onAdjust={onAdjust} />
-        <button onClick={onQuit} className="btn-brand px-10 py-4 text-lg">
-          Back to the lobby
-        </button>
+        <button onClick={onQuit} className="btn-brand px-10 py-4 text-lg">{t(t(t("Back to the lobby")))}</button>
       </main>
     );
   }
@@ -97,17 +97,13 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
         {/* ---- answering: no question on this screen, on purpose ---- */}
         {state.phase === "answer" && (
           <>
-            <p className="t-label font-display uppercase text-moon-dim">Look at your phone</p>
-            <h2 className="t-clue text-balance font-display uppercase tracking-wide text-moon">
-              Everyone has a question. One of you has a different one.
-            </h2>
-            <p className="max-w-3xl text-[clamp(1rem,1.8vw,1.8rem)] text-moon-dim">
-              Answer yours. Then work out who was answering something else.
-            </p>
+            <p className="t-label font-display uppercase text-moon-dim">{t(t(t("Look at your phone")))}</p>
+            <h2 className="t-clue text-balance font-display uppercase tracking-wide text-moon">{t(t(t("Everyone has a question. One of you has a different one.")))}</h2>
+            <p className="max-w-3xl text-[clamp(1rem,1.8vw,1.8rem)] text-moon-dim">{t(t(t("Answer yours. Then work out who was answering something else.")))}</p>
             <Clock left={left} seconds={state.seconds} />
             <p className="font-display text-[clamp(0.9rem,1.5vw,1.5rem)] uppercase tracking-[0.2em] text-moon-dim">
               {waiting.length
-                ? `Waiting on ${waiting.map((p) => p.name).join(", ")}`
+                ? t(t(t("Waiting on {names}")), { names: waiting.map((p) => p.name).join("، ") })
                 : "Everyone's in"}
             </p>
           </>
@@ -116,14 +112,12 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
         {/* ---- voting: the answers, with names, and still no question ---- */}
         {state.phase === "vote" && (
           <>
-            <h2 className="t-clue font-display uppercase tracking-wide text-moon">
-              Whose answer doesn&apos;t fit?
-            </h2>
+            <h2 className="t-clue font-display uppercase tracking-wide text-moon">{t(t(t("Whose answer doesn't fit?")))}</h2>
             <Answers state={state} room={room} />
             <p className="font-display text-[clamp(0.9rem,1.5vw,1.5rem)] uppercase tracking-[0.2em] text-moon-dim">
               {waiting.length
-                ? `Vote on your phone · waiting on ${waiting.map((p) => p.name).join(", ")}`
-                : "Counting…"}
+                ? t(t(t("Vote on your phone · waiting on {names}")), { names: waiting.map((p) => p.name).join("، ") })
+                : t(t(t("Counting…")))}
             </p>
           </>
         )}
@@ -140,11 +134,11 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
               ].join(" ")}
             >
               {state.caught
-                ? `Caught — it was ${emoji(state.oddId ?? "")} ${name(state.oddId)}`
-                : `${emoji(state.oddId ?? "")} ${name(state.oddId)} got away with it`}
+                ? t(t(t("Caught — it was {who}")), { who: `${emoji(state.oddId ?? "")} ${name(state.oddId)}` })
+                : t(t(t("{who} got away with it")), { who: `${emoji(state.oddId ?? "")} ${name(state.oddId)}` })}
             </motion.p>
             <div className="grid w-full max-w-5xl gap-[1.5vmin] sm:grid-cols-2">
-              <Question label="Everyone was asked" text={pair?.question ?? ""} />
+              <Question label={t(t(t(t("Everyone was asked"))))} text={pair?.question ?? ""} />
               <Question label={`${name(state.oddId)} was asked`} text={pair?.decoy ?? ""} odd />
             </div>
             <Answers state={state} room={room} revealOdd />
@@ -160,9 +154,7 @@ export function OddHost({ room, state, onForce, onNext, onQuit, onAdjust }: Prop
             </button>
           )}
           {state.phase === "reveal" && (
-            <button onClick={onNext} className="btn-accent px-10 py-3 text-lg">
-              Next round
-            </button>
+            <button onClick={onNext} className="btn-accent px-10 py-3 text-lg">{t(t(t("Next round")))}</button>
           )}
         </div>
         <Standings room={room} onAdjust={onAdjust} compact />

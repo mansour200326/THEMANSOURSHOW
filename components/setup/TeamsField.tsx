@@ -1,4 +1,5 @@
 "use client";
+import { useT } from "@/components/LangProvider";
 
 export const MIN_TEAMS = 2;
 export const MAX_TEAMS = 6;
@@ -31,15 +32,14 @@ type Props = {
  * two.
  */
 export function TeamsField({ names, onChange, max = MAX_TEAMS }: Props) {
+  const t = useT();
   const setName = (i: number, value: string) =>
     onChange(names.map((n, j) => (j === i ? value : n)));
 
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">
-          Teams
-        </h2>
+        <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">{t(t(t("Teams")))}</h2>
         <div className="flex items-center gap-2">
           <span className="font-display text-sm tabular-nums text-moon-deep">
             {names.length}
@@ -49,7 +49,7 @@ export function TeamsField({ names, onChange, max = MAX_TEAMS }: Props) {
             onClick={() => onChange(names.slice(0, -1))}
             disabled={names.length <= MIN_TEAMS}
             className="btn-ghost h-9 w-9 px-0 py-0 text-lg"
-            aria-label="Remove team"
+            aria-label={t(t(t(t("Remove team"))))}
           >
             −
           </button>
@@ -58,7 +58,7 @@ export function TeamsField({ names, onChange, max = MAX_TEAMS }: Props) {
             onClick={() => onChange([...names, nextTeamName(names.length)])}
             disabled={names.length >= max}
             className="btn-ghost h-9 w-9 px-0 py-0 text-lg"
-            aria-label="Add team"
+            aria-label={t(t(t(t("Add team"))))}
           >
             +
           </button>
@@ -74,7 +74,7 @@ export function TeamsField({ names, onChange, max = MAX_TEAMS }: Props) {
             <input
               value={name}
               onChange={(e) => setName(i, e.target.value)}
-              placeholder={`Team ${i + 1}`}
+              placeholder={t(t(t("Team {n}")), { n: i + 1 })}
               maxLength={24}
               className="field"
             />

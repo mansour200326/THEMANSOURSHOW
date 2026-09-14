@@ -23,10 +23,12 @@ import { backHref } from "@/lib/backHref";
 import { recordNight, setHostSheet } from "@/lib/night/report";
 import { ScoreNudge } from "@/components/ScoreNudge";
 import { WinnerMoment } from "@/components/WinnerMoment";
+import { useT } from "@/components/LangProvider";
 
 const KEY = "bignight:feud:v1";
 
 function FaceOffStage() {
+  const t = useT();
   const [state, dispatch] = useReducer(feudReducer, undefined, emptyFeud);
 
   /*
@@ -152,9 +154,9 @@ function FaceOffStage() {
   if (generating) {
     return (
       <Generating
-        title="Writing the survey"
-        items={generating.themes.length ? generating.themes : ["Face-Off"]}
-        note="A question and its top answers for every round, ranked the way a hundred people would have."
+        title={t(t(t(t("Writing the survey"))))}
+        items={generating.themes.length ? generating.themes : [t(t(t("Face-Off")))]}
+        note={t(t(t(t("A question and its top answers for every round, ranked the way a hundred people would have."))))}
         onCancel={() => {
           abort.current?.abort();
           setGenerating(null);
@@ -184,7 +186,7 @@ function FaceOffStage() {
       <HowToPlay
         gameId="face-off"
         name="Face-Off"
-        startLabel="Set it up"
+        startLabel={t(t(t(t("Set it up"))))}
         onStart={() => setExplained(true)}
         onBack={() => {
           window.location.href = backHref();
@@ -256,12 +258,8 @@ function FaceOffStage() {
             onClick={() => dispatch({ type: "UNDO" })}
             disabled={!state.past.length}
             className="btn-ghost px-3 py-1.5 text-xs"
-          >
-            Undo
-          </button>
-          <button onClick={quit} className="btn-ghost px-3 py-1.5 text-xs">
-            Quit
-          </button>
+          >{t(t(t(t("Undo"))))}</button>
+          <button onClick={quit} className="btn-ghost px-3 py-1.5 text-xs">{t(t(t("Quit")))}</button>
         </div>
       </header>
 
@@ -280,9 +278,7 @@ function FaceOffStage() {
                 <p className="t-label font-display uppercase text-moon-deep">
                   Round {state.round + 1}
                 </p>
-                <p className="t-clue max-w-[80vw] text-balance font-display uppercase tracking-wide text-moon">
-                  Who takes the board?
-                </p>
+                <p className="t-clue max-w-[80vw] text-balance font-display uppercase tracking-wide text-moon">{t(t(t("Who takes the board?")))}</p>
                 <div className="flex flex-wrap justify-center gap-4">
                   {state.teams.map((team, i) => (
                     <button
@@ -312,7 +308,7 @@ function FaceOffStage() {
             {state.phase === "winner" && (
               <div className="flex h-full flex-col items-center justify-center gap-[3vmin] text-center">
                 <p className="t-label font-display uppercase text-moon-deep">
-                  {feudWinners(state.teams).length > 1 ? "It's a tie" : "Champions"}
+                  {feudWinners(state.teams).length > 1 ? t(t(t("It's a tie"))) : t(t("Champions"))}
                 </p>
                 <WinnerMoment>
                   {feudWinners(state.teams)
@@ -339,9 +335,7 @@ function FaceOffStage() {
                     </div>
                   ))}
                 </div>
-                <button onClick={quit} className="btn-ghost px-8 py-4">
-                  New game
-                </button>
+                <button onClick={quit} className="btn-ghost px-8 py-4">{t(t(t("New game")))}</button>
               </div>
             )}
           </motion.div>

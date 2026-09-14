@@ -1,37 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { LANG_COOKIE, type Lang, isLang } from "@/lib/lang";
+import { useLang } from "@/components/LangProvider";
+import { LANG_COOKIE, type Lang } from "@/lib/lang";
 
-const EVENT = "bignight:lang";
-
-/** The language, live: follows the toggle wherever it's pressed. */
-export function useLang(): Lang {
-  const [lang, setLang] = useState<Lang>("en");
-  useEffect(() => {
-    const read = () => {
-      const l = document.documentElement.lang;
-      setLang(isLang(l) ? l : "en");
-    };
-    read();
-    window.addEventListener(EVENT, read);
-    return () => window.removeEventListener(EVENT, read);
-  }, []);
-  return lang;
-}
-
-export function applyLang(next: Lang) {
-  document.documentElement.lang = next;
-  document.cookie = `${LANG_COOKIE}=${next}; path=/; max-age=31536000; SameSite=Lax`;
-  window.dispatchEvent(new Event(EVENT));
-}
+export { useLang } from "@/components/LangProvider";
 
 /**
  * عربي / English.
  *
- * Arabic means Arabic content — the questions, the prompts, the suggested
- * categories. It's remembered in a cookie, which is what the writers read,
- * and a room started while it's on carries it to every phone.
+ * Arabic means the whole thing: the buttons, the rules, the questions, the
+ * suggested categories, right to left. The choice lives in a cookie the
+ * server reads, so the page reloads on a flip and every screen — server-
+ * rendered or not — comes back in the new language.
  */
 export function LangToggle({
   className = "",
@@ -40,21 +20,22 @@ export function LangToggle({
 }: {
   className?: string;
   prominent?: boolean;
-  /** For a lobby, so the room can be told too. */
+  /** Called before the reload, for a lobby that wants to tell the room. */
   onChange?: (lang: Lang) => void;
 }) {
   const lang = useLang();
   const flip = () => {
     const next: Lang = lang === "ar" ? "en" : "ar";
-    applyLang(next);
+    document.cookie = `${LANG_COOKIE}=${next}; path=/; max-age=31536000; SameSite=Lax`;
     onChange?.(next);
+    // Give a room update a moment to leave before the page goes.
+    window.setTimeout(() => window.location.reload(), onChange ? 250 : 0);
   };
   return (
     <button
       type="button"
       onClick={flip}
-      aria-label={lang === "ar" ? "Switch to English content" : "Switch to Arabic content"}
-      title={lang === "ar" ? "Questions in English" : "الأسئلة بالعربي"}
+      aria-label={lang === "ar" ? "Switch to English" : "التبديل إلى العربية"}
       className={
         prominent
           ? `btn-ghost opacity-100 ${className || "px-4 py-2.5 text-sm"}`

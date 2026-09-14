@@ -10,8 +10,10 @@ import { AccountLink } from "@/components/account/AccountLink";
 import { Onboarding, useFirstVisit } from "@/components/Onboarding";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LangToggle } from "@/components/LangToggle";
+import { useT } from "@/components/LangProvider";
 
 export default function Home() {
+  const t = useT();
   const router = useRouter();
   const [opening, setOpening] = useState(false);
 
@@ -54,9 +56,7 @@ export default function Home() {
         <button
           onClick={() => setShowHow(true)}
           className="btn-accent whitespace-nowrap px-4 py-2 text-sm sm:px-5 sm:py-2.5"
-        >
-          ▶ How it works
-        </button>
+        >{t(t(t(t("▶ How it works"))))}</button>
         <div className="ml-auto flex flex-wrap items-center justify-end gap-2 sm:gap-3">
           <AccountLink className="whitespace-nowrap px-4 py-2 text-sm sm:px-5 sm:py-2.5" />
           <LangToggle prominent className="whitespace-nowrap px-4 py-2 text-sm sm:px-5 sm:py-2.5" />
@@ -77,7 +77,7 @@ export default function Home() {
        * straight through it — it's a footnote now, out of the way at the
        * bottom, which is where anyone who wants it will look.
        */}
-      <HeroStage footnote="Seventeen games · the TV is the stage, your phone is the controller · no downloads, no accounts">
+      <HeroStage footnote={t(t(t("Seventeen games · the TV is the stage, your phone is the controller · no downloads, no accounts")))}>
         <ShowMark />
 
         {/* Straight in behind the blast, not a polite fade afterwards. */}
@@ -98,11 +98,9 @@ export default function Home() {
             disabled={opening}
             className="btn-brand px-12 py-5 text-xl sm:text-2xl"
           >
-            {opening ? "Opening the room…" : "Host a game"}
+            {opening ? t(t(t("Opening the room…"))) : t(t("Host a game"))}
           </button>
-          <Link href="/play" className="btn-ghost px-12 py-5 text-xl sm:text-2xl">
-            Join a game
-          </Link>
+          <Link href="/play" className="btn-ghost px-12 py-5 text-xl sm:text-2xl">{t(t(t("Join a game")))}</Link>
         </motion.div>
       </HeroStage>
     </main>

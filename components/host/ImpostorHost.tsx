@@ -11,6 +11,7 @@ import {
 import { type Room, connectedPlayers } from "@/lib/room/types";
 import { ScoreNudge } from "@/components/ScoreNudge";
 import { WinnerMoment } from "@/components/WinnerMoment";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   /** Host putting a score right by hand. */
@@ -34,6 +35,7 @@ export function ImpostorHost({
   onNext,
   onQuit,
 }: Props) {
+  const t = useT();
   const players = connectedPlayers(room);
   const byId = (id: string | null) => players.find((p) => p.id === id);
   const [left, setLeft] = useState(state.seconds);
@@ -77,15 +79,11 @@ export function ImpostorHost({
     const standings = [...players].sort((a, b) => b.score - a.score);
     return (
       <main className="flex min-h-dvh lg:h-dvh flex-col items-center justify-center gap-[3vmin] p-[3vmin] text-center pb-16 lg:pb-[1.6vmin]">
-        <p className="t-label font-display uppercase text-moon-dim">
-          Impostor — that&apos;s the lot
-        </p>
+        <p className="t-label font-display uppercase text-moon-dim">{t(t(t("Impostor — that's the lot")))}</p>
         <WinnerMoment>
-          {standings[0]?.name ?? "Nobody"}
+          {standings[0]?.name ?? t(t(t("Nobody")))}
         </WinnerMoment>
-        <button onClick={onQuit} className="btn-brand px-10 py-4 text-lg">
-          Back to the lobby
-        </button>
+        <button onClick={onQuit} className="btn-brand px-10 py-4 text-lg">{t(t(t("Back to the lobby")))}</button>
       </main>
     );
   }
@@ -98,26 +96,18 @@ export function ImpostorHost({
         </span>
         <div className="flex gap-2">
           {state.phase === "deal" && (
-            <button onClick={onStart} className="btn-ghost px-3 py-1.5 text-[clamp(0.8rem,1.15vw,1.35rem)]">
-              Start without them
-            </button>
+            <button onClick={onStart} className="btn-ghost px-3 py-1.5 text-[clamp(0.8rem,1.15vw,1.35rem)]">{t(t(t("Start without them")))}</button>
           )}
           {state.phase === "vote" && (
-            <button onClick={onForce} className="btn-ghost px-3 py-1.5 text-[clamp(0.8rem,1.15vw,1.35rem)]">
-              Close the vote
-            </button>
+            <button onClick={onForce} className="btn-ghost px-3 py-1.5 text-[clamp(0.8rem,1.15vw,1.35rem)]">{t(t(t("Close the vote")))}</button>
           )}
         </div>
       </header>
 
       {state.phase === "deal" && (
         <Centre>
-          <p className="t-clue font-display uppercase tracking-wide text-moon">
-            Check your phone
-          </p>
-          <p className="text-[clamp(0.9rem,1.6vw,1.6rem)] text-moon-dim">
-            One of you is somewhere else entirely.
-          </p>
+          <p className="t-clue font-display uppercase tracking-wide text-moon">{t(t(t("Check your phone")))}</p>
+          <p className="text-[clamp(0.9rem,1.6vw,1.6rem)] text-moon-dim">{t(t(t("One of you is somewhere else entirely.")))}</p>
           <div className="mt-[2vmin] flex flex-wrap justify-center gap-3">
             {players.map((p) => (
               <span
@@ -146,9 +136,7 @@ export function ImpostorHost({
           >
             {clock}
           </p>
-          <p className="shrink-0 font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.25em] text-moon-dim">
-            Ask each other questions · anyone can call a vote from their phone
-          </p>
+          <p className="shrink-0 font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.25em] text-moon-dim">{t(t(t("Ask each other questions · anyone can call a vote from their phone")))}</p>
           <div className="grid min-h-0 flex-1 w-full grid-cols-2 content-start gap-[1vmin] overflow-auto px-[4vw] sm:grid-cols-3 lg:grid-cols-5">
             {state.places.map((place) => (
               <div
@@ -164,9 +152,7 @@ export function ImpostorHost({
 
       {state.phase === "vote" && (
         <Centre>
-          <p className="t-clue font-display uppercase tracking-wide text-moon">
-            Who is it?
-          </p>
+          <p className="t-clue font-display uppercase tracking-wide text-moon">{t(t(t("Who is it?")))}</p>
           <p className="text-[clamp(0.9rem,1.6vw,1.6rem)] text-moon-dim">
             {byId(state.calledBy)?.name ?? "Someone"} called it. Everyone votes
             on their phone.
@@ -197,20 +183,19 @@ export function ImpostorHost({
             className="t-label font-display uppercase text-moon-dim"
           >
             {state.outcome === "impostor-caught"
-              ? "Caught"
+              ? t("Caught")
               : state.outcome === "place-guessed"
-                ? "Named it"
-                : "Got away with it"}
+                ? t("Named it")
+                : t(t(t("Got away with it")))}
           </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             className="accent-text t-hero font-display font-bold uppercase tracking-tight"
           >
-            {byId(state.impostorId)?.name ?? "Nobody"}
+            {byId(state.impostorId)?.name ?? t(t(t("Nobody")))}
           </motion.h2>
-          <p className="text-[clamp(1rem,2vw,2rem)] text-moon-dim">
-            It was <span className="text-accent">{impostorPlace(state)?.name}</span>
+          <p className="text-[clamp(1rem,2vw,2rem)] text-moon-dim">{t(t(t("It was")))}<span className="text-accent">{impostorPlace(state)?.name}</span>
             {state.guessedPlace !== null && (
               <>
                 {" "}
@@ -221,9 +206,7 @@ export function ImpostorHost({
               </>
             )}
           </p>
-          <button onClick={onNext} className="btn-accent mt-[2vmin] px-12 py-4 text-xl">
-            Next round
-          </button>
+          <button onClick={onNext} className="btn-accent mt-[2vmin] px-12 py-4 text-xl">{t(t(t("Next round")))}</button>
         </Centre>
       )}
 

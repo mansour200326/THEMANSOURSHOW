@@ -5,6 +5,7 @@ import type { ActState } from "@/lib/games/actOut";
 import { clockLeft } from "@/lib/games/leadIn";
 import type { ViewerExtras } from "@/lib/room/redact";
 import { type Player, type Room, connectedPlayers, playerById } from "@/lib/room/types";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   room: Room;
@@ -20,6 +21,7 @@ type Props = {
  * else's phone says one thing — shout — and stays out of the way.
  */
 export function ActPlayer({ room, state, me, onStart, onGot, onPass }: Props) {
+  const t = useT();
   const acting = state.actorId === me.id;
   const actor = playerById(room, state.actorId ?? undefined);
   const [left, setLeft] = useState(state.seconds);
@@ -54,9 +56,7 @@ export function ActPlayer({ room, state, me, onStart, onGot, onPass }: Props) {
     const gained = state.lastScores[me.id] ?? 0;
     return (
       <Centre>
-        <p className="font-display text-sm uppercase tracking-[0.25em] text-moon-deep">
-          Time
-        </p>
+        <p className="font-display text-sm uppercase tracking-[0.25em] text-moon-deep">{t(t(t("Time")))}</p>
         <p className="font-display text-3xl uppercase text-moon">
           {state.got.length} got
         </p>
@@ -77,10 +77,10 @@ export function ActPlayer({ room, state, me, onStart, onGot, onPass }: Props) {
         {state.phase === "acting" ? (
           <>
             <p className="font-display text-7xl font-bold tabular-nums text-accent">{left}</p>
-            <p className="accent-text font-display text-xl uppercase tracking-[0.2em]">Shout it out</p>
+            <p className="accent-text font-display text-xl uppercase tracking-[0.2em]">{t(t(t("Shout it out")))}</p>
           </>
         ) : (
-          <p className="text-moon-deep">Look at them, not at this.</p>
+          <p className="text-moon-deep">{t(t(t("Look at them, not at this.")))}</p>
         )}
       </Centre>
     );
@@ -89,13 +89,9 @@ export function ActPlayer({ room, state, me, onStart, onGot, onPass }: Props) {
   if (state.phase === "ready") {
     return (
       <Centre>
-        <p className="font-display text-sm uppercase tracking-[0.25em] text-moon-deep">You&apos;re up</p>
-        <p className="max-w-xs text-balance text-moon-dim">
-          Stand where everyone can see you. The word appears when the clock starts.
-        </p>
-        <button onClick={onStart} className="btn-accent w-full max-w-xs py-6 text-2xl">
-          Start
-        </button>
+        <p className="font-display text-sm uppercase tracking-[0.25em] text-moon-deep">{t(t(t("You're up")))}</p>
+        <p className="max-w-xs text-balance text-moon-dim">{t(t(t("Stand where everyone can see you. The word appears when the clock starts.")))}</p>
+        <button onClick={onStart} className="btn-accent w-full max-w-xs py-6 text-2xl">{t(t(t("Start")))}</button>
       </Centre>
     );
   }
@@ -114,7 +110,7 @@ export function ActPlayer({ room, state, me, onStart, onGot, onPass }: Props) {
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
-        <p className="font-display text-xs uppercase tracking-[0.25em] text-moon-deep">Act this</p>
+        <p className="font-display text-xs uppercase tracking-[0.25em] text-moon-deep">{t(t(t("Act this")))}</p>
         <p className="accent-text text-balance font-display text-[clamp(2rem,10vw,3.4rem)] font-bold uppercase leading-tight">
           {state.yourWord}
         </p>
@@ -122,9 +118,7 @@ export function ActPlayer({ room, state, me, onStart, onGot, onPass }: Props) {
 
       {naming ? (
         <div className="flex flex-col gap-2">
-          <p className="text-center font-display text-sm uppercase tracking-[0.2em] text-moon-dim">
-            Who got it?
-          </p>
+          <p className="text-center font-display text-sm uppercase tracking-[0.2em] text-moon-dim">{t(t(t("Who got it?")))}</p>
           <div className="grid grid-cols-2 gap-2">
             {others.map((p) => (
               <button
@@ -136,18 +130,12 @@ export function ActPlayer({ room, state, me, onStart, onGot, onPass }: Props) {
               </button>
             ))}
           </div>
-          <button onClick={() => onGot(null)} className="btn-ghost w-full py-3">
-            Everyone at once
-          </button>
+          <button onClick={() => onGot(null)} className="btn-ghost w-full py-3">{t(t(t("Everyone at once")))}</button>
         </div>
       ) : (
         <div className="flex gap-3">
-          <button onClick={onPass} className="btn-ghost flex-1 py-6 text-xl">
-            Pass
-          </button>
-          <button onClick={() => setNaming(true)} className="btn-accent flex-[2] py-6 text-2xl">
-            Got it
-          </button>
+          <button onClick={onPass} className="btn-ghost flex-1 py-6 text-xl">{t(t(t("Pass")))}</button>
+          <button onClick={() => setNaming(true)} className="btn-accent flex-[2] py-6 text-2xl">{t(t(t("Got it")))}</button>
         </div>
       )}
     </main>

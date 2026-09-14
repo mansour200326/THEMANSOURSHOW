@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useT } from "@/components/LangProvider";
 
 /**
  * The screen while the AI writes.
@@ -46,6 +47,7 @@ export function Generating({
   note?: string;
   onCancel: () => void;
 }) {
+  const t = useT();
   const [line, setLine] = useState(0);
   const [elapsed, setElapsed] = useState(0);
 
@@ -71,9 +73,7 @@ export function Generating({
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-[4vmin] px-6 text-center">
       <div>
-        <p className="t-label font-display uppercase text-moon-deep">
-          Big Night presents
-        </p>
+        <p className="t-label font-display uppercase text-moon-deep">{t(t(t("Big Night presents")))}</p>
         <h1 className="accent-text mt-1 font-display text-[clamp(2.2rem,6vw,6rem)] font-bold uppercase leading-none tracking-tight">
           {title}
         </h1>
@@ -110,7 +110,7 @@ export function Generating({
                   />
                 </span>
                 <span className="font-display text-[clamp(0.75rem,1vw,1.2rem)] uppercase tracking-[0.2em] text-moon-deep">
-                  {done ? "Written" : i === working ? "Writing…" : "Waiting"}
+                  {done ? t(t(t("Written"))) : i === working ? t(t(t("Writing…"))) : t(t("Waiting"))}
                 </span>
                 {i === working && !done && (
                   <motion.span
@@ -146,16 +146,14 @@ export function Generating({
           animate={{ y: 0 }}
           className="font-display text-[clamp(1rem,1.6vw,1.9rem)] uppercase tracking-[0.2em] text-accent"
         >
-          {REASSURANCE[line]}
+          {t(REASSURANCE[line])}
         </motion.p>
         {note && (
           <p className="mt-2 text-balance text-[clamp(0.95rem,1.3vw,1.5rem)] text-moon-dim">{note}</p>
         )}
       </div>
 
-      <button onClick={onCancel} className="btn-ghost text-[clamp(0.9rem,1.2vw,1.4rem)]">
-        Cancel
-      </button>
+      <button onClick={onCancel} className="btn-ghost text-[clamp(0.9rem,1.2vw,1.4rem)]">{t(t(t("Cancel")))}</button>
     </main>
   );
 }

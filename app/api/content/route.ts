@@ -12,6 +12,7 @@ import {
   generateEmojiRiddles,
   generateQuestionPairs,
   generateMostLikely,
+  generateWhoSaidIt,
   generatePunchlines,
   generateCaptionPictures,
   generateStrokePairs,
@@ -38,6 +39,7 @@ const RequestSchema = z.object({
     "emoji-riddles",
     "bluff-trivia",
     "most-likely-to",
+    "who-said-it",
     "punchline",
     "caption-this",
     "act-it-out",
@@ -127,6 +129,10 @@ export async function POST(request: Request) {
     "most-likely-to": {
       key: "prompts",
       write: () => generateMostLikely({ themes: spread, avoid, lang, count: many(8) }),
+    },
+    "who-said-it": {
+      key: "prompts",
+      write: () => generateWhoSaidIt({ themes: spread, avoid, lang, count: many(6) }),
     },
     punchline: {
       key: "prompts",

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { play } from "@/lib/sound";
+import { useT } from "@/components/LangProvider";
 
 /**
  * The name filling the screen, and confetti.
@@ -24,6 +25,7 @@ export function WinnerMoment({
   children: React.ReactNode;
   className?: string;
 }) {
+  const t = useT();
   const canvas = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {

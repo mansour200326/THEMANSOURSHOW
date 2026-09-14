@@ -548,6 +548,48 @@ export async function generateMostLikely({
   return { content, isPersonal: parsed.isPersonal };
 }
 
+/* --------------------------------------------- Who Said It questions */
+
+const GeneratedQuestions = z.object({
+  questions: z.array(z.string().describe("One question everyone answers about themselves, in a line.")),
+  ...isPersonalField,
+});
+
+export async function generateWhoSaidIt({
+  themes,
+  count,
+  avoid = [],
+  lang = "en",
+}: {
+  themes: string[];
+  count: number;
+  avoid?: string[];
+  lang?: Lang;
+}): Promise<Written<Prompt[]>> {
+  const client = new Anthropic();
+  const response = await client.messages.parse({
+    model: MODELS.packs,
+    max_tokens: 2000,
+    system:
+      "You write questions for a party game where everyone answers the same " +
+      "question about themselves anonymously, one answer goes up on the TV, and " +
+      "the room guesses who wrote it. Questions must invite a short, personal, " +
+      "revealing answer that could plausibly come from anyone in a group of " +
+      "friends — \"What's the pettiest reason you've held a grudge?\", \"What " +
+      "would your autobiography be called?\". One line each. Clean enough for a " +
+      "living room with everyone's parents in it." + PERSONAL + langBrief(lang),
+    output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedQuestions), "low"),
+    messages: [
+      { role: "user", content: `Write ${overAsk(count, avoid)} questions.${themeLine(themes)}` + alreadyAsked(avoid) },
+    ],
+  });
+  const parsed = response.parsed_output;
+  if (!parsed) throw new Error("Couldn't write those questions.");
+  const drafted = parsed.questions.map((q) => q.trim()).filter(Boolean).map((text) => ({ text }));
+  const content = enforceAvoid(drafted, avoid, (p) => p.text).slice(0, count);
+  return { content, isPersonal: parsed.isPersonal };
+}
+
 /* ------------------------------------------------- Punchline setups */
 
 const GeneratedSetups = z.object({

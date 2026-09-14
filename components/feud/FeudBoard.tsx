@@ -11,6 +11,7 @@ import {
 import { clockLeft } from "@/lib/games/leadIn";
 import { CountIn } from "@/components/CountIn";
 import { useRoundCard } from "@/components/RoundCard";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   state: FeudState;
@@ -32,6 +33,7 @@ export function FeudBoard({
   onNextRound,
   onClock,
 }: Props) {
+  const t = useT();
   const [draft, setDraft] = useState("");
   const box = useRef<HTMLInputElement>(null);
   const question = currentQuestion(state);
@@ -89,8 +91,8 @@ export function FeudBoard({
         <span className="font-display text-[clamp(0.9rem,1.6vw,1.8rem)] uppercase tracking-[0.2em] text-accent">
           {over
             ? state.outcome === "cleared"
-              ? "Board cleared"
-              : "Every team struck out"
+              ? t("Board cleared")
+              : t("Every team struck out")
             : controlTeam?.name}
         </span>
         <span className="flex gap-2">
@@ -210,11 +212,11 @@ export function FeudBoard({
         >
           <p className="font-display text-[clamp(0.85rem,1.4vw,1.5rem)] uppercase tracking-wider text-moon-dim">
             {state.outcome === "cleared"
-              ? "Every answer found"
-              : "The rest are shown above"}
+              ? t("Every answer found")
+              : t(t(t("The rest are shown above")))}
           </p>
           <button onClick={onNextRound} className="btn-accent px-12 py-4 text-xl">
-            {lastRound ? "Final standings" : "Next round"}
+            {lastRound ? t(t(t("Final standings"))) : t(t("Next round"))}
           </button>
           <p className="t-label font-display uppercase text-moon-dim">
             Round {state.round + 1}/{state.questions.length}
@@ -233,7 +235,7 @@ export function FeudBoard({
       {!over && (
       <div className="flex shrink-0 flex-wrap items-end gap-3 px-[2vw] sm:flex-nowrap sm:gap-[1.5vw]">
         <div className="order-1 shrink-0 text-left">
-          <p className="t-label font-display uppercase text-moon-dim">Pot</p>
+          <p className="t-label font-display uppercase text-moon-dim">{t(t(t("Pot")))}</p>
           <p className="accent-text font-display text-[clamp(1.6rem,3vw,3.6rem)] font-bold tabular-nums">
             {state.pot}
           </p>
@@ -246,7 +248,7 @@ export function FeudBoard({
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && submit()}
-              placeholder={checking ? "Checking…" : "Type what they said…"}
+              placeholder={checking ? t(t(t("Checking…"))) : t(t("Type what they said…"))}
               disabled={checking}
               autoFocus
               className="field flex-1 text-[clamp(1rem,1.8vw,1.6rem)]"
@@ -270,9 +272,7 @@ export function FeudBoard({
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-wider text-moon-dim"
-                >
-                  Checking the board…
-                </motion.p>
+                >{t(t(t(t("Checking the board…"))))}</motion.p>
               ) : (
                 feedback && (
                 <motion.p
@@ -290,7 +290,7 @@ export function FeudBoard({
                   ].join(" ")}
                 >
                   {feedback.matched !== null
-                    ? `“${feedback.text}” → ${question.answers[feedback.matched]?.text}`
+                    ? t(t(t("“{said}” → {matched}")), { said: feedback.text, matched: question.answers[feedback.matched]?.text ?? "" })
                     : feedback.repeat
                       ? `“${feedback.text}” — already up, no strike`
                       : `“${feedback.text}” — not on the board`}
@@ -308,11 +308,9 @@ export function FeudBoard({
                 onClick={() => onClock(!state.clock)}
                 className="btn-ghost px-4 py-3 text-[clamp(0.95rem,1.4vw,1.7rem)]"
               >
-                {state.clock ? "Stop clock" : "Start clock"}
+                {state.clock ? t(t(t("Stop clock"))) : t(t("Start clock"))}
               </button>
-              <button onClick={onStrike} className="btn-bad px-6 py-3">
-                Strike ✗
-              </button>
+              <button onClick={onStrike} className="btn-bad px-6 py-3">{t(t(t("Strike ✗")))}</button>
             </div>
           )}
           <p className="t-label mt-1 font-display uppercase text-moon-dim">

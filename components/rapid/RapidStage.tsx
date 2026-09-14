@@ -11,6 +11,7 @@ import {
 import { clockLeft, startsAfterLeadIn } from "@/lib/games/leadIn";
 import { CountIn } from "@/components/CountIn";
 import { useRoundCard } from "@/components/RoundCard";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   state: RapidState;
@@ -22,6 +23,7 @@ type Props = {
 };
 
 export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
+  const t = useT();
   const prompt = rapidPrompt(state);
   const team = state.teams[state.turn];
   const [left, setLeft] = useState(state.seconds);
@@ -80,7 +82,7 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
           Round {state.round + 1} of {state.prompts.length}
           {state.phase === "bidding" ? " · up for bids" : ` · ${team?.name}`}
           {state.mode === "categories" && state.phase !== "bidding" && state.bid
-            ? ` · called ${state.bid}`
+            ? t(t(t(" · called {n}")), { n: state.bid })
             : ""}
         </p>
         <motion.p
@@ -102,9 +104,7 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
             exit={{ y: -8, transition: { duration: 0.15 } }}
             className="flex flex-col items-center gap-[2vmin]"
           >
-            <p className="font-display text-[clamp(0.9rem,1.5vw,1.6rem)] uppercase tracking-[0.25em] text-moon-dim">
-              Bid against each other — how many can you name?
-            </p>
+            <p className="font-display text-[clamp(0.9rem,1.5vw,1.6rem)] uppercase tracking-[0.25em] text-moon-dim">{t(t(t("Bid against each other — how many can you name?")))}</p>
 
             <div className="flex flex-wrap justify-center gap-3">
               {state.teams.map((t, i) => (
@@ -126,7 +126,7 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
             <div className="flex items-center gap-5">
               <button
                 onClick={() => setBid((b) => Math.max(1, b - 1))}
-                aria-label="Lower the bid"
+                aria-label={t(t(t(t("Lower the bid"))))}
                 className="btn-ghost h-16 w-16 px-0 text-3xl"
               >
                 −
@@ -136,7 +136,7 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
               </span>
               <button
                 onClick={() => setBid((b) => b + 1)}
-                aria-label="Raise the bid"
+                aria-label={t(t(t(t("Raise the bid"))))}
                 className="btn-ghost h-16 w-16 px-0 text-3xl"
               >
                 +
@@ -149,11 +149,7 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
             >
               {state.teams[bidTeam]?.name} takes it at {bid}
             </button>
-            <p className="max-w-[60ch] text-[clamp(0.75rem,1.1vw,1rem)] text-moon-dim">
-              Whoever bids highest plays the category alone. Reach the number
-              and you win the category; fall short and the other side takes it.
-              One point either way.
-            </p>
+            <p className="max-w-[60ch] text-[clamp(0.75rem,1.1vw,1rem)] text-moon-dim">{t(t(t("Whoever bids highest plays the category alone. Reach the number and you win the category; fall short and the other side takes it. One point either way.")))}</p>
           </motion.div>
         )}
 
@@ -167,12 +163,10 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
           >
             <p className="font-display text-[clamp(0.9rem,1.5vw,1.6rem)] uppercase tracking-[0.25em] text-moon-dim">
               {state.mode === "categories"
-                ? `${team?.name} — name ${state.bid} or more`
+                ? t(t(t("{team} — name {n} or more")), { team: team?.name ?? "", n: state.bid })
                 : RAPID_RULE[state.mode]}
             </p>
-            <button onClick={onGo} className="btn-accent px-16 py-5 text-2xl">
-              Start the clock
-            </button>
+            <button onClick={onGo} className="btn-accent px-16 py-5 text-2xl">{t(t(t("Start the clock")))}</button>
           </motion.div>
         )}
 
@@ -201,9 +195,7 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
               * already dried up, or already got there. Stopping the clock is
               * the same as the clock stopping itself.
               */}
-            <button onClick={onTimeUp} className="btn-ghost px-10 py-3 text-lg">
-              Finish now
-            </button>
+            <button onClick={onTimeUp} className="btn-ghost px-10 py-3 text-lg">{t(t(t("Finish now")))}</button>
           </motion.div>
         )}
 
@@ -214,9 +206,7 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
             animate={{ y: 0 }}
             className="flex flex-col items-center gap-[2.5vmin]"
           >
-            <p className="font-display text-[clamp(1.2rem,3vw,3rem)] uppercase tracking-[0.2em] text-rose-400">
-              Time
-            </p>
+            <p className="font-display text-[clamp(1.2rem,3vw,3rem)] uppercase tracking-[0.2em] text-rose-400">{t(t(t("Time")))}</p>
 
             {state.mode === "categories" ? (
               <>
@@ -248,8 +238,8 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
                   ].join(" ")}
                 >
                   {count >= state.bid
-                    ? `Made it — ${count} to ${team?.name}`
-                    : `Short — ${state.bid} to ${state.teams[(state.turn + 1) % state.teams.length]?.name}`}
+                    ? t(t(t("Made it — {count} to {team}")), { count, team: team?.name ?? "" })
+                    : t(t(t("Short — {n} to {team}")), { n: state.bid, team: state.teams[(state.turn + 1) % state.teams.length]?.name ?? "" })}
                 </button>
               </>
             ) : (
@@ -258,12 +248,8 @@ export function RapidStage({ state, onBid, onGo, onTimeUp, onScore }: Props) {
                   Did {team?.name} name all three?
                 </p>
                 <div className="flex gap-4">
-                  <button onClick={() => onScore(1)} className="btn-good px-12 py-5 text-2xl">
-                    ✓ Got it
-                  </button>
-                  <button onClick={() => onScore(0)} className="btn-bad px-12 py-5 text-2xl">
-                    ✗ Missed
-                  </button>
+                  <button onClick={() => onScore(1)} className="btn-good px-12 py-5 text-2xl">{t(t(t("✓ Got it")))}</button>
+                  <button onClick={() => onScore(0)} className="btn-bad px-12 py-5 text-2xl">{t(t(t("✗ Missed")))}</button>
                 </div>
               </>
             )}

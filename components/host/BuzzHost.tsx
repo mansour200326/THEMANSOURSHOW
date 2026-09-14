@@ -10,6 +10,7 @@ import { type Room, connectedPlayers, playerById } from "@/lib/room/types";
 import { ScoreNudge } from "@/components/ScoreNudge";
 import { useRoundCard } from "@/components/RoundCard";
 import { WinnerMoment } from "@/components/WinnerMoment";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   /** Host putting a score right by hand. */
@@ -20,6 +21,7 @@ type Props = {
 };
 
 export function BuzzHost({ room, state, send, onAdjust }: Props) {
+  const t = useT();
   const item = buzzCurrent(state);
   const roundCard = useRoundCard(state.index, state.items.length, state.mode === "sequence" && state.phase !== "done");
   const buzzer = playerById(room, state.buzzedBy ?? undefined);
@@ -66,7 +68,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
       <header className="flex shrink-0 items-center justify-between">
         <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-dim">
           {state.mode === "sequence"
-            ? `Riddle ${Math.min(state.index + 1, state.items.length)} of ${state.items.length}`
+            ? t(t(t("Riddle {n} of {total}")), { n: Math.min(state.index + 1, state.items.length), total: state.items.length })
             : "Pick a tile, then race for it"}
         </span>
       </header>
@@ -143,9 +145,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
                   <span className="accent-text font-display text-[clamp(2rem,5vw,5rem)] font-bold uppercase">
                     {buzzer.name}
                   </span>
-                  <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.25em] text-moon-dim">
-                    Answer out loud
-                  </span>
+                  <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.25em] text-moon-dim">{t(t(t("Answer out loud")))}</span>
                 </motion.div>
               ) : state.phase === "open" ? (
                 armed ? (
@@ -154,18 +154,14 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
                     animate={{ opacity: [0.45, 1, 0.45] }}
                     transition={{ duration: 1.6, repeat: Infinity }}
                     className="font-display text-[clamp(1.1rem,2.4vw,2.6rem)] uppercase tracking-[0.3em] text-accent"
-                  >
-                    Buzz in
-                  </motion.p>
+                  >{t(t(t(t("Buzz in"))))}</motion.p>
                 ) : (
                   <motion.p
                     key="arming"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="font-display text-[clamp(1.1rem,2.4vw,2.6rem)] uppercase tracking-[0.3em] text-moon-dim"
-                  >
-                    Read it…
-                  </motion.p>
+                  >{t(t(t(t("Read it…"))))}</motion.p>
                 )
               ) : null}
             </AnimatePresence>
@@ -193,15 +189,9 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
       <div className="flex shrink-0 flex-wrap items-center justify-center gap-3">
         {state.phase === "buzzed" && (
           <>
-            <button onClick={() => send("judge", { correct: true })} className="btn-good px-10 py-3 text-lg">
-              ✓ Correct
-            </button>
-            <button onClick={() => send("judge", { correct: false })} className="btn-bad px-10 py-3 text-lg">
-              ✗ Wrong
-            </button>
-            <button onClick={() => send("reopen")} className="btn-ghost text-[clamp(0.95rem,1.4vw,1.7rem)]">
-              Misfire — reopen
-            </button>
+            <button onClick={() => send("judge", { correct: true })} className="btn-good px-10 py-3 text-lg">{t("✓ Correct")}</button>
+            <button onClick={() => send("judge", { correct: false })} className="btn-bad px-10 py-3 text-lg">{t("✗ Wrong")}</button>
+            <button onClick={() => send("reopen")} className="btn-ghost text-[clamp(0.95rem,1.4vw,1.7rem)]">{t("Misfire — reopen")}</button>
           </>
         )}
 
@@ -212,15 +202,11 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
           * mid-round was the host squinting at Peek.
           */}
         {item && !state.revealed && state.phase !== "picking" && state.phase !== "done" && (
-          <button onClick={() => send("reveal")} className="btn-accent px-8 py-3">
-            Reveal the answer
-          </button>
+          <button onClick={() => send("reveal")} className="btn-accent px-8 py-3">{t("Reveal the answer")}</button>
         )}
 
         {(state.phase === "open" || state.phase === "buzzed") && (
-          <button onClick={() => send("skip")} className="btn-ghost text-[clamp(0.95rem,1.4vw,1.7rem)]">
-            Nobody got it — next
-          </button>
+          <button onClick={() => send("skip")} className="btn-ghost text-[clamp(0.95rem,1.4vw,1.7rem)]">{t("Nobody got it — next")}</button>
         )}
 
         {/* Host-only answer check — small on purpose. */}
@@ -230,7 +216,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
               onClick={() => setPeek((v) => !v)}
               className="btn-ghost px-3 py-1.5 text-[clamp(0.8rem,1.15vw,1.35rem)]"
             >
-              {peek ? "Hide" : "Peek"}
+              {peek ? t(t(t("Hide"))) : t(t("Peek"))}
             </button>
             <span
               className={[
@@ -243,14 +229,10 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
           </div>
         )}
         {state.phase === "scored" && (
-          <button onClick={() => send("continue")} className="btn-accent px-10 py-3 text-lg">
-            Next
-          </button>
+          <button onClick={() => send("continue")} className="btn-accent px-10 py-3 text-lg">{t("Next")}</button>
         )}
         {state.phase === "done" && (
-          <button onClick={() => send("game:end")} className="btn-accent px-10 py-3 text-lg">
-            Back to the lobby
-          </button>
+          <button onClick={() => send("game:end")} className="btn-accent px-10 py-3 text-lg">{t("Back to the lobby")}</button>
         )}
       </div>
 
@@ -294,6 +276,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
 }
 
 function Standings({ room }: { room: Room }) {
+  const t = useT();
   const ranked = [...room.players].sort((a, b) => b.score - a.score);
   const top = ranked[0];
   return (
@@ -305,9 +288,7 @@ function Standings({ room }: { room: Room }) {
         </WinnerMoment>
       )}
       <div className="w-full space-y-2">
-      <p className="mb-[2vmin] text-center font-display text-[clamp(1.5rem,4vw,4rem)] uppercase text-accent">
-        Game over
-      </p>
+      <p className="mb-[2vmin] text-center font-display text-[clamp(1.5rem,4vw,4rem)] uppercase text-accent">{t(t(t("Game over")))}</p>
       {ranked.map((p, i) => (
         <div
           key={p.id}

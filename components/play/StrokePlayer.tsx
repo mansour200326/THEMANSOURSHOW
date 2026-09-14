@@ -6,6 +6,7 @@ import { type StrokeState, strokeColourFor, strokeDrawer, strokePair } from "@/l
 import { SKETCH_COLOURS } from "@/lib/games/sketch";
 import type { ViewerExtras } from "@/lib/room/redact";
 import { type Player, type Room, connectedPlayers, playerById } from "@/lib/room/types";
+import { useT } from "@/components/LangProvider";
 
 type Props = {
   room: Room;
@@ -23,6 +24,7 @@ type Props = {
  * one stroke and hands the pen on the moment you lift.
  */
 export function StrokePlayer({ room, state, me, onStroke, onLift, onVote, onGuess }: Props) {
+  const t = useT();
   const [text, setText] = useState("");
   const drawerId = strokeDrawer(state);
   const myTurn = drawerId === me.id;
@@ -43,20 +45,20 @@ export function StrokePlayer({ room, state, me, onStroke, onLift, onVote, onGues
     const fake = playerById(room, state.fakeId ?? undefined);
     return (
       <Centre>
-        <p className="font-display text-sm uppercase tracking-[0.25em] text-moon-deep">It was</p>
+        <p className="font-display text-sm uppercase tracking-[0.25em] text-moon-deep">{t(t(t("It was")))}</p>
         <p className="accent-text font-display text-4xl uppercase">{pair?.word}</p>
         <p className="text-moon-dim">
-          {fake?.emoji} {fake?.name} was the fake{state.fakeWon ? " — and won it" : ""}
+          {fake?.emoji} {fake?.name} was the fake{state.fakeWon ? t(t(t(" — and won it"))) : ""}
         </p>
         <p className={["font-display text-2xl uppercase tracking-wide", scored ? "text-emerald-300" : "text-moon-dim"].join(" ")}>
-          {scored ? `+${scored}` : "Nothing that time"}
+          {scored ? `+${scored}` : t(t(t("Nothing that time")))}
         </p>
       </Centre>
     );
   }
 
   const secret = state.youAreFake ? (
-    <p className="font-display text-2xl uppercase tracking-wide text-rose-300">You&apos;re the fake — bluff it</p>
+    <p className="font-display text-2xl uppercase tracking-wide text-rose-300">{t(t(t("You're the fake — bluff it")))}</p>
   ) : (
     <p className="accent-text font-display text-3xl uppercase">{state.yourWord}</p>
   );
@@ -65,8 +67,8 @@ export function StrokePlayer({ room, state, me, onStroke, onLift, onVote, onGues
     if (!state.youAreFake) {
       return (
         <Centre>
-          <p className="font-display text-sm uppercase tracking-[0.25em] text-moon-deep">Caught</p>
-          <p className="text-moon-dim">The fake gets one guess at the word. Say nothing.</p>
+          <p className="font-display text-sm uppercase tracking-[0.25em] text-moon-deep">{t(t(t("Caught")))}</p>
+          <p className="text-moon-dim">{t(t(t("The fake gets one guess at the word. Say nothing.")))}</p>
         </Centre>
       );
     }
@@ -79,14 +81,12 @@ export function StrokePlayer({ room, state, me, onStroke, onLift, onVote, onGues
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter" && text.trim()) onGuess(text); }}
-          placeholder="Your guess"
+          placeholder={t(t(t(t("Your guess"))))}
           autoFocus
           maxLength={40}
           className="field py-5 text-center text-2xl"
         />
-        <button onClick={() => text.trim() && onGuess(text)} disabled={!text.trim()} className="btn-accent w-full py-6 text-2xl">
-          Guess
-        </button>
+        <button onClick={() => text.trim() && onGuess(text)} disabled={!text.trim()} className="btn-accent w-full py-6 text-2xl">{t(t(t("Guess")))}</button>
       </main>
     );
   }
@@ -98,7 +98,7 @@ export function StrokePlayer({ room, state, me, onStroke, onLift, onVote, onGues
       <main className="flex min-h-dvh flex-col gap-4 p-5">
         <SketchCanvas strokes={state.strokes} live={state.live} className="mx-auto w-3/4" />
         <p className="text-center font-display text-lg uppercase tracking-wide text-moon">
-          {mine ? "Vote in — look at the TV" : "Who was faking it?"}
+          {mine ? t(t(t("Vote in — look at the TV"))) : t(t("Who was faking it?"))}
         </p>
         {!mine && (
           <div className="grid grid-cols-2 gap-2">
@@ -137,7 +137,7 @@ export function StrokePlayer({ room, state, me, onStroke, onLift, onVote, onGues
       />
       <p className="text-center font-display text-sm uppercase tracking-[0.2em] text-moon-dim">
         {myTurn ? (
-          <span className="text-accent">Your line — one stroke, then lift</span>
+          <span className="text-accent">{t(t(t("Your line — one stroke, then lift")))}</span>
         ) : (
           <>
             <span className="mr-2 inline-block h-3 w-3 rounded-full align-middle" style={{ backgroundColor: SKETCH_COLOURS[drawerId ? strokeColourFor(state, drawerId) : 0] }} />
