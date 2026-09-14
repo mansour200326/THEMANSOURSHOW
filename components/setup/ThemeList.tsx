@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Difficulty } from "@/lib/difficulty";
 import { suggestionsFor } from "@/lib/games/themeSuggestions";
+import { useLang } from "@/components/LangToggle";
 
 export const MIN_THEMES = 1;
 export const MAX_THEMES = 6;
@@ -43,7 +44,8 @@ export function ThemeList({
   noun = "theme",
   gameId,
 }: Props) {
-  const SUGGESTIONS = suggestionsFor(gameId);
+  const lang = useLang();
+  const SUGGESTIONS = suggestionsFor(gameId, lang);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

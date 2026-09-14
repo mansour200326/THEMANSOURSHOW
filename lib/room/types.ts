@@ -4,6 +4,9 @@
  * over this object, so the server never needs to know how any game works.
  */
 
+/** Which language the room's content is in; phones render to match. */
+export type RoomLang = "en" | "ar";
+
 export type Player = {
   id: string;
   name: string;
@@ -42,6 +45,7 @@ export type HostSheet = {
 };
 
 export type Room = {
+  lang?: RoomLang;
   code: string;
   players: Player[];
   /** null = sitting in the lobby. */

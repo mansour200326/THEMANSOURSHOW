@@ -7,6 +7,8 @@ import { currentHost } from "@/lib/plan/host";
 import { GATE_COPY, canPlay } from "@/lib/plan/limits";
 import { z } from "zod";
 import { generateFeudPack, friendlyAiError, hasApiKey } from "@/lib/ai";
+import { cookies } from "next/headers";
+import { LANG_COOKIE, isLang, withLang } from "@/lib/lang";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -50,8 +52,10 @@ export async function POST(request: Request) {
   const rounds = parsed.data.rounds ?? 5;
 
   try {
+    const langCookie = (await cookies()).get(LANG_COOKIE)?.value;
+    const lang = isLang(langCookie) ? langCookie : "en";
     const served = await serveContent({
-      gameType: "face-off",
+      gameType: withLang("face-off", lang),
       themes,
       // Round count is part of what was asked for — a five-round pack is not
       // a ten-round one, even about the same subject.
@@ -60,9 +64,10 @@ export async function POST(request: Request) {
       canWrite: hasApiKey,
       write: async () =>
         generateFeudPack({
+          lang,
           themes: broaden(themes),
           rounds,
-          avoid: await everythingToAvoid(host, "face-off", themes),
+          avoid: await everythingToAvoid(host, withLang("face-off", lang), themes),
         }),
     });
 

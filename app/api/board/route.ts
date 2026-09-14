@@ -7,6 +7,8 @@ import { broaden } from "@/lib/library/theme";
 import { serveContent } from "@/lib/library/serve";
 import { currentHost } from "@/lib/plan/host";
 import { GATE_COPY, canPlay } from "@/lib/plan/limits";
+import { cookies } from "next/headers";
+import { LANG_COOKIE, isLang, withLang } from "@/lib/lang";
 
 export const runtime = "nodejs";
 /** Board generation is slow by web standards — give it room on Vercel. */
@@ -66,19 +68,22 @@ export async function POST(request: Request) {
   try {
     // The library answers first; the model only writes what isn't on the
     // shelf already. See lib/library/serve.ts.
+    const langCookie = (await cookies()).get(LANG_COOKIE)?.value;
+    const lang = isLang(langCookie) ? langCookie : "en";
     const served = await serveContent({
-      gameType: "trivia-royale",
+      gameType: withLang("trivia-royale", lang),
       themes: categories,
       difficulty: parsed.data.difficulty ?? "medium",
       host,
       canWrite: hasApiKey,
       write: async () =>
         generateTriviaBoard({
+          lang,
           categories: broaden(categories),
           vibe: parsed.data.vibe,
           difficulty: parsed.data.difficulty,
           // This host's past plus the whole shelf for these categories.
-          avoid: await everythingToAvoid(host, "trivia-royale", categories),
+          avoid: await everythingToAvoid(host, withLang("trivia-royale", lang), categories),
         }),
     });
 

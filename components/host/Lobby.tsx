@@ -13,6 +13,7 @@ import { AccountLink } from "@/components/account/AccountLink";
 import { JoinQr } from "@/components/host/JoinQr";
 import { SoundControl } from "@/components/SoundControl";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LangToggle } from "@/components/LangToggle";
 
 type Props = {
   room: Room;
@@ -22,10 +23,11 @@ type Props = {
   onKick: (playerId: string) => void;
   /** Open the night's combined standings. */
   onNight: () => void;
+  onLang?: (lang: "en" | "ar") => void;
 };
 
 /** Games that run on this screen alone — no room, no phones. */
-export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }: Props) {
+export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight, onLang }: Props) {
   // The corner sound/lights pair steps aside while this header carries them.
   useEffect(() => {
     document.body.dataset.controls = "header";
@@ -91,6 +93,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
               {/* Labelled here: the faint corner pair is invisible on a TV across the room. */}
               <SoundControl prominent className="px-3 py-1 text-xs" />
               <ThemeToggle prominent className="px-3 py-1 text-xs" />
+              <LangToggle prominent className="px-3 py-1 text-xs" onChange={onLang} />
               <button
                 onClick={onNight}
                 className="btn-ghost px-3 py-1 text-xs"

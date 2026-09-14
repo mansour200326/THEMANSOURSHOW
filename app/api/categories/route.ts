@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { callerKey, rateLimit } from "@/lib/rateLimit";
 import { z } from "zod";
 import { generateCategoryIdeas, friendlyAiError, hasApiKey } from "@/lib/ai";
+import { cookies } from "next/headers";
+import { LANG_COOKIE, isLang } from "@/lib/lang";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -39,7 +41,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Bad request." }, { status: 400 });
   }
   try {
-    const categories = await generateCategoryIdeas(parsed.data);
+    const langCookie = (await cookies()).get(LANG_COOKIE)?.value;
+    const lang = isLang(langCookie) ? langCookie : "en";
+    const categories = await generateCategoryIdeas({ ...parsed.data, lang });
     return NextResponse.json({ categories });
   } catch (error) {
     const message = friendlyAiError(error);

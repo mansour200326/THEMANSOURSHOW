@@ -14,6 +14,7 @@ import { type Difficulty, difficultyBrief, varietyBrief } from "@/lib/difficulty
 import { normalise as normaliseAnswer } from "@/lib/feud/match";
 import type { Prompt } from "@/lib/games/roundEngine";
 import { roundGamePacks } from "@/lib/games/roundGames";
+import { type Lang, langBrief } from "@/lib/lang";
 
 /**
  * Server-side AI content generation. Every generator here returns the same
@@ -327,6 +328,7 @@ export type GenerateBoardInput = {
   difficulty?: Difficulty;
   /** Answers this host has already been served. Off-limits. */
   avoid?: string[];
+  lang?: Lang;
 };
 
 export type GenerateBoardResult = {
@@ -339,13 +341,14 @@ export async function generateTriviaBoard({
   vibe = "",
   difficulty = "medium",
   avoid = [],
+  lang = "en",
 }: GenerateBoardInput): Promise<Written<GenerateBoardResult>> {
   const client = new Anthropic();
 
   const response = await client.messages.parse({
     model: MODELS.board,
     max_tokens: 16000,
-    system: `${SYSTEM}\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL,
+    system: `${SYSTEM}\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL + langBrief(lang),
     output_config: outputConfig(
       MODELS.board,
       zodOutputFormat(GeneratedBoard),
@@ -507,11 +510,13 @@ export async function generateMostLikely({
   themes,
   count,
   avoid = [],
+  lang = "en",
 }: {
   themes: string[];
   count: number;
   /** Prompts this host has already been served. Off-limits. */
   avoid?: string[];
+  lang?: Lang;
 }): Promise<Written<Array<{ text: string }>>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
@@ -523,7 +528,9 @@ export async function generateMostLikely({
       "to\". The good ones are specific, faintly accusatory, and true of somebody " +
       "in every friend group: not \"most likely to be famous\" but \"most likely to " +
       "text 'omw' from the shower\". No two about the same thing. Clean enough for " +
-      "a living room with everyone's parents in it." + PERSONAL,
+      "a living room with everyone's parents in it." +
+      (lang === "ar" ? " In Arabic, every prompt begins «الأكثر احتمالاً أن»." : "") +
+      PERSONAL + langBrief(lang),
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedMostLikely), "low"),
     messages: [
       { role: "user", content: `Write ${overAsk(count, avoid)} prompts.${themeLine(themes)}` + alreadyAsked(avoid) },
@@ -533,7 +540,8 @@ export async function generateMostLikely({
   if (!parsed) throw new Error("Couldn't write those prompts.");
   const drafted = parsed.prompts
     .map((t) => t.trim())
-    .filter((t) => /^most likely to/i.test(t))
+    // The English opening is the whole format; the Arabic one is its equivalent.
+    .filter((t) => (lang === "ar" ? /^الأكثر/.test(t) : /^most likely to/i.test(t)))
     .map((text) => ({ text }));
   // Anything on the avoid list is dropped here, whatever the model did.
   const content = enforceAvoid(drafted, avoid, (p) => p.text).slice(0, count);
@@ -555,10 +563,12 @@ export async function generatePunchlines({
   themes,
   count,
   avoid = [],
+  lang = "en",
 }: {
   themes: string[];
   count: number;
   avoid?: string[];
+  lang?: Lang;
 }): Promise<Written<Prompt[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
@@ -571,7 +581,7 @@ export async function generatePunchlines({
       "\"The airline's new policy:\", \"My therapist finally admitted…\". " +
       "Each should invite ten different jokes, not one obvious one. Short. " +
       "No punchline of your own. Clean enough for a living room with " +
-      "everyone's parents in it." + PERSONAL,
+      "everyone's parents in it." + PERSONAL + langBrief(lang),
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedSetups), "low"),
     messages: [
       { role: "user", content: `Write ${overAsk(count, avoid)} setups.${themeLine(themes)}` + alreadyAsked(avoid) },
@@ -615,10 +625,12 @@ export async function generateCaptionPictures({
   themes,
   count,
   avoid = [],
+  lang = "en",
 }: {
   themes: string[];
   count: number;
   avoid?: string[];
+  lang?: Lang;
 }): Promise<Written<Prompt[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
@@ -631,7 +643,7 @@ export async function generateCaptionPictures({
       "shouldn't be, an expression that says everything. Use the literal, " +
       "searchable words a photo archive would title the file with — " +
       "'raccoon in a bin', 'cat on a keyboard' — never a joke, never a " +
-      "person's name, never a brand, and nothing sad or unkind." + PERSONAL,
+      "person's name, never a brand, and nothing sad or unkind." + PERSONAL + langBrief(lang),
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedSubjects), "low"),
     messages: [
       {
@@ -680,10 +692,12 @@ export async function generateStrokePairs({
   themes,
   count,
   avoid = [],
+  lang = "en",
 }: {
   themes: string[];
   count: number;
   avoid?: string[];
+  lang?: Lang;
 }): Promise<Written<Array<{ category: string; word: string }>>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
@@ -695,7 +709,7 @@ export async function generateStrokePairs({
       "category. Each round is a category plus one thing in it. The category " +
       "must be broad enough that the fake has something to draw — 'Animal', " +
       "not 'Animals with long necks' — and the thing must have a recognisable " +
-      "shape. Nothing abstract, no brands, no people's names." + PERSONAL,
+      "shape. Nothing abstract, no brands, no people's names." + PERSONAL + langBrief(lang),
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedStrokePairs), "low"),
     messages: [
       { role: "user", content: `Write ${overAsk(count, avoid)} rounds.${themeLine(themes)}` + alreadyAsked(avoid) },
@@ -730,11 +744,13 @@ export async function generateQuestionPairs({
   themes,
   count,
   avoid = [],
+  lang = "en",
 }: {
   themes: string[];
   count: number;
   /** Answers this host has already been served. Off-limits. */
   avoid?: string[];
+  lang?: Lang;
 }): Promise<Written<Array<{ question: string; decoy: string }>>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
@@ -748,7 +764,7 @@ export async function generateQuestionPairs({
       "the odd answer is the right KIND of thing and only slightly off. A decoy on a " +
       "different subject produces an obviously wrong answer and no game. Questions " +
       "are opinions and preferences, never facts with one right answer, so every " +
-      "answer is plausible. One line each. Clean enough for a living room." + PERSONAL,
+      "answer is plausible. One line each. Clean enough for a living room." + PERSONAL + langBrief(lang),
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedPairs), "low"),
     messages: [
       { role: "user", content: `Write ${overAsk(count, avoid)} pairs.${themeLine(themes)}` + alreadyAsked(avoid) },
@@ -817,6 +833,7 @@ export async function generateFeudPack({
   rounds,
   difficulty = "medium",
   avoid = [],
+  lang = "en",
 }: {
   /** Spread the rounds across these. Empty means anything goes. */
   themes: string[];
@@ -824,13 +841,14 @@ export async function generateFeudPack({
   difficulty?: Difficulty;
   /** Answers this host has already been served. Off-limits. */
   avoid?: string[];
+  lang?: Lang;
 }): Promise<Written<FeudQuestion[]>> {
   const client = new Anthropic();
 
   const response = await client.messages.parse({
     model: MODELS.board,
     max_tokens: 16000,
-    system: `${FEUD_SYSTEM}\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL,
+    system: `${FEUD_SYSTEM}\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL + langBrief(lang),
     output_config: outputConfig(
       MODELS.board,
       zodOutputFormat(GeneratedFeud),
@@ -966,10 +984,12 @@ export async function generateCategoryIdeas({
   count,
   hint = "",
   difficulty = "medium",
+  lang = "en",
 }: {
   count: number;
   hint?: string;
   difficulty?: Difficulty;
+  lang?: Lang;
 }): Promise<string[]> {
   const client = new Anthropic();
 
@@ -981,7 +1001,7 @@ export async function generateCategoryIdeas({
       "across different corners of general knowledge — film, music, sport, " +
       "food, history, science, language, the internet — so no single person " +
       "dominates the board. Titles are short and playable, never abstract " +
-      `academic headings.\n\nDifficulty: ${difficultyBrief[difficulty]}`,
+      `academic headings.\n\nDifficulty: ${difficultyBrief[difficulty]}` + langBrief(lang),
     output_config: outputConfig(
       MODELS.packs,
       zodOutputFormat(GeneratedCategories),
@@ -1034,12 +1054,14 @@ export async function generateStandingQuestions({
   count,
   difficulty = "medium",
   avoid = [],
+  lang = "en",
 }: {
   themes?: string[];
   count: number;
   difficulty?: Difficulty;
   /** Answers this host has already been served. Off-limits. */
   avoid?: string[];
+  lang?: Lang;
 }): Promise<Written<LiveItem[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
@@ -1052,7 +1074,7 @@ export async function generateStandingQuestions({
       "place. Never a question with several valid answers, and never one that " +
       "needs specialist knowledge. Order them easiest first; they should get " +
       "harder as the field thins out." +
-      `\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL,
+      `\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL + langBrief(lang),
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedStanding), "low"),
     messages: [
       { role: "user", content: `Write ${overAsk(count, avoid)} questions.${themeLine(themes)}` + alreadyAsked(avoid) },
@@ -1087,12 +1109,14 @@ export async function generateTimelineRounds({
   count,
   difficulty = "medium",
   avoid = [],
+  lang = "en",
 }: {
   themes?: string[];
   count: number;
   difficulty?: Difficulty;
   /** Answers this host has already been served. Off-limits. */
   avoid?: string[];
+  lang?: Lang;
 }): Promise<Written<LiveItem[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
@@ -1104,7 +1128,7 @@ export async function generateTimelineRounds({
       "first — the game shuffles them itself. Every fact must be genuinely " +
       "true and checkable. Space them out: five things from the same decade " +
       "is a coin flip, not a round. Keep each entry to a few words." +
-      `\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL,
+      `\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL + langBrief(lang),
     output_config: outputConfig(MODELS.board, zodOutputFormat(GeneratedTimeline), "medium"),
     messages: [
       { role: "user", content: `Write ${overAsk(count, avoid)} rounds.${themeLine(themes)}` + alreadyAsked(avoid) },
@@ -1139,11 +1163,13 @@ export async function generateSpectrums({
   themes = [],
   count,
   avoid = [],
+  lang = "en",
 }: {
   themes?: string[];
   count: number;
   /** Answers this host has already been served. Off-limits. */
   avoid?: string[];
+  lang?: Lang;
 }): Promise<Written<LiveItem[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
@@ -1154,7 +1180,7 @@ export async function generateSpectrums({
       "clue and the rest guess a point on the scale between them. The pair " +
       "must be a genuine spectrum with a debatable middle — 'Cold / Hot' " +
       "works, 'Alive / Dead' doesn't. Keep them everyday and arguable, the " +
-      "sort of thing a room will shout about." + PERSONAL,
+      "sort of thing a room will shout about." + PERSONAL + langBrief(lang),
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedSpectrums), "low"),
     messages: [
       { role: "user", content: `Write ${overAsk(count, avoid)} pairs.${themeLine(themes)}` + alreadyAsked(avoid) },
@@ -1192,11 +1218,13 @@ export async function generateImpostorPlaces({
   themes = [],
   count,
   avoid = [],
+  lang = "en",
 }: {
   themes?: string[];
   count: number;
   /** Answers this host has already been served. Off-limits. */
   avoid?: string[];
+  lang?: Lang;
 }): Promise<Written<ImpostorPlace[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
@@ -1207,7 +1235,7 @@ export async function generateImpostorPlaces({
       "know where everyone is and has to bluff, so every place needs to be " +
       "somewhere ordinary that anyone could picture, and the roles need to " +
       "be specific enough that a faker gets caught out. Six roles per place. " +
-      "Avoid anywhere so unusual that a vague answer would pass." + PERSONAL,
+      "Avoid anywhere so unusual that a vague answer would pass." + PERSONAL + langBrief(lang),
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedPlaces), "low"),
     messages: [
       { role: "user", content: `Write ${overAsk(count, avoid)} places.${themeLine(themes)}` + alreadyAsked(avoid) },
@@ -1241,12 +1269,14 @@ export async function generateWordPack({
   themes = [],
   count,
   avoid = [],
+  lang = "en",
 }: {
   kind: "grid" | "sketch" | "charades";
   themes?: string[];
   count: number;
   /** Answers this host has already been served. Off-limits. */
   avoid?: string[];
+  lang?: Lang;
 }): Promise<Written<string[]>> {
   const client = new Anthropic();
   const brief =
@@ -1265,7 +1295,7 @@ export async function generateWordPack({
   const response = await client.messages.parse({
     model: MODELS.packs,
     max_tokens: 2000,
-    system: `You write word packs for a party game.\n\n${brief}` + PERSONAL,
+    system: `You write word packs for a party game.\n\n${brief}` + PERSONAL + langBrief(lang),
     output_config: outputConfig(MODELS.packs, zodOutputFormat(GeneratedWords), "low"),
     messages: [
       { role: "user", content: `Write ${overAsk(count, avoid)} of them.${themeLine(themes)}` + alreadyAsked(avoid) },
@@ -1328,12 +1358,14 @@ export async function generateEmojiRiddles({
   count,
   difficulty = "medium",
   avoid = [],
+  lang = "en",
 }: {
   themes?: string[];
   count: number;
   difficulty?: Difficulty;
   /** Answers this host has already been served. Off-limits. */
   avoid?: string[];
+  lang?: Lang;
 }): Promise<Written<BuzzItem[]>> {
   const client = new Anthropic();
   const response = await client.messages.parse({
@@ -1363,7 +1395,7 @@ export async function generateEmojiRiddles({
       "to be honest. A footballer is a Person, not a Job. An app is a " +
       "Brand, not a Song. If none of the kinds fits, write a different " +
       "riddle instead of mislabelling this one." +
-      `\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL,
+      `\n\nDifficulty: ${difficultyBrief[difficulty]}` + PERSONAL + langBrief(lang),
     output_config: outputConfig(MODELS.board, zodOutputFormat(GeneratedRiddles), "low"),
     messages: [
       {
@@ -1454,6 +1486,7 @@ export async function generateRapidPrompts({
   themes = [],
   difficulty = "medium",
   avoid = [],
+  lang = "en",
 }: {
   mode: "categories";
   count: number;
@@ -1462,6 +1495,7 @@ export async function generateRapidPrompts({
   difficulty?: Difficulty;
   /** Answers this host has already been served. Off-limits. */
   avoid?: string[];
+  lang?: Lang;
 }): Promise<Written<string[]>> {
   const client = new Anthropic();
 
@@ -1480,7 +1514,7 @@ export async function generateRapidPrompts({
       `You write prompts for a fast-talking party game.\n\n${brief}\n\n` +
       "Everything must be answerable by an ordinary adult with no special " +
       "knowledge, and clean enough for a room full of friends.\n\n" +
-      `Difficulty: ${difficultyBrief[difficulty]}` + PERSONAL,
+      `Difficulty: ${difficultyBrief[difficulty]}` + PERSONAL + langBrief(lang),
     output_config: outputConfig(
       MODELS.packs,
       zodOutputFormat(GeneratedPrompts),

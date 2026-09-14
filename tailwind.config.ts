@@ -69,8 +69,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ["var(--font-display)", "Impact", "sans-serif"],
-        body: ["var(--font-body)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "var(--font-arabic)", "Impact", "sans-serif"],
+        body: ["var(--font-body)", "var(--font-arabic)", "system-ui", "sans-serif"],
       },
       boxShadow: {
         tile: "inset 0 1px 0 rgb(var(--line-rgb) / 0.08), 0 10px 30px rgb(var(--shadow-rgb) / 0.45)",

@@ -47,6 +47,10 @@ export default function HostPage({
   const { code } = use(params);
   const roomCode = code.toUpperCase();
   const { room, status, send } = useRoom(roomCode);
+  // The room's language marks the document, so Arabic content is set right.
+  useEffect(() => {
+    document.documentElement.lang = room?.lang ?? "en";
+  }, [room?.lang]);
 
   const router = useRouter();
   const me = useEntitlements();
@@ -308,6 +312,7 @@ export default function HostPage({
       <Stage id="lobby">
       <Lobby
         onNight={() => setShowNight(true)}
+        onLang={(lang) => send("room:lang", { lang })}
         room={room}
         onStart={(gameId) => {
           if (!canPlay(me.plan, gameId)) {

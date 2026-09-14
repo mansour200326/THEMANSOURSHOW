@@ -22,6 +22,8 @@ import {
   generateWordPack,
   hasApiKey,
 } from "@/lib/ai";
+import { cookies } from "next/headers";
+import { LANG_COOKIE, isLang, withLang } from "@/lib/lang";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -83,6 +85,9 @@ export async function POST(request: Request) {
     rounds && rounds > 0 ? Math.min(30, Math.max(3, rounds)) : fallback;
 
   const host = await currentHost();
+  const langCookie = (await cookies()).get(LANG_COOKIE)?.value;
+  const lang = isLang(langCookie) ? langCookie : "en";
+
   if (!canPlay(host.plan, gameId)) {
     return NextResponse.json(
       { error: GATE_COPY.game.line, gate: "game" },
@@ -101,59 +106,59 @@ export async function POST(request: Request) {
   > = {
     "last-one-standing": {
       key: "items",
-      write: () => generateStandingQuestions({ themes: spread, avoid, count: many(12), difficulty }),
+      write: () => generateStandingQuestions({ themes: spread, avoid, lang, count: many(12), difficulty }),
     },
     timeline: {
       key: "items",
-      write: () => generateTimelineRounds({ themes: spread, avoid, count: many(6), difficulty }),
+      write: () => generateTimelineRounds({ themes: spread, avoid, lang, count: many(6), difficulty }),
     },
     "dial-it-in": {
       key: "items",
-      write: () => generateSpectrums({ themes: spread, avoid, count: many(8) }),
+      write: () => generateSpectrums({ themes: spread, avoid, lang, count: many(8) }),
     },
     impostor: {
       key: "places",
-      write: () => generateImpostorPlaces({ themes: spread, avoid, count: 10 }),
+      write: () => generateImpostorPlaces({ themes: spread, avoid, lang, count: 10 }),
     },
     "sketch-and-guess": {
       key: "words",
-      write: () => generateWordPack({ kind: "sketch", themes: spread, avoid, count: many(12) }),
+      write: () => generateWordPack({ kind: "sketch", themes: spread, avoid, lang, count: many(12) }),
     },
     "most-likely-to": {
       key: "prompts",
-      write: () => generateMostLikely({ themes: spread, avoid, count: many(8) }),
+      write: () => generateMostLikely({ themes: spread, avoid, lang, count: many(8) }),
     },
     punchline: {
       key: "prompts",
-      write: () => generatePunchlines({ themes: spread, avoid, count: many(6) }),
+      write: () => generatePunchlines({ themes: spread, avoid, lang, count: many(6) }),
     },
     "caption-this": {
       key: "prompts",
-      write: () => generateCaptionPictures({ themes: spread, avoid, count: many(6) }),
+      write: () => generateCaptionPictures({ themes: spread, avoid, lang, count: many(6) }),
     },
     "act-it-out": {
       key: "words",
       // A turn burns through six or eight words; write for every turn.
-      write: () => generateWordPack({ kind: "charades", themes: spread, avoid, count: 8 * many(8) }),
+      write: () => generateWordPack({ kind: "charades", themes: spread, avoid, lang, count: 8 * many(8) }),
     },
     "one-stroke": {
       key: "pairs",
-      write: () => generateStrokePairs({ themes: spread, avoid, count: many(3) }),
+      write: () => generateStrokePairs({ themes: spread, avoid, lang, count: many(3) }),
     },
     "bluff-trivia": {
       key: "pairs",
-      write: () => generateQuestionPairs({ themes: spread, avoid, count: many(6) }),
+      write: () => generateQuestionPairs({ themes: spread, avoid, lang, count: many(6) }),
     },
     "emoji-riddles": {
       key: "items",
-      write: () => generateEmojiRiddles({ themes: spread, avoid, count: many(18), difficulty }),
+      write: () => generateEmojiRiddles({ themes: spread, avoid, lang, count: many(18), difficulty }),
     },
   };
 
   // Everything this host has been asked in this game, plus everything
   // already written under this theme for anyone — so new boards are
   // different from each other, not just from this host's own past.
-  const avoid = await everythingToAvoid(host, gameId, themes);
+  const avoid = await everythingToAvoid(host, withLang(gameId, lang), themes);
   // Broad themes get sent into a different corner each time. The library
   // still keys on the plain theme, so the shelf isn't fragmented.
   const spread = broaden(themes);
@@ -170,7 +175,7 @@ export async function POST(request: Request) {
     // count rides along in the difficulty slot rather than silently serving
     // somebody the wrong length.
     const served = await serveContent({
-      gameType: gameId,
+      gameType: withLang(gameId, lang),
       themes,
       difficulty: `${difficulty}:${rounds ?? "default"}`,
       host,

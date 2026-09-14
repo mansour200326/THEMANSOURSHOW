@@ -9,6 +9,7 @@ import { IMPACT, ShowMark } from "@/components/ShowMark";
 import { AccountLink } from "@/components/account/AccountLink";
 import { Onboarding, useFirstVisit } from "@/components/Onboarding";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LangToggle } from "@/components/LangToggle";
 
 export default function Home() {
   const router = useRouter();
@@ -58,6 +59,7 @@ export default function Home() {
         </button>
         <div className="ml-auto flex flex-wrap items-center justify-end gap-2 sm:gap-3">
           <AccountLink className="whitespace-nowrap px-4 py-2 text-sm sm:px-5 sm:py-2.5" />
+          <LangToggle prominent className="whitespace-nowrap px-4 py-2 text-sm sm:px-5 sm:py-2.5" />
           <ThemeToggle prominent className="whitespace-nowrap px-4 py-2 text-sm sm:px-5 sm:py-2.5" />
         </div>
       </div>

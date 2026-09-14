@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { DifficultyBar } from "@/components/DifficultyBar";
 import type { Difficulty } from "@/lib/difficulty";
 import { suggestionsFor } from "@/lib/games/themeSuggestions";
+import { useLang } from "@/components/LangToggle";
 
 type Props = {
   gameName: string;
@@ -55,7 +56,8 @@ export function GameSetup({
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [suggesting, setSuggesting] = useState(false);
   // Topics chosen for this particular game — see lib/games/themeSuggestions.
-  const picks = suggestionsFor(gameId);
+  const lang = useLang();
+  const picks = suggestionsFor(gameId, lang);
   const [minutes, setMinutes] = useState(lengths?.[Math.floor(lengths.length / 2)]);
 
   const filled = categories.map((c) => c.trim()).filter(Boolean);

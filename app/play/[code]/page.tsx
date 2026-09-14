@@ -43,6 +43,10 @@ export default function PlayPage({
   // Saying who we are is what lets the server strip the other players'
   // secrets before they ever reach this phone.
   const { room, status, send } = useRoom(roomCode, playerId);
+  // The room's language marks the document, so Arabic content is set right.
+  useEffect(() => {
+    document.documentElement.lang = room?.lang ?? "en";
+  }, [room?.lang]);
 
   // The screen takes its colour from whatever game is running.
   useAccentFamily(room?.gameId);

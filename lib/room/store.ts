@@ -70,7 +70,7 @@ function prune() {
   }
 }
 
-export function createRoom(maxPlayers = 12): Room {
+export function createRoom(maxPlayers = 12, lang: "en" | "ar" = "en"): Room {
   prune();
   let code = makeRoomCode();
   // Vanishingly unlikely, but a collision would hijack someone else's game.
@@ -80,6 +80,7 @@ export function createRoom(maxPlayers = 12): Room {
     code,
     players: [],
     gameId: null,
+    lang,
     game: null,
     createdAt: Date.now(),
     touchedAt: Date.now(),
@@ -313,6 +314,13 @@ function reduceRoom(room: Room, action: Action): Room {
         delete (started as Record<string, unknown>)[key];
       });
       return started;
+    }
+
+    /** The host flipped the language in the lobby; every phone follows. */
+    case "room:lang": {
+      const lang = action.payload?.lang;
+      if (lang !== "en" && lang !== "ar") return room;
+      return { ...room, lang };
     }
 
     case "game:end": {

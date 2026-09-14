@@ -7,6 +7,8 @@ import { currentHost } from "@/lib/plan/host";
 import { GATE_COPY, canPlay } from "@/lib/plan/limits";
 import { z } from "zod";
 import { friendlyAiError, generateRapidPrompts, hasApiKey } from "@/lib/ai";
+import { cookies } from "next/headers";
+import { LANG_COOKIE, isLang, withLang } from "@/lib/lang";
 
 export const runtime = "nodejs";
 export const maxDuration = 180;
@@ -47,8 +49,10 @@ export async function POST(request: Request) {
   }
 
   try {
+    const langCookie = (await cookies()).get(LANG_COOKIE)?.value;
+    const lang = isLang(langCookie) ? langCookie : "en";
     const served = await serveContent({
-      gameType: parsed.data.mode,
+      gameType: withLang(parsed.data.mode, lang),
       themes: parsed.data.themes ?? [],
       difficulty: `${parsed.data.difficulty ?? "medium"}:${parsed.data.count}`,
       host,
@@ -56,8 +60,9 @@ export async function POST(request: Request) {
       write: async () =>
         generateRapidPrompts({
           ...parsed.data,
+          lang,
           themes: broaden(parsed.data.themes ?? []),
-          avoid: await everythingToAvoid(host, parsed.data.mode, parsed.data.themes ?? []),
+          avoid: await everythingToAvoid(host, withLang(parsed.data.mode, lang), parsed.data.themes ?? []),
         }),
     });
 

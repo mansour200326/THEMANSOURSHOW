@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Oswald } from "next/font/google";
+import { Cairo, Inter, Oswald } from "next/font/google";
 import { ConnectionBar } from "@/components/ConnectionBar";
 import { SoundControl } from "@/components/SoundControl";
 import { THEME_BOOT, ThemeToggle } from "@/components/ThemeToggle";
+import { LANG_BOOT } from "@/lib/lang";
 import "./globals.css";
 
 const display = Oswald({
@@ -15,6 +16,18 @@ const display = Oswald({
 const body = Inter({
   subsets: ["latin"],
   variable: "--font-body",
+  display: "swap",
+});
+
+/*
+ * Arabic. The display face has no Arabic glyphs, so Cairo sits behind it in
+ * every stack: Latin keeps its face, Arabic falls through to this one, and
+ * a mixed line reads as one line.
+ */
+const arabic = Cairo({
+  subsets: ["arabic", "latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-arabic",
   display: "swap",
 });
 
@@ -49,7 +62,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${display.variable} ${body.variable} ${arabic.variable}`} suppressHydrationWarning>
       <head>
         {/*
           * Applies a stored light-mode choice before anything paints. React
@@ -57,6 +70,7 @@ export default function RootLayout({
           * has already been on screen for a frame.
           */}
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
+        <script dangerouslySetInnerHTML={{ __html: LANG_BOOT }} />
       </head>
       <body>
         {children}

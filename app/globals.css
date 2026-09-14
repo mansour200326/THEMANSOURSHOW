@@ -231,3 +231,21 @@ html[data-theme="light"] .g-word { --accent-rgb: 94 155 20; --accent-bright-rgb:
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/*
+ * Arabic content in an English-built layout.
+ *
+ * Every piece of text decides its own direction from its first strong
+ * character, so an Arabic clue reads right-to-left inside a card that is
+ * otherwise laid out left-to-right, and an English button next to it is
+ * unaffected. When the document is Arabic, "left" means "start", and the
+ * letter-spacing the display face wears is removed: spaced-out Arabic
+ * letters disconnect, and connected letters are the script.
+ */
+h1, h2, h3, h4, p, span, li, button, a, label, input, textarea, figcaption, td, th {
+  unicode-bidi: plaintext;
+}
+html[lang="ar"] .text-left { text-align: start; }
+html[lang="ar"] .text-right { text-align: end; }
+html[lang="ar"] [class*="tracking-"] { letter-spacing: 0 !important; }
