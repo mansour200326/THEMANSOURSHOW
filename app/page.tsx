@@ -43,22 +43,24 @@ export default function Home() {
 
   return (
     <main className="relative">
-      {/* Top right: the lights, and the only entrance to an account. */}
-      <div className="absolute right-5 top-5 z-20 flex items-center gap-3">
-        <AccountLink />
-        <ThemeToggle prominent />
-      </div>
       {/*
-        * A button, not a footnote. Set in the same grey as the legal line it
-        * looked like exactly that, and a first-time host is the one person
-        * who most needs to notice it.
+        * One bar across the top, wrapping when it has to. It was two groups
+        * pinned to opposite corners, which met in the middle on a phone and
+        * sat on top of each other. "How it works" is a button, not a
+        * footnote: a first-time host is the one person who most needs it.
         */}
-      <button
-        onClick={() => setShowHow(true)}
-        className="btn-accent absolute left-5 top-5 z-20 px-5 py-2.5 text-sm"
-      >
-        ▶ How it works
-      </button>
+      <div className="absolute inset-x-0 top-0 z-20 flex flex-wrap items-center gap-2 p-3 sm:gap-3 sm:p-5">
+        <button
+          onClick={() => setShowHow(true)}
+          className="btn-accent whitespace-nowrap px-4 py-2 text-sm sm:px-5 sm:py-2.5"
+        >
+          ▶ How it works
+        </button>
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+          <AccountLink className="whitespace-nowrap px-4 py-2 text-sm sm:px-5 sm:py-2.5" />
+          <ThemeToggle prominent className="whitespace-nowrap px-4 py-2 text-sm sm:px-5 sm:py-2.5" />
+        </div>
+      </div>
       {((firstVisit && introDone) || showHow) && (
         <Onboarding
           onDone={() => {

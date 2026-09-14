@@ -76,11 +76,12 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight }
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col rounded-2xl border border-line/10 bg-line/[0.02] px-4 py-2.5 lg:px-5 lg:py-[1vmin]">
-          <div className="flex shrink-0 items-center justify-between gap-4">
-            <span className="t-label font-display uppercase text-moon-deep">
+          <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2">
+            <span className="t-label whitespace-nowrap font-display uppercase text-moon-deep">
               In the room · {live.length}
             </span>
-            <div className="flex items-center gap-2">
+            {/* Six buttons never fit one phone-width row; they wrap and stay inside the box. */}
+            <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
               {bots.length > 0 && (
                 <button onClick={onClearBots} className="btn-ghost px-3 py-1 text-xs">
                   Clear bots
