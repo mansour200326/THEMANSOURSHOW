@@ -51,7 +51,7 @@ export function SketchPlayer({
     const scored = state.lastScores[me.id] ?? 0;
     return (
       <Centre>
-        <p className="font-display text-sm uppercase tracking-[0.25em] text-moon-deep">{t(t(t("It was")))}</p>
+        <p className="font-display text-sm uppercase tracking-[0.25em] text-moon-deep">{t("It was")}</p>
         <p className="accent-text font-display text-4xl uppercase">
           {state.words[state.round]}
         </p>
@@ -61,7 +61,7 @@ export function SketchPlayer({
             scored ? "text-emerald-300" : "text-moon-dim",
           ].join(" ")}
         >
-          {scored ? `+${scored}` : t(t(t("Nothing that time")))}
+          {scored ? `+${scored}` : t("Nothing that time")}
         </p>
       </Centre>
     );
@@ -71,7 +71,7 @@ export function SketchPlayer({
     return (
       <main className="flex min-h-dvh flex-col gap-3 p-4">
         <div className="text-center">
-          <p className="font-display text-xs uppercase tracking-[0.25em] text-moon-deep">{t(t(t("Draw this — no letters, no numbers")))}</p>
+          <p className="font-display text-xs uppercase tracking-[0.25em] text-moon-deep">{t("Draw this — no letters, no numbers")}</p>
           <p className="accent-text font-display text-3xl uppercase">
             {state.yourWord}
           </p>
@@ -93,7 +93,7 @@ export function SketchPlayer({
               key={hex}
               type="button"
               onClick={() => setColour(i)}
-              aria-label={t(t(t("Colour {n}")), { n: i + 1 })}
+              aria-label={t("Colour {n}", { n: i + 1 })}
               aria-pressed={colour === i}
               className={[
                 "h-11 rounded-full border-2 transition-transform",
@@ -113,7 +113,7 @@ export function SketchPlayer({
               key={w}
               type="button"
               onClick={() => setWidth(i)}
-              aria-label={t(t(t("Nib {n}")), { n: i + 1 })}
+              aria-label={t("Nib {n}", { n: i + 1 })}
               aria-pressed={width === i}
               className={[
                 "flex h-12 w-12 items-center justify-center rounded-full border transition-colors",
@@ -135,8 +135,8 @@ export function SketchPlayer({
         </div>
 
         <div className="mt-auto flex gap-2">
-          <button onClick={onUndo} className="btn-ghost flex-1 py-4">{t(t(t("Undo")))}</button>
-          <button onClick={onClear} className="btn-ghost flex-1 py-4">{t(t(t("Clear")))}</button>
+          <button onClick={onUndo} className="btn-ghost flex-1 py-4">{t("Undo")}</button>
+          <button onClick={onClear} className="btn-ghost flex-1 py-4">{t("Clear")}</button>
         </div>
       </main>
     );
@@ -150,7 +150,7 @@ export function SketchPlayer({
         <p className="font-display text-3xl uppercase tracking-wide text-emerald-300">
           Got it — #{place}
         </p>
-        <p className="text-moon-deep">{t(t(t("Don't say it out loud.")))}</p>
+        <p className="text-moon-deep">{t("Don't say it out loud.")}</p>
       </Centre>
     );
   }
@@ -159,7 +159,7 @@ export function SketchPlayer({
 
   return (
     <main className="flex min-h-dvh flex-col justify-center gap-4 p-6">
-      <p className="text-center text-moon-dim">{t(t(t("What is it?")))}</p>
+      <p className="text-center text-moon-dim">{t("What is it?")}</p>
       <input
         value={text}
         onChange={(e) => setText(e.target.value)}
@@ -169,7 +169,7 @@ export function SketchPlayer({
             setText("");
           }
         }}
-        placeholder={t(t(t(t("Type a guess"))))}
+        placeholder={t("Type a guess")}
         autoFocus
         maxLength={40}
         className="field py-5 text-center text-2xl"
@@ -182,7 +182,7 @@ export function SketchPlayer({
         }}
         disabled={!text.trim()}
         className="btn-accent w-full py-6 text-2xl"
-      >{t(t(t(t("Guess"))))}</button>
+      >{t("Guess")}</button>
       {mine.length > 0 && (
         <div className="flex flex-wrap justify-center gap-2">
           {mine.slice(-4).map((g, i) => (

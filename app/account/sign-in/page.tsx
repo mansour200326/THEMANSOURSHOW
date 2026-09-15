@@ -31,8 +31,8 @@ export default async function SignInPage({
       </Link>
 
       <div>
-        <h1 className="brand-text font-display text-4xl font-bold uppercase tracking-tight">{t(t(t("Sign in")))}</h1>
-        <p className="mt-2 text-moon-dim">{t(t(t("Only the host needs this. Signed in, the questions you've played follow you from the TV to the laptop to your phone, so nothing repeats. Everyone else just joins with the code on the TV.")))}</p>
+        <h1 className="brand-text font-display text-4xl font-bold uppercase tracking-tight">{t("Sign in")}</h1>
+        <p className="mt-2 text-moon-dim">{t("Only the host needs this. Signed in, the questions you've played follow you from the TV to the laptop to your phone, so nothing repeats. Everyone else just joins with the code on the TV.")}</p>
       </div>
 
       {!hasDatabase() ? (
@@ -61,20 +61,20 @@ export default async function SignInPage({
             * get people trying again for ten minutes.
             */}
           {error === "Configuration" ? (
-            <p className="rounded-xl border border-amber-400/40 bg-amber-500/10 px-4 py-3 text-amber-100">{t(t(t("Sign-in is misconfigured on the server — nothing you did. The logs will say which setting.")))}</p>
+            <p className="rounded-xl border border-amber-400/40 bg-amber-500/10 px-4 py-3 text-amber-100">{t("Sign-in is misconfigured on the server — nothing you did. The logs will say which setting.")}</p>
           ) : error ? (
-            <p className="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-rose-200">{t(t(t("That link didn't work. Try again — they expire quickly.")))}</p>
+            <p className="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-rose-200">{t("That link didn't work. Try again — they expire quickly.")}</p>
           ) : null}
           <input
             type="email"
             name="email"
             required
             autoComplete="email"
-            placeholder={t(t(t(t("you@example.com"))))}
+            placeholder={t("you@example.com")}
             className="field py-4 text-center text-lg"
           />
           <button type="submit" className="btn-brand w-full py-4 text-lg">
-            {canEmail() ? t(t(t("Email me a link"))) : t(t("Make me a link"))}
+            {canEmail() ? t("Email me a link") : t("Make me a link")}
           </button>
 
           {/* Don't promise an email that nothing is going to send. */}
@@ -89,7 +89,7 @@ export default async function SignInPage({
         </form>
       )}
 
-      <Link href="/" className="btn-ghost self-start px-5 py-3 text-sm">{t(t(t("Back")))}</Link>
+      <Link href="/" className="btn-ghost self-start px-5 py-3 text-sm">{t("Back")}</Link>
     </main>
   );
 }

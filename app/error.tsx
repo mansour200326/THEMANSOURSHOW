@@ -25,12 +25,12 @@ export default function Error({
 
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6 text-center">
-      <p className="font-display text-sm uppercase tracking-[0.3em] text-moon-deep">{t(t(t("Well, that's embarrassing")))}</p>
-      <h1 className="brand-text font-display text-4xl font-bold uppercase tracking-tight sm:text-6xl">{t(t(t("Something broke")))}</h1>
-      <p className="max-w-md text-moon-dim">{t(t(t("The room is still on the server — nobody has been thrown out. Try that again, and if it keeps happening the code on the TV still works.")))}</p>
+      <p className="font-display text-sm uppercase tracking-[0.3em] text-moon-deep">{t("Well, that's embarrassing")}</p>
+      <h1 className="brand-text font-display text-4xl font-bold uppercase tracking-tight sm:text-6xl">{t("Something broke")}</h1>
+      <p className="max-w-md text-moon-dim">{t("The room is still on the server — nobody has been thrown out. Try that again, and if it keeps happening the code on the TV still works.")}</p>
       <div className="flex gap-3">
-        <button onClick={reset} className="btn-brand px-8 py-4 text-lg">{t(t(t("Try again")))}</button>
-        <a href="/" className="btn-ghost px-6 py-4">{t(t(t("Back to the start")))}</a>
+        <button onClick={reset} className="btn-brand px-8 py-4 text-lg">{t("Try again")}</button>
+        <a href="/" className="btn-ghost px-6 py-4">{t("Back to the start")}</a>
       </div>
     </main>
   );

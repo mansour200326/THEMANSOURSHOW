@@ -71,27 +71,27 @@ export function NightScreen({
     <main className="flex min-h-dvh lg:h-dvh flex-col gap-[2vmin] p-[3vmin]">
       <header className="flex shrink-0 items-baseline justify-between">
         <div>
-          <p className="t-label font-display uppercase text-moon-deep">{t(t(t("Tonight")))}</p>
+          <p className="t-label font-display uppercase text-moon-deep">{t("Tonight")}</p>
           <h1 className="brand-text font-display text-[clamp(2rem,5vw,4.5rem)] font-bold uppercase leading-none tracking-tight">
             {rows.length ? `${rows[0].name} wins the night` : "Nothing played yet"}
           </h1>
         </div>
         <div className="flex gap-2">
           {night.length > 0 && (
-            <button onClick={onClear} className="btn-ghost px-4 py-2 text-[clamp(0.95rem,1.4vw,1.7rem)]">{t(t(t("Start a new night")))}</button>
+            <button onClick={onClear} className="btn-ghost px-4 py-2 text-[clamp(0.95rem,1.4vw,1.7rem)]">{t("Start a new night")}</button>
           )}
-          <button onClick={onBack} className="btn-accent px-6 py-2">{t(t(t("Back to the lobby")))}</button>
+          <button onClick={onBack} className="btn-accent px-6 py-2">{t("Back to the lobby")}</button>
         </div>
       </header>
 
       {!night.length ? (
-        <p className="text-moon-dim">{t(t(t("Play a game through to the end and it lands here. The four screen-only games count too, as long as they were opened from this lobby.")))}</p>
+        <p className="text-moon-dim">{t("Play a game through to the end and it lands here. The four screen-only games count too, as long as they were opened from this lobby.")}</p>
       ) : (
         <div className="min-h-0 flex-1 overflow-auto rounded-3xl border border-line/10 bg-line/[0.02]">
           <table className="w-full text-left">
             <thead className="sticky top-0 bg-dusk">
               <tr className="text-moon-deep">
-                <th className="px-5 py-3 font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-widest">{t(t(t("Who")))}</th>
+                <th className="px-5 py-3 font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-widest">{t("Who")}</th>
                 {night.map((g, i) => (
                   <th
                     key={i}
@@ -100,10 +100,10 @@ export function NightScreen({
                     {g.label}
                   </th>
                 ))}
-                <th className="px-5 py-3 text-right font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-widest text-accent">{t(t(t("Night")))}</th>
+                <th className="px-5 py-3 text-right font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-widest text-accent">{t("Night")}</th>
               </tr>
               <tr className="text-moon-deep/70">
-                <th className="px-5 pb-2 text-[0.65rem] font-normal normal-case tracking-normal">{t(t(t("3 · 2 · 1 for first, second, third in each game. Small number is the score in that game.")))}</th>
+                <th className="px-5 pb-2 text-[0.65rem] font-normal normal-case tracking-normal">{t("3 · 2 · 1 for first, second, third in each game. Small number is the score in that game.")}</th>
                 {night.map((_, i) => <th key={i} />)}
                 <th />
               </tr>

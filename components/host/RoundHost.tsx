@@ -70,7 +70,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
       {roundCard}
       <header className="flex shrink-0 items-center justify-between">
         <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-dim">
-          {t(t(t("Round {n} of {total}")), { n: state.round + 1, total: state.prompts.length })}
+          {t("Round {n} of {total}", { n: state.round + 1, total: state.prompts.length })}
         </span>
       </header>
 
@@ -100,7 +100,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
           <Standings room={room} />
         ) : state.phase === "collect" ? (
           <>
-            <p className="font-display text-[clamp(1rem,2vw,2.2rem)] uppercase tracking-[0.2em] text-accent">{t(t(t("Answering on their phones")))}</p>
+            <p className="font-display text-[clamp(1rem,2vw,2.2rem)] uppercase tracking-[0.2em] text-accent">{t("Answering on their phones")}</p>
             <div className="flex flex-wrap justify-center gap-[1vmin]">
               {live.map((p) => {
                 const done = state.submissions[p.id] !== undefined;
@@ -171,7 +171,7 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
                       </span>
                       <span className="flex shrink-0 items-center gap-3">
                         {revealed && isTruth && (
-                          <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-widest text-emerald-300">{t(t(t("The truth")))}</span>
+                          <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-widest text-emerald-300">{t("The truth")}</span>
                         )}
                         {revealed && author && (
                           <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-widest text-moon-dim">
@@ -213,8 +213,8 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
             {state.phase === "vote" && (
               <p className="pt-[1vmin] text-center font-display text-[clamp(0.8rem,1.2vw,1.3rem)] uppercase tracking-[0.2em] text-moon-dim">
                 {waitingOn.length
-                  ? t(t(t("Waiting on {names}")), { names: waitingOn.map((p) => p.name).join("، ") })
-                  : t(t(t("Counting…")))}
+                  ? t("Waiting on {names}", { names: waitingOn.map((p) => p.name).join("، ") })
+                  : t("Counting…")}
               </p>
             )}
           </div>
@@ -226,13 +226,13 @@ export function RoundHost({ room, state, onForce, onNext, onQuit, onAdjust }: Pr
       <div className="shrink-0 space-y-[1vmin]">
         <div className="flex justify-center gap-3">
           {(state.phase === "collect" || state.phase === "vote") && (
-            <button onClick={onForce} className="btn-ghost text-[clamp(0.95rem,1.4vw,1.7rem)]">{t(t(t("Skip the stragglers")))}</button>
+            <button onClick={onForce} className="btn-ghost text-[clamp(0.95rem,1.4vw,1.7rem)]">{t("Skip the stragglers")}</button>
           )}
           {state.phase === "reveal" && (
-            <button onClick={onNext} className="btn-accent px-10 py-3 text-lg">{t(t(t("Next round")))}</button>
+            <button onClick={onNext} className="btn-accent px-10 py-3 text-lg">{t("Next round")}</button>
           )}
           {state.phase === "done" && (
-            <button onClick={onQuit} className="btn-accent px-10 py-3 text-lg">{t(t(t("Back to the lobby")))}</button>
+            <button onClick={onQuit} className="btn-accent px-10 py-3 text-lg">{t("Back to the lobby")}</button>
           )}
         </div>
 
@@ -280,7 +280,7 @@ function Standings({ room }: { room: Room }) {
         </WinnerMoment>
       )}
       <div className="w-full space-y-2">
-      <p className="mb-[2vmin] text-center font-display text-[clamp(1.5rem,4vw,4rem)] uppercase text-accent">{t(t(t("Segment over")))}</p>
+      <p className="mb-[2vmin] text-center font-display text-[clamp(1.5rem,4vw,4rem)] uppercase text-accent">{t("Segment over")}</p>
       {ranked.map((p, i) => (
         <motion.div
           key={p.id}

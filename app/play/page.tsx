@@ -17,8 +17,8 @@ export default function JoinPage() {
   return (
     <main className="flex min-h-dvh flex-col justify-center gap-6 p-6">
       <div className="text-center">
-        <p className="font-display text-xs uppercase tracking-[0.3em] text-moon-deep">{t(t(t("Big Night")))}</p>
-        <h1 className="mt-2 font-display text-3xl uppercase tracking-wide text-moon">{t(t(t("Enter the room code")))}</h1>
+        <p className="font-display text-xs uppercase tracking-[0.3em] text-moon-deep">{t("Big Night")}</p>
+        <h1 className="mt-2 font-display text-3xl uppercase tracking-wide text-moon">{t("Enter the room code")}</h1>
       </div>
 
       <input
@@ -39,9 +39,9 @@ export default function JoinPage() {
         onClick={go}
         disabled={!ready}
         className="btn-brand w-full py-6 text-2xl"
-      >{t(t(t(t("Join"))))}</button>
+      >{t("Join")}</button>
 
-      <p className="text-center text-sm text-moon-deep">{t(t(t("The code is on the TV.")))}</p>
+      <p className="text-center text-sm text-moon-deep">{t("The code is on the TV.")}</p>
     </main>
   );
 }

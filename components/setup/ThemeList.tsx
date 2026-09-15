@@ -97,7 +97,7 @@ export function ThemeList({
             disabled={busy}
             className="btn-ghost px-3 py-1.5 text-xs"
           >
-            {busy ? t(t(t("Thinking…"))) : t(t("✦ Suggest for me"))}
+            {busy ? t("Thinking…") : t("✦ Suggest for me")}
           </button>
           <span className="font-display text-xs tabular-nums text-moon-deep">
             {filled.length}/{themes.length}
@@ -124,7 +124,7 @@ export function ThemeList({
               onClick={() => onChange(themes.filter((_, j) => j !== i))}
               disabled={themes.length <= min}
               className="btn-ghost h-10 w-10 shrink-0 px-0 py-0 text-lg"
-              aria-label={t(t(t("Remove {noun} {n}")), { noun: t(noun), n: i + 1 })}
+              aria-label={t("Remove {noun} {n}", { noun: t(noun), n: i + 1 })}
             >
               ×
             </button>
@@ -147,7 +147,7 @@ export function ThemeList({
       )}
 
       <div className="mt-5">
-        <p className="t-label font-display uppercase text-moon-deep/70">{t(t(t("Or tap one")))}</p>
+        <p className="t-label font-display uppercase text-moon-deep/70">{t("Or tap one")}</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {SUGGESTIONS.map((topic) => {
             const used = filled.some(

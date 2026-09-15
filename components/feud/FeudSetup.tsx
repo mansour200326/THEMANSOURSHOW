@@ -60,13 +60,13 @@ export function FeudSetup({
         <Link
           href={backHref()}
           className="font-display text-xs uppercase tracking-[0.2em] text-moon-deep hover:text-moon/75"
-        >{t(t(t(t("← Back"))))}</Link>
+        >{t("← Back")}</Link>
       </header>
 
       <div className="mt-10">
-        <p className="t-label font-display uppercase text-moon-deep">{t(t(t("Big Night presents")))}</p>
-        <h1 className="accent-text mt-1 font-display text-5xl font-bold uppercase tracking-tight sm:text-7xl">{t(t(t("Face-Off")))}</h1>
-        <p className="mt-3 text-moon-dim">{t(t(t("Two to six teams, one survey board, three strikes each. No phones — you run it from here and everyone shouts.")))}</p>
+        <p className="t-label font-display uppercase text-moon-deep">{t("Big Night presents")}</p>
+        <h1 className="accent-text mt-1 font-display text-5xl font-bold uppercase tracking-tight sm:text-7xl">{t("Face-Off")}</h1>
+        <p className="mt-3 text-moon-dim">{t("Two to six teams, one survey board, three strikes each. No phones — you run it from here and everyone shouts.")}</p>
       </div>
 
       {canResume && (
@@ -75,8 +75,8 @@ export function FeudSetup({
           animate={{ opacity: 1, y: 0 }}
           className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-accent/40 bg-accent/[0.08] px-5 py-4"
         >
-          <p className="text-moon/90">{t(t(t("There's a game in progress.")))}</p>
-          <button onClick={onResume} className="btn-brand">{t(t(t("Resume game")))}</button>
+          <p className="text-moon/90">{t("There's a game in progress.")}</p>
+          <button onClick={onResume} className="btn-brand">{t("Resume game")}</button>
         </motion.div>
       )}
 
@@ -85,14 +85,14 @@ export function FeudSetup({
 
         <ThemeList
         gameId={"face-off"}
-          title={t(t(t(t("Survey themes"))))}
-          hint={t(t(t(t("What the questions should be about. Add a few and the rounds spread across them — we write the survey and rank the answers."))))}
+          title={t("Survey themes")}
+          hint={t("What the questions should be about. Add a few and the rounds spread across them — we write the survey and rank the answers.")}
           themes={themes}
           onChange={setThemes}
         />
 
         <div>
-          <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">{t(t(t("Rounds")))}</h2>
+          <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">{t("Rounds")}</h2>
           <div className="mt-3 flex gap-2">
             {ROUND_CHOICES.map((n) => (
               <button
@@ -113,8 +113,8 @@ export function FeudSetup({
         </div>
 
         <div>
-          <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">{t(t(t("Think time")))}</h2>
-          <p className="mt-1 text-sm text-moon-deep">{t(t(t("How long a team gets per answer. Nothing is enforced — it runs out and you decide.")))}</p>
+          <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">{t("Think time")}</h2>
+          <p className="mt-1 text-sm text-moon-deep">{t("How long a team gets per answer. Nothing is enforced — it runs out and you decide.")}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {FEUD_CLOCK_CHOICES.map((n) => (
               <button
@@ -154,20 +154,20 @@ export function FeudSetup({
           disabled={generating}
           className="btn-brand px-16 py-5 text-2xl"
         >
-          {generating ? t(t(t("Writing the survey…"))) : t(t("Build the survey"))}
+          {generating ? t("Writing the survey…") : t("Build the survey")}
         </button>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <button
             onClick={() => onStart(config("mine"))}
             disabled={generating}
             className="btn-accent px-6 py-2.5 text-sm"
-          >{t(t(t(t("✎ Write my own survey"))))}</button>
+          >{t("✎ Write my own survey")}</button>
           {/* The bundled packs are English; an Arabic room writes its own. */}
 {lang !== "ar" && (<button
             onClick={() => onStart(config("sample"))}
             disabled={generating}
             className="btn-ghost text-sm"
-          >{t(t(t(t("Skip it — play the sample pack"))))}</button>)}
+          >{t("Skip it — play the sample pack")}</button>)}
         </div>
       </div>
     </main>

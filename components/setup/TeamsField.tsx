@@ -39,7 +39,7 @@ export function TeamsField({ names, onChange, max = MAX_TEAMS }: Props) {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">{t(t(t("Teams")))}</h2>
+        <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">{t("Teams")}</h2>
         <div className="flex items-center gap-2">
           <span className="font-display text-sm tabular-nums text-moon-deep">
             {names.length}
@@ -49,7 +49,7 @@ export function TeamsField({ names, onChange, max = MAX_TEAMS }: Props) {
             onClick={() => onChange(names.slice(0, -1))}
             disabled={names.length <= MIN_TEAMS}
             className="btn-ghost h-9 w-9 px-0 py-0 text-lg"
-            aria-label={t(t(t(t("Remove team"))))}
+            aria-label={t("Remove team")}
           >
             −
           </button>
@@ -58,7 +58,7 @@ export function TeamsField({ names, onChange, max = MAX_TEAMS }: Props) {
             onClick={() => onChange([...names, nextTeamName(names.length)])}
             disabled={names.length >= max}
             className="btn-ghost h-9 w-9 px-0 py-0 text-lg"
-            aria-label={t(t(t(t("Add team"))))}
+            aria-label={t("Add team")}
           >
             +
           </button>
@@ -74,7 +74,7 @@ export function TeamsField({ names, onChange, max = MAX_TEAMS }: Props) {
             <input
               value={name}
               onChange={(e) => setName(i, e.target.value)}
-              placeholder={t(t(t("Team {n}")), { n: i + 1 })}
+              placeholder={t("Team {n}", { n: i + 1 })}
               maxLength={24}
               className="field"
             />

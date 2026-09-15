@@ -59,13 +59,13 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
     if (state.picker !== me.id) {
       return (
         <Wrap>
-          <p className="text-center text-lg text-moon-dim">{t(t(t("Waiting for the board pick…")))}</p>
+          <p className="text-center text-lg text-moon-dim">{t("Waiting for the board pick…")}</p>
         </Wrap>
       );
     }
     return (
       <div className="flex min-h-dvh flex-col gap-3 p-4">
-        <p className="pt-2 text-center font-display text-lg uppercase tracking-wide text-accent">{t(t(t("Your pick")))}</p>
+        <p className="pt-2 text-center font-display text-lg uppercase tracking-wide text-accent">{t("Your pick")}</p>
         <div className="grid flex-1 grid-cols-3 gap-2">
           {state.board.categories.map((cat, c) => (
             <div key={cat.title} className="flex flex-col gap-2">
@@ -108,7 +108,7 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
               ? "Someone beat you to it"
               : state.phase === "open" && !armed
                 ? t("Wait for it…")
-                : t(t(t("Watch the TV")))}
+                : t("Watch the TV")}
       </p>
 
       <motion.button
@@ -133,7 +133,7 @@ export function BuzzPlayer({ room, state, me, onBuzz, onPick }: Props) {
                   : "border-line/10 bg-line/[0.03] text-moon-deep/70",
         ].join(" ")}
       >
-        {iBuzzed ? "YOU!" : iAmOut ? "OUT" : live ? t(t(t("BUZZ"))) : t(t("WAIT"))}
+        {iBuzzed ? "YOU!" : iAmOut ? "OUT" : live ? t("BUZZ") : t("WAIT")}
       </motion.button>
 
       <p className="py-3 text-center font-display text-sm uppercase tracking-widest text-accent">

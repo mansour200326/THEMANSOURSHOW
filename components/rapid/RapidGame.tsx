@@ -139,7 +139,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
   if (generating) {
     return (
       <Generating
-        title={t(t(t(t("Writing the prompts"))))}
+        title={t("Writing the prompts")}
         items={usableThemes(themes).length ? usableThemes(themes) : [RAPID_TITLE[mode]]}
         onCancel={() => {
           abort.current?.abort();
@@ -169,7 +169,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
       <HowToPlay
         gameId={mode}
         name={RAPID_TITLE[mode]}
-        startLabel={t(t(t(t("Set it up"))))}
+        startLabel={t("Set it up")}
         onStart={() => setExplained(true)}
         onBack={() => {
           window.location.href = backHref();
@@ -188,11 +188,11 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
           <Link
             href={backHref()}
             className="font-display text-xs uppercase tracking-[0.2em] text-moon-deep hover:text-moon/75"
-          >{t(t(t(t("← Back"))))}</Link>
+          >{t("← Back")}</Link>
         </header>
 
         <div className="mt-10">
-          <p className="t-label font-display uppercase text-moon-deep">{t(t(t("Big Night presents")))}</p>
+          <p className="t-label font-display uppercase text-moon-deep">{t("Big Night presents")}</p>
           <h1 className="accent-text mt-1 font-display text-5xl font-bold uppercase tracking-tight sm:text-7xl">
             {RAPID_TITLE[mode]}
           </h1>
@@ -208,11 +208,11 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
             animate={{ opacity: 1, y: 0 }}
             className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-accent/40 bg-accent/[0.08] px-5 py-4"
           >
-            <p className="text-moon/90">{t(t(t("There's a game in progress.")))}</p>
+            <p className="text-moon/90">{t("There's a game in progress.")}</p>
             <button
               onClick={() => dispatch({ type: "HYDRATE", state: saved })}
               className="btn-brand"
-            >{t(t(t(t("Resume game"))))}</button>
+            >{t("Resume game")}</button>
           </motion.div>
         )}
 
@@ -221,15 +221,15 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
 
           <ThemeList
             gameId={mode}
-            title={t(t(t(t("Themes"))))}
-            hint={t(t(t(t("What the prompts should lean towards. Add a few and they'll be spread across them."))))}
+            title={t("Themes")}
+            hint={t("What the prompts should lean towards. Add a few and they'll be spread across them.")}
             themes={themes}
             onChange={setThemes}
             difficulty={difficulty}
           />
 
           <div>
-            <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">{t(t(t("Rounds")))}</h2>
+            <h2 className="font-display text-xl uppercase tracking-widest text-moon/75">{t("Rounds")}</h2>
             <div className="mt-3 flex gap-2">
               {ROUND_CHOICES.map((n) => (
                 <button
@@ -246,11 +246,11 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
                 </button>
               ))}
             </div>
-            <p className="mt-2 text-sm text-moon-deep">{t(t(t("Each round, every team gets a turn.")))}</p>
+            <p className="mt-2 text-sm text-moon-deep">{t("Each round, every team gets a turn.")}</p>
           </div>
 
           <div>
-            <h2 className="mb-3 font-display text-xl uppercase tracking-widest text-moon/75">{t(t(t("Difficulty")))}</h2>
+            <h2 className="mb-3 font-display text-xl uppercase tracking-widest text-moon/75">{t("Difficulty")}</h2>
             <DifficultyBar value={difficulty} onChange={setDifficulty} />
           </div>
         </section>
@@ -269,14 +269,14 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
         </AnimatePresence>
 
         <div className="mt-10 flex flex-col items-center gap-3 pb-6">
-          <button onClick={() => start(true)} className="btn-brand px-16 py-5 text-2xl">{t(t(t("Write the prompts")))}</button>
+          <button onClick={() => start(true)} className="btn-brand px-16 py-5 text-2xl">{t("Write the prompts")}</button>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={() => setWriting(true)}
               className="btn-accent px-6 py-2.5 text-sm"
-            >{t(t(t(t("✎ Write my own prompts"))))}</button>
+            >{t("✎ Write my own prompts")}</button>
             {/* The bundled packs are English; an Arabic room writes its own. */}
-{lang !== "ar" && (<button onClick={() => start(false)} className="btn-ghost text-sm">{t(t("Skip — use the built-in prompts"))}</button>)}
+{lang !== "ar" && (<button onClick={() => start(false)} className="btn-ghost text-sm">{t("Skip — use the built-in prompts")}</button>)}
           </div>
         </div>
       </main>
@@ -298,8 +298,8 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
             onClick={() => dispatch({ type: "UNDO" })}
             disabled={!state.past.length}
             className="btn-ghost px-3 py-1.5 text-xs"
-          >{t(t(t(t("Undo"))))}</button>
-          <button onClick={quit} className="btn-ghost px-3 py-1.5 text-xs">{t(t(t("Quit")))}</button>
+          >{t("Undo")}</button>
+          <button onClick={quit} className="btn-ghost px-3 py-1.5 text-xs">{t("Quit")}</button>
         </div>
       </header>
 
@@ -307,7 +307,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
         {state.phase === "winner" ? (
           <div className="flex h-full flex-col items-center justify-center gap-[3vmin] text-center">
             <p className="t-label font-display uppercase text-moon-deep">
-              {rapidWinners(state.teams).length > 1 ? t(t(t("It's a tie"))) : t(t("Winner"))}
+              {rapidWinners(state.teams).length > 1 ? t("It's a tie") : t("Winner")}
             </p>
             <WinnerMoment>
               {rapidWinners(state.teams).map((t) => t.name).join(" & ")}
@@ -330,7 +330,7 @@ export function RapidGame({ mode }: { mode: RapidMode }) {
                 </div>
               ))}
             </div>
-            <button onClick={quit} className="btn-ghost px-8 py-4">{t(t(t("New game")))}</button>
+            <button onClick={quit} className="btn-ghost px-8 py-4">{t("New game")}</button>
           </div>
         ) : (
           <RapidStage

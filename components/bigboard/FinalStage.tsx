@@ -39,7 +39,7 @@ export function FinalStage({
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col items-center"
       >
-        <p className="t-label font-display uppercase text-moon-dim">{t(t(t("Final Round")))}</p>
+        <p className="t-label font-display uppercase text-moon-dim">{t("Final Round")}</p>
         <h2 className="accent-text font-display text-[clamp(2rem,5vw,6rem)] font-bold uppercase tracking-tight">
           {final.clue.category}
         </h2>
@@ -47,7 +47,7 @@ export function FinalStage({
 
       {phase === "final-wager" && (
         <>
-          <p className="max-w-3xl text-balance text-[clamp(0.95rem,1.4vw,1.5rem)] text-moon-dim">{t(t(t("Everyone writes a wager down, then you type them in. Nobody has seen the clue yet.")))}</p>
+          <p className="max-w-3xl text-balance text-[clamp(0.95rem,1.4vw,1.5rem)] text-moon-dim">{t("Everyone writes a wager down, then you type them in. Nobody has seen the clue yet.")}</p>
 
           <div
             className="grid w-full max-w-6xl gap-[1vmin]"
@@ -81,7 +81,7 @@ export function FinalStage({
             })}
           </div>
 
-          <button onClick={onLockWagers} className="btn-accent px-12 py-4 text-xl">{t(t(t("Lock wagers · show the clue")))}</button>
+          <button onClick={onLockWagers} className="btn-accent px-12 py-4 text-xl">{t("Lock wagers · show the clue")}</button>
         </>
       )}
 
@@ -100,9 +100,9 @@ export function FinalStage({
             <CountdownRing seconds={60} resetKey="final" />
           )}
 
-          <p className="text-[clamp(0.85rem,1.2vw,1.25rem)] uppercase tracking-[0.2em] text-moon-dim">{t(t(t("Write your answers")))}</p>
+          <p className="text-[clamp(0.85rem,1.2vw,1.25rem)] uppercase tracking-[0.2em] text-moon-dim">{t("Write your answers")}</p>
 
-          <button onClick={onShowJudging} className="btn-accent px-12 py-4 text-xl">{t(t(t("Reveal the answer")))}</button>
+          <button onClick={onShowJudging} className="btn-accent px-12 py-4 text-xl">{t("Reveal the answer")}</button>
         </>
       )}
 
@@ -112,7 +112,7 @@ export function FinalStage({
             {final.clue.clue}
           </p>
           <div className="flex flex-col items-center gap-1">
-            <span className="t-label font-display uppercase text-moon-dim">{t(t(t("Answer")))}</span>
+            <span className="t-label font-display uppercase text-moon-dim">{t("Answer")}</span>
             <motion.p
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
@@ -174,7 +174,7 @@ export function FinalStage({
             onClick={onFinish}
             disabled={!allJudged}
             className="btn-accent px-12 py-4 text-xl"
-          >{t(t(t(t("Final standings"))))}</button>
+          >{t("Final standings")}</button>
         </>
       )}
     </div>

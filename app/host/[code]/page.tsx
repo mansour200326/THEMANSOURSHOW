@@ -107,19 +107,19 @@ export default function HostPage({
 
   /** Games that ask what they should be about before they start. */
   const NEEDS_SETUP: Record<string, string> = {
-    "trivia-royale": t(t(t("Speed Trivia"))),
-    "last-one-standing": t(t(t("Last One Standing"))),
-    timeline: t(t("In Order")),
-    "dial-it-in": t(t(t("Dial It In"))),
-    impostor: t(t(t("Impostor"))),
-    "sketch-and-guess": t(t(t("Sketch & Guess"))),
-    "emoji-riddles": t(t(t("Emoji Riddles"))),
-    "bluff-trivia": t(t(t("Bluff Trivia"))),
-    "most-likely-to": t(t(t("Most Likely To"))),
-    punchline: t(t(t("Punchline"))),
-    "caption-this": t(t(t("Add a Caption"))),
-    "act-it-out": t(t(t("Act It Out"))),
-    "one-stroke": t(t(t("Something Sketchy"))),
+    "trivia-royale": t("Speed Trivia"),
+    "last-one-standing": t("Last One Standing"),
+    timeline: t("In Order"),
+    "dial-it-in": t("Dial It In"),
+    impostor: t("Impostor"),
+    "sketch-and-guess": t("Sketch & Guess"),
+    "emoji-riddles": t("Emoji Riddles"),
+    "bluff-trivia": t("Bluff Trivia"),
+    "most-likely-to": t("Most Likely To"),
+    punchline: t("Punchline"),
+    "caption-this": t("Add a Caption"),
+    "act-it-out": t("Act It Out"),
+    "one-stroke": t("Something Sketchy"),
   };
 
   const launch = async (
@@ -196,8 +196,8 @@ export default function HostPage({
         <h1 className="font-display text-3xl uppercase tracking-wide text-moon/90">
           Room {roomCode} is gone
         </h1>
-        <p className="max-w-md text-moon-dim">{t(t(t("Rooms are kept for twelve hours, and a deploy without a mounted volume clears them sooner. Start a fresh one and the phones can rejoin with the new code.")))}</p>
-        <Link href="/" className="btn-brand px-8 py-4 text-lg">{t(t(t("Host a new room")))}</Link>
+        <p className="max-w-md text-moon-dim">{t("Rooms are kept for twelve hours, and a deploy without a mounted volume clears them sooner. Start a fresh one and the phones can rejoin with the new code.")}</p>
+        <Link href="/" className="btn-brand px-8 py-4 text-lg">{t("Host a new room")}</Link>
       </main>
     );
   }
@@ -215,7 +215,7 @@ export default function HostPage({
   if (busy) {
     return (
       <Generating
-        title={t(t(t("Writing {what}")), { what: setupFor ? t(NEEDS_SETUP[setupFor]) : "…" })}
+        title={t("Writing {what}", { what: setupFor ? t(NEEDS_SETUP[setupFor]) : "…" })}
         items={writingThemes}
         onCancel={() => {
           // Actually stop the request, rather than just hiding the screen and
@@ -251,7 +251,7 @@ export default function HostPage({
       <HowToPlay
         gameId={explaining}
         name={game?.name ?? t("Next up")}
-        startLabel={NEEDS_SETUP[explaining] ? t(t(t("Set it up"))) : t(t("Start the game"))}
+        startLabel={NEEDS_SETUP[explaining] ? t("Set it up") : t("Start the game")}
         onBack={() => setExplaining(null)}
         onWriteOwn={() => {
           const id = explaining;

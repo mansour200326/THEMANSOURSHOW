@@ -51,7 +51,7 @@ export function HowToPlay({
         animate={{ opacity: 1, y: 0 }}
         className="mx-auto w-full max-w-4xl"
       >
-        <p className="t-label font-display uppercase text-moon-deep">{t(t(t("How it works")))}</p>
+        <p className="t-label font-display uppercase text-moon-deep">{t("How it works")}</p>
         <h1 className="accent-text mt-1 font-display text-[clamp(2.2rem,6vw,5rem)] font-bold uppercase leading-none tracking-tight">
           {t(name)}
         </h1>
@@ -89,7 +89,7 @@ export function HowToPlay({
             transition={{ delay: 0.42 }}
             className="mt-[3vh] rounded-2xl border border-accent/30 bg-accent/[0.07] p-5"
           >
-            <p className="t-label font-display uppercase text-accent">{t(t(t("For example")))}</p>
+            <p className="t-label font-display uppercase text-accent">{t("For example")}</p>
             <p className="mt-1.5 text-[clamp(0.9rem,1.5vw,1.35rem)] leading-snug text-moon/90">
               {rules.example}
             </p>
@@ -103,8 +103,8 @@ export function HowToPlay({
             transition={{ delay: 0.45 }}
             className="mt-[3vh] grid gap-3 sm:grid-cols-2"
           >
-            <Note label={t(t(t(t("Scoring"))))} text={rules.scoring} />
-            <Note label={t(t(t(t("You need"))))} text={rules.needs} />
+            <Note label={t("Scoring")} text={rules.scoring} />
+            <Note label={t("You need")} text={rules.needs} />
           </motion.div>
         )}
 
@@ -120,7 +120,7 @@ export function HowToPlay({
             transition={{ delay: 0.5 }}
             className="mt-[3vh] flex flex-wrap items-center gap-3"
           >
-            <span className="t-label font-display uppercase text-moon-deep">{t(t(t("Rounds")))}</span>
+            <span className="t-label font-display uppercase text-moon-deep">{t("Rounds")}</span>
             {choices.map((n) => (
               <button
                 key={n}
@@ -146,9 +146,9 @@ export function HowToPlay({
             {startLabel}
           </button>
           {onWriteOwn && (
-            <button onClick={onWriteOwn} className="btn-accent px-8 py-5">{t(t(t("✎ Write my own")))}</button>
+            <button onClick={onWriteOwn} className="btn-accent px-8 py-5">{t("✎ Write my own")}</button>
           )}
-          <button onClick={onBack} className="btn-ghost px-8 py-5">{t(t(t("Pick another game")))}</button>
+          <button onClick={onBack} className="btn-ghost px-8 py-5">{t("Pick another game")}</button>
         </div>
       </motion.div>
     </main>

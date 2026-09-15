@@ -38,7 +38,7 @@ export function ImpostorPlayer({
         <p className="font-display text-2xl uppercase tracking-wide text-moon">
           {me.score.toLocaleString()} points
         </p>
-        <p className="text-moon-dim">{t(t(t("Look at the TV.")))}</p>
+        <p className="text-moon-dim">{t("Look at the TV.")}</p>
       </Centre>
     );
   }
@@ -49,20 +49,20 @@ export function ImpostorPlayer({
       <main className="flex min-h-dvh flex-col justify-center gap-6 p-6 text-center">
         {impostor ? (
           <>
-            <p className="font-display text-sm uppercase tracking-[0.3em] text-rose-400">{t(t(t("You are the impostor")))}</p>
-            <p className="font-display text-4xl uppercase leading-tight text-moon">{t(t(t("You don't know where you are")))}</p>
-            <p className="text-moon-dim">{t(t(t("Everyone else does. Answer as if you belong, and work out the place before they work out you.")))}</p>
+            <p className="font-display text-sm uppercase tracking-[0.3em] text-rose-400">{t("You are the impostor")}</p>
+            <p className="font-display text-4xl uppercase leading-tight text-moon">{t("You don't know where you are")}</p>
+            <p className="text-moon-dim">{t("Everyone else does. Answer as if you belong, and work out the place before they work out you.")}</p>
           </>
         ) : (
           <>
-            <p className="font-display text-sm uppercase tracking-[0.3em] text-moon-deep">{t(t(t("You are at")))}</p>
+            <p className="font-display text-sm uppercase tracking-[0.3em] text-moon-deep">{t("You are at")}</p>
             <p className="accent-text font-display text-4xl uppercase leading-tight">
               {state.yourPlace}
             </p>
             <p className="font-display text-xl uppercase tracking-wide text-moon/75">
               {state.yourRole}
             </p>
-            <p className="text-moon-deep">{t(t(t("One of you is somewhere else. Don't make it obvious where this is.")))}</p>
+            <p className="text-moon-deep">{t("One of you is somewhere else. Don't make it obvious where this is.")}</p>
           </>
         )}
         <button
@@ -70,7 +70,7 @@ export function ImpostorPlayer({
           disabled={ready}
           className="btn-accent w-full py-6 text-2xl"
         >
-          {ready ? t(t(t("Waiting for the others…"))) : t(t("Got it"))}
+          {ready ? t("Waiting for the others…") : t("Got it")}
         </button>
       </main>
     );
@@ -80,7 +80,7 @@ export function ImpostorPlayer({
     const voted = state.votes[me.id];
     return (
       <main className="flex min-h-dvh flex-col justify-center gap-4 p-5">
-        <p className="text-center font-display text-xl uppercase tracking-wide text-moon">{t(t(t("Who is it?")))}</p>
+        <p className="text-center font-display text-xl uppercase tracking-wide text-moon">{t("Who is it?")}</p>
         <div className="flex flex-col gap-2.5">
           {others.map((p) => (
             <button
@@ -108,7 +108,7 @@ export function ImpostorPlayer({
     <main className="flex min-h-dvh flex-col justify-center gap-5 p-6">
       <div className="rounded-2xl border border-line/10 bg-line/[0.03] p-6 text-center">
         {impostor ? (
-          <p className="font-display text-2xl uppercase tracking-wide text-rose-300">{t(t(t("You're the impostor")))}</p>
+          <p className="font-display text-2xl uppercase tracking-wide text-rose-300">{t("You're the impostor")}</p>
         ) : (
           <>
             <p className="accent-text font-display text-3xl uppercase leading-tight">
@@ -121,7 +121,7 @@ export function ImpostorPlayer({
         )}
       </div>
 
-      <button onClick={onAccuse} className="btn-bad w-full py-6 text-2xl">{t(t(t("Call a vote")))}</button>
+      <button onClick={onAccuse} className="btn-bad w-full py-6 text-2xl">{t("Call a vote")}</button>
 
       {impostor &&
         (naming ? (
@@ -130,7 +130,7 @@ export function ImpostorPlayer({
           <button
             onClick={() => setNaming(true)}
             className="btn-ghost w-full py-4"
-          >{t(t(t(t("I know where we are"))))}</button>
+          >{t("I know where we are")}</button>
         ))}
     </main>
   );
@@ -147,7 +147,7 @@ function NamePlace({
   const t = useT();
   return (
     <div className="mt-2">
-      <p className="mb-2 text-center font-display text-xs uppercase tracking-[0.25em] text-rose-300">{t(t(t("One guess. Wrong and it's over.")))}</p>
+      <p className="mb-2 text-center font-display text-xs uppercase tracking-[0.25em] text-rose-300">{t("One guess. Wrong and it's over.")}</p>
       <div className="grid grid-cols-2 gap-2">
         {state.places.map((place, i) => (
           <button

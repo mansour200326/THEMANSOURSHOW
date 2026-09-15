@@ -246,6 +246,21 @@ html[data-theme="light"] .g-word { --accent-rgb: 94 155 20; --accent-bright-rgb:
 h1, h2, h3, h4, p, span, li, button, a, label, input, textarea, figcaption, td, th {
   unicode-bidi: plaintext;
 }
+/*
+ * Cairo's letters sit low and small beside the tall condensed display face,
+ * so the same size reads smaller in Arabic — on a television, too small.
+ * The root steps up, and every rem-based size steps up with it.
+ */
+html[lang="ar"] {
+  font-size: 108%;
+  /*
+   * The real fix for the size: match the Arabic face's x-height to the
+   * display face's (Oswald sits at about 0.58), so Cairo is drawn at the
+   * proportions the layout was designed around instead of two thirds of
+   * them. Browsers without font-size-adjust keep the root bump alone.
+   */
+  font-size-adjust: 0.58;
+}
 html[lang="ar"] .text-left { text-align: start; }
 html[lang="ar"] .text-right { text-align: end; }
 html[lang="ar"] [class*="tracking-"] { letter-spacing: 0 !important; }

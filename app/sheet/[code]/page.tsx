@@ -71,7 +71,7 @@ function Sheet({ code, hostKey }: { code: string; hostKey: string }) {
   if (status === "missing") {
     return <Centre>That room is gone.</Centre>;
   }
-  if (!room) return <Centre>{t(t(t(t("Connecting…"))))}</Centre>;
+  if (!room) return <Centre>{t("Connecting…")}</Centre>;
 
   const sheet = room.hostSheet;
   if (!sheet) {

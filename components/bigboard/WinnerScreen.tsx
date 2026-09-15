@@ -86,7 +86,7 @@ export function WinnerScreen({ teams, onRematch, onNewGame, rewrites = false }: 
         className="relative z-10 flex flex-col items-center"
       >
         <p className="t-label font-display uppercase text-moon-deep">
-          {tie ? t(t(t("It's a tie"))) : t(t("Champions"))}
+          {tie ? t("It's a tie") : t("Champions")}
         </p>
         <WinnerMoment>
           {champs.map((t) => t.name).join(" & ")}
@@ -132,9 +132,9 @@ export function WinnerScreen({ teams, onRematch, onNewGame, rewrites = false }: 
 
       <div className="relative z-10 mt-2 flex flex-wrap justify-center gap-3">
         <button onClick={onRematch} className="btn-brand px-8 py-4 text-lg">
-          {rewrites ? t(t(t("Rematch · new questions"))) : t(t("Rematch · same teams"))}
+          {rewrites ? t("Rematch · new questions") : t("Rematch · same teams")}
         </button>
-        <button onClick={onNewGame} className="btn-ghost px-8 py-4 text-lg">{t(t(t("New game")))}</button>
+        <button onClick={onNewGame} className="btn-ghost px-8 py-4 text-lg">{t("New game")}</button>
       </div>
     </div>
   );

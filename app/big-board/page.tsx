@@ -179,7 +179,7 @@ function BigBoardStage() {
       if (rematch) {
         // The room is standing there. Play the old board rather than a form.
         dispatch({ type: "REMATCH" });
-        setNotice(t(t(t("Couldn't write a new board ({message}). Same board, fresh scores.")), { message }));
+        setNotice(t("Couldn't write a new board ({message}). Same board, fresh scores.", { message }));
         return;
       }
       setGenError(message);
@@ -222,7 +222,7 @@ function BigBoardStage() {
   if (pending) {
     return (
       <Generating
-        title={rematching ? t(t(t("Writing a fresh board"))) : t(t("Writing the board"))}
+        title={rematching ? t("Writing a fresh board") : t("Writing the board")}
         items={pending.categories}
         note={
           rematching
@@ -242,7 +242,7 @@ function BigBoardStage() {
       <HowToPlay
         gameId="big-board"
         name="Big Board"
-        startLabel={t(t(t(t("Set it up"))))}
+        startLabel={t("Set it up")}
         onStart={() => setExplained(true)}
         onBack={() => {
           window.location.href = backHref();
@@ -301,14 +301,14 @@ function BigBoardStage() {
             onClick={() => dispatch({ type: "UNDO" })}
             disabled={!state.past.length}
             className="btn-ghost px-3 py-1.5 text-xs"
-          >{t(t(t(t("Undo"))))}</button>
+          >{t("Undo")}</button>
           <button
             onClick={toggleFullscreen}
             className="btn-ghost px-3 py-1.5 text-xs"
           >
-            {isFullscreen ? t(t(t("Exit full screen"))) : t(t("Full screen"))}
+            {isFullscreen ? t("Exit full screen") : t("Full screen")}
           </button>
-          <button onClick={quit} className="btn-ghost px-3 py-1.5 text-xs">{t(t(t("Quit")))}</button>
+          <button onClick={quit} className="btn-ghost px-3 py-1.5 text-xs">{t("Quit")}</button>
         </div>
       </header>
 

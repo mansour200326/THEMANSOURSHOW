@@ -86,7 +86,7 @@ export function LivePlayer({ state, me, onSubmit, onClue }: Props) {
         <p className="font-display text-2xl uppercase tracking-wide text-moon">
           {me.score.toLocaleString()} points
         </p>
-        <p className="text-moon-dim">{t(t(t("That's the segment. Watch the TV.")))}</p>
+        <p className="text-moon-dim">{t("That's the segment. Watch the TV.")}</p>
       </Centre>
     );
   }
@@ -95,8 +95,8 @@ export function LivePlayer({ state, me, onSubmit, onClue }: Props) {
     return (
       <Centre>
         <p className="text-6xl opacity-40">{me.emoji}</p>
-        <p className="font-display text-xl uppercase tracking-wide text-moon-dim">{t(t(t("You're on the bench")))}</p>
-        <p className="text-moon-deep">{t(t(t("Heckling is still allowed.")))}</p>
+        <p className="font-display text-xl uppercase tracking-wide text-moon-dim">{t("You're on the bench")}</p>
+        <p className="text-moon-deep">{t("Heckling is still allowed.")}</p>
       </Centre>
     );
   }
@@ -113,9 +113,9 @@ export function LivePlayer({ state, me, onSubmit, onClue }: Props) {
             scored ? "text-emerald-300" : "text-moon-dim",
           ].join(" ")}
         >
-          {scored ? `+${scored}` : t(t(t("Nothing that time")))}
+          {scored ? `+${scored}` : t("Nothing that time")}
         </p>
-        <p className="text-moon-deep">{t(t(t("Look up.")))}</p>
+        <p className="text-moon-deep">{t("Look up.")}</p>
       </Centre>
     );
   }
@@ -138,7 +138,7 @@ export function LivePlayer({ state, me, onSubmit, onClue }: Props) {
         <p className="font-display text-xl uppercase tracking-wide text-accent">
           “{state.clue}”
         </p>
-        <p className="text-moon-dim">{t(t(t("That's all you get to say. No pointing.")))}</p>
+        <p className="text-moon-dim">{t("That's all you get to say. No pointing.")}</p>
       </Centre>
     );
   }
@@ -147,8 +147,8 @@ export function LivePlayer({ state, me, onSubmit, onClue }: Props) {
     return (
       <Centre>
         <p className="text-6xl">{me.emoji}</p>
-        <p className="font-display text-xl uppercase tracking-wide text-accent">{t(t(t("Locked in")))}</p>
-        <p className="text-moon-deep">{t(t(t("Waiting for everyone else.")))}</p>
+        <p className="font-display text-xl uppercase tracking-wide text-accent">{t("Locked in")}</p>
+        <p className="text-moon-deep">{t("Waiting for everyone else.")}</p>
       </Centre>
     );
   }
@@ -208,7 +208,7 @@ function AnswerBox({
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && text.trim() && onSend(text)}
-        placeholder={t(t(t(t("Your answer"))))}
+        placeholder={t("Your answer")}
         autoFocus
         maxLength={60}
         className="field py-5 text-center text-2xl"
@@ -217,7 +217,7 @@ function AnswerBox({
         onClick={() => text.trim() && onSend(text)}
         disabled={!text.trim()}
         className="btn-accent w-full py-6 text-2xl"
-      >{t(t(t(t("Lock it in"))))}</button>
+      >{t("Lock it in")}</button>
     </main>
   );
 }
@@ -250,7 +250,7 @@ function OrderBox({
   return (
     <main className="flex min-h-dvh flex-col justify-center gap-4 p-5">
       {clock}
-      <p className="text-center text-moon-dim">{t(t(t("Tap them in order — earliest first.")))}</p>
+      <p className="text-center text-moon-dim">{t("Tap them in order — earliest first.")}</p>
       <div className="flex flex-col gap-2.5">
         {events.map((event, position) => {
           const place = order.indexOf(position);
@@ -281,7 +281,7 @@ function OrderBox({
         disabled={!done}
         className="btn-accent w-full py-5 text-xl"
       >
-        {done ? t(t(t("Lock it in"))) : t(t(t("{a}/{b} placed")), { a: order.length, b: events.length })}
+        {done ? t("Lock it in") : t("{a}/{b} placed", { a: order.length, b: events.length })}
       </button>
     </main>
   );
@@ -305,13 +305,13 @@ function ClueBox({
   return (
     <main className="flex min-h-dvh flex-col justify-center gap-5 p-6">
       {clock}
-      <p className="text-center font-display uppercase tracking-widest text-accent">{t(t(t("Only you can see this")))}</p>
+      <p className="text-center font-display uppercase tracking-widest text-accent">{t("Only you can see this")}</p>
       <Spectrum left={left} right={right} marker={target} />
       <input
         value={clue}
         onChange={(e) => setClue(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && clue.trim() && onSend(clue)}
-        placeholder={t(t(t(t("One clue…"))))}
+        placeholder={t("One clue…")}
         autoFocus
         maxLength={40}
         className="field py-5 text-center text-2xl"
@@ -320,7 +320,7 @@ function ClueBox({
         onClick={() => clue.trim() && onSend(clue)}
         disabled={!clue.trim()}
         className="btn-accent w-full py-6 text-2xl"
-      >{t(t(t(t("Say it"))))}</button>
+      >{t("Say it")}</button>
     </main>
   );
 }
@@ -354,12 +354,12 @@ function DialBox({
         value={value}
         onChange={(e) => setValue(Number(e.target.value))}
         className="h-12 w-full accent-[rgb(var(--accent-rgb))]"
-        aria-label={t(t(t(t("Where on the spectrum"))))}
+        aria-label={t("Where on the spectrum")}
       />
       <button
         onClick={() => onSend(String(value))}
         className="btn-accent w-full py-6 text-2xl"
-      >{t(t(t(t("Lock it in"))))}</button>
+      >{t("Lock it in")}</button>
     </main>
   );
 }

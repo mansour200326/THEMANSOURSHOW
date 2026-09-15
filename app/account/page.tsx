@@ -14,8 +14,8 @@ export default async function AccountPage() {
   if (!session?.user) {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center gap-5 px-6 text-center">
-        <h1 className="font-display text-2xl uppercase text-moon/90">{t(t(t("Not signed in")))}</h1>
-        <Link href="/account/sign-in" className="btn-brand px-8 py-4">{t(t(t("Sign in")))}</Link>
+        <h1 className="font-display text-2xl uppercase text-moon/90">{t("Not signed in")}</h1>
+        <Link href="/account/sign-in" className="btn-brand px-8 py-4">{t("Sign in")}</Link>
       </main>
     );
   }
@@ -30,13 +30,13 @@ export default async function AccountPage() {
       </Link>
 
       <div>
-        <p className="t-label font-display uppercase text-moon-deep">{t(t(t("Signed in as")))}</p>
+        <p className="t-label font-display uppercase text-moon-deep">{t("Signed in as")}</p>
         <p className="font-display text-xl text-moon">{email}</p>
       </div>
 
       <div className="rounded-3xl border border-line/12 bg-line/[0.03] p-6">
-        <p className="font-display text-2xl uppercase tracking-wide text-accent-bright">{t(t(t("Host account")))}</p>
-        <p className="mt-2 text-moon/80">{t(t(t("Every board and pack written for you is remembered here, on any device you sign in on. Nothing you've played comes back.")))}</p>
+        <p className="font-display text-2xl uppercase tracking-wide text-accent-bright">{t("Host account")}</p>
+        <p className="mt-2 text-moon/80">{t("Every board and pack written for you is remembered here, on any device you sign in on. Nothing you've played comes back.")}</p>
       </div>
 
       {plansEnforced() && (
@@ -63,9 +63,9 @@ export default async function AccountPage() {
 
       {/* The way out, first and biggest. Signing out is the rare case. */}
       <div className="flex flex-wrap gap-3">
-        <Link href="/" className="btn-brand px-8 py-4 text-lg">{t(t(t("Back to the games")))}</Link>
+        <Link href="/" className="btn-brand px-8 py-4 text-lg">{t("Back to the games")}</Link>
         {plansEnforced() && plan === "free" && (
-          <Link href="/account/upgrade" className="btn-brand px-6 py-4">{t(t(t("See Pro")))}</Link>
+          <Link href="/account/upgrade" className="btn-brand px-6 py-4">{t("See Pro")}</Link>
         )}
         <form
           action={async () => {
@@ -73,7 +73,7 @@ export default async function AccountPage() {
             await signOut({ redirectTo: "/" });
           }}
         >
-          <button type="submit" className="btn-ghost px-6 py-4">{t(t(t("Sign out")))}</button>
+          <button type="submit" className="btn-ghost px-6 py-4">{t("Sign out")}</button>
         </form>
       </div>
     </main>

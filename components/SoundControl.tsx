@@ -51,10 +51,10 @@ export function SoundControl({
       <button
         type="button"
         onClick={flip}
-        aria-label={off ? t(t(t("Turn sound on"))) : t(t(t("Turn sound off")))}
+        aria-label={off ? t("Turn sound on") : t("Turn sound off")}
         className={`btn-ghost opacity-100 ${off ? "border-rose-500/40 text-rose-200" : ""} ${className || "px-4 py-2.5 text-sm"}`}
       >
-        {off ? t(t(t("🔇 Sound off"))) : t(t(t("🔊 Sound on")))}
+        {off ? t("🔇 Sound off") : t("🔊 Sound on")}
       </button>
     );
   }
@@ -63,8 +63,8 @@ export function SoundControl({
     <button
       type="button"
       onClick={flip}
-      aria-label={off ? t(t(t("Turn sound on"))) : t(t(t("Turn sound off")))}
-      title={off ? t(t(t("Sound is off"))) : t(t(t("Sound is on")))}
+      aria-label={off ? t("Turn sound on") : t("Turn sound off")}
+      title={off ? t("Sound is off") : t("Sound is on")}
       className={[
         "flex h-11 w-11 items-center justify-center rounded-full",
         "border text-lg transition-all duration-200",

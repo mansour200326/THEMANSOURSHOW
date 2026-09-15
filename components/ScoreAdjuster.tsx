@@ -76,15 +76,15 @@ export function ScoreAdjuster({
         className="max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-3xl border border-line/12 bg-dusk p-5 shadow-tile"
       >
         <div className="flex items-baseline justify-between gap-4">
-          <h2 className="font-display text-xl uppercase tracking-widest text-moon">{t(t(t("Fix the scores")))}</h2>
-          <button onClick={onClose} className="btn-ghost px-4 py-2 text-sm">{t(t(t("Done")))}</button>
+          <h2 className="font-display text-xl uppercase tracking-widest text-moon">{t("Fix the scores")}</h2>
+          <button onClick={onClose} className="btn-ghost px-4 py-2 text-sm">{t("Done")}</button>
         </div>
 
         <div className="mt-4">
           <label
             htmlFor="score-amount"
             className="t-label font-display uppercase text-moon-deep"
-          >{t(t(t(t("Points per tap"))))}</label>
+          >{t("Points per tap")}</label>
           <div className="mt-2 flex items-center gap-3">
             <input
               id="score-amount"
@@ -115,14 +115,14 @@ export function ScoreAdjuster({
               </span>
               <button
                 onClick={() => onAdjust(entry.id, -amount)}
-                aria-label={t(t(t("Take {amount} from {name}")), { amount, name: entry.name })}
+                aria-label={t("Take {amount} from {name}", { amount, name: entry.name })}
                 className="h-12 shrink-0 rounded-xl border border-rose-400/60 bg-rose-500/25 px-4 font-display text-lg tabular-nums text-rose-100 transition-colors hover:bg-rose-500/45"
               >
                 −{amount.toLocaleString()}
               </button>
               <button
                 onClick={() => onAdjust(entry.id, amount)}
-                aria-label={t(t(t("Give {amount} to {name}")), { amount, name: entry.name })}
+                aria-label={t("Give {amount} to {name}", { amount, name: entry.name })}
                 className="h-12 shrink-0 rounded-xl border border-emerald-400/60 bg-emerald-500/25 px-4 font-display text-lg tabular-nums text-emerald-100 transition-colors hover:bg-emerald-500/45"
               >
                 +{amount.toLocaleString()}
@@ -130,7 +130,7 @@ export function ScoreAdjuster({
             </div>
           ))}
           {!entries.length && (
-            <p className="text-moon-deep">{t(t(t("Nobody to adjust yet.")))}</p>
+            <p className="text-moon-deep">{t("Nobody to adjust yet.")}</p>
           )}
         </div>
       </motion.div>
@@ -157,9 +157,9 @@ export function ScoreFixer({
     <>
       <button
         onClick={() => setOpen(true)}
-        title={t(t(t(t("Add or subtract points"))))}
+        title={t("Add or subtract points")}
         className={`btn-ghost px-3 py-1.5 text-xs ${className}`}
-      >{t(t(t(t("Fix scores"))))}</button>
+      >{t("Fix scores")}</button>
       <AnimatePresence>
         {open && (
           <ScoreAdjuster

@@ -57,11 +57,11 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
     const standings = [...players].sort((a, b) => b.score - a.score);
     return (
       <main className="flex min-h-dvh lg:h-dvh flex-col items-center justify-center gap-[3vmin] p-[3vmin] text-center pb-16 lg:pb-[1.6vmin]">
-        <p className="t-label font-display uppercase text-moon-dim">{t(t(t("Sketch & Guess — pens down")))}</p>
+        <p className="t-label font-display uppercase text-moon-dim">{t("Sketch & Guess — pens down")}</p>
         <WinnerMoment>
-          {standings[0]?.name ?? t(t(t("Nobody")))}
+          {standings[0]?.name ?? t("Nobody")}
         </WinnerMoment>
-        <button onClick={onQuit} className="btn-brand px-10 py-4 text-lg">{t(t(t("Back to the lobby")))}</button>
+        <button onClick={onQuit} className="btn-brand px-10 py-4 text-lg">{t("Back to the lobby")}</button>
       </main>
     );
   }
@@ -91,7 +91,7 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
 
       <aside className="flex w-[26vw] min-w-[240px] shrink-0 flex-col gap-[1.5vmin]">
         <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.2em] text-moon-dim">
-          {t(t(t("Round {n} of {total}")), { n: state.round + 1, total: state.totalRounds ?? state.words.length })}
+          {t("Round {n} of {total}", { n: state.round + 1, total: state.totalRounds ?? state.words.length })}
         </span>
 
         <p
@@ -104,7 +104,7 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
         </p>
 
         <p className="text-center font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-wide text-moon-dim">
-          {t(t(t("{name} is drawing")), { name: `${drawer?.emoji ?? ""} ${drawer?.name ?? ""}` })}
+          {t("{name} is drawing", { name: `${drawer?.emoji ?? ""} ${drawer?.name ?? ""}` })}
         </p>
 
         <div className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-auto">
@@ -138,14 +138,14 @@ export function SketchHost({ room, state, onTimeUp, onNext, onQuit }: Props) {
 
         {state.phase === "reveal" && (
           <div className="hidden lg:block">
-            <p className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-dim">{t(t(t("It was")))}</p>
+            <p className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-dim">{t("It was")}</p>
             <p className="accent-text font-display text-[clamp(1.6rem,3.2vw,3.4rem)] font-bold uppercase leading-none">
               {state.words[state.round]}
             </p>
           </div>
         )}
         {state.phase === "reveal" && (
-          <button onClick={onNext} className="btn-accent w-full py-4 text-lg">{t(t(t("Next drawing")))}</button>
+          <button onClick={onNext} className="btn-accent w-full py-4 text-lg">{t("Next drawing")}</button>
         )}
       </aside>
     </main>

@@ -213,10 +213,10 @@ export function FeudBoard({
           <p className="font-display text-[clamp(0.85rem,1.4vw,1.5rem)] uppercase tracking-wider text-moon-dim">
             {state.outcome === "cleared"
               ? t("Every answer found")
-              : t(t(t("The rest are shown above")))}
+              : t("The rest are shown above")}
           </p>
           <button onClick={onNextRound} className="btn-accent px-12 py-4 text-xl">
-            {lastRound ? t(t(t("Final standings"))) : t(t("Next round"))}
+            {lastRound ? t("Final standings") : t("Next round")}
           </button>
           <p className="t-label font-display uppercase text-moon-dim">
             Round {state.round + 1}/{state.questions.length}
@@ -235,7 +235,7 @@ export function FeudBoard({
       {!over && (
       <div className="flex shrink-0 flex-wrap items-end gap-3 px-[2vw] sm:flex-nowrap sm:gap-[1.5vw]">
         <div className="order-1 shrink-0 text-left">
-          <p className="t-label font-display uppercase text-moon-dim">{t(t(t("Pot")))}</p>
+          <p className="t-label font-display uppercase text-moon-dim">{t("Pot")}</p>
           <p className="accent-text font-display text-[clamp(1.6rem,3vw,3.6rem)] font-bold tabular-nums">
             {state.pot}
           </p>
@@ -248,7 +248,7 @@ export function FeudBoard({
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && submit()}
-              placeholder={checking ? t(t(t("Checking…"))) : t(t("Type what they said…"))}
+              placeholder={checking ? t("Checking…") : t("Type what they said…")}
               disabled={checking}
               autoFocus
               className="field flex-1 text-[clamp(1rem,1.8vw,1.6rem)]"
@@ -272,7 +272,7 @@ export function FeudBoard({
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-wider text-moon-dim"
-                >{t(t(t(t("Checking the board…"))))}</motion.p>
+                >{t("Checking the board…")}</motion.p>
               ) : (
                 feedback && (
                 <motion.p
@@ -290,7 +290,7 @@ export function FeudBoard({
                   ].join(" ")}
                 >
                   {feedback.matched !== null
-                    ? t(t(t("“{said}” → {matched}")), { said: feedback.text, matched: question.answers[feedback.matched]?.text ?? "" })
+                    ? t("“{said}” → {matched}", { said: feedback.text, matched: question.answers[feedback.matched]?.text ?? "" })
                     : feedback.repeat
                       ? `“${feedback.text}” — already up, no strike`
                       : `“${feedback.text}” — not on the board`}
@@ -308,9 +308,9 @@ export function FeudBoard({
                 onClick={() => onClock(!state.clock)}
                 className="btn-ghost px-4 py-3 text-[clamp(0.95rem,1.4vw,1.7rem)]"
               >
-                {state.clock ? t(t(t("Stop clock"))) : t(t("Start clock"))}
+                {state.clock ? t("Stop clock") : t("Start clock")}
               </button>
-              <button onClick={onStrike} className="btn-bad px-6 py-3">{t(t(t("Strike ✗")))}</button>
+              <button onClick={onStrike} className="btn-bad px-6 py-3">{t("Strike ✗")}</button>
             </div>
           )}
           <p className="t-label mt-1 font-display uppercase text-moon-dim">

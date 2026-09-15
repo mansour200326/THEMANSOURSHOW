@@ -40,7 +40,7 @@ export function ScoreNudge({
           e.stopPropagation();
           onAdjust(-step);
         }}
-        aria-label={t(t(t("Take {step} away")), { step })}
+        aria-label={t("Take {step} away", { step })}
         title={`−${step}`}
         className={`${button} shrink-0 rounded-full border border-rose-400/50 font-display leading-none text-rose-300 transition-colors hover:border-rose-400 hover:bg-rose-500/25 active:bg-rose-500/40`}
       >
@@ -55,7 +55,7 @@ export function ScoreNudge({
           e.stopPropagation();
           onAdjust(step);
         }}
-        aria-label={t(t(t("Add {step}")), { step })}
+        aria-label={t("Add {step}", { step })}
         title={`+${step}`}
         className={`${button} shrink-0 rounded-full border border-emerald-400/50 font-display leading-none text-emerald-300 transition-colors hover:border-emerald-400 hover:bg-emerald-500/25 active:bg-emerald-500/40`}
       >

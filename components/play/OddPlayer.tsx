@@ -45,7 +45,7 @@ export function OddPlayer({ room, state, me, onAnswer, onVote }: Props) {
       <Centre>
         <p className="text-6xl">{me.emoji}</p>
         <p className="font-display text-2xl uppercase tracking-wide text-moon">{me.score.toLocaleString()} points</p>
-        <p className="text-moon-dim">{t(t(t("That's the game. Watch the TV.")))}</p>
+        <p className="text-moon-dim">{t("That's the game. Watch the TV.")}</p>
       </Centre>
     );
   }
@@ -57,14 +57,14 @@ export function OddPlayer({ room, state, me, onAnswer, onVote }: Props) {
       <Centre>
         <p className="text-6xl">{me.emoji}</p>
         <p className={["font-display text-3xl uppercase tracking-wide", scored ? "text-emerald-300" : "text-moon-dim"].join(" ")}>
-          {scored ? `+${scored}` : t(t(t("Nothing that time")))}
+          {scored ? `+${scored}` : t("Nothing that time")}
         </p>
         <p className="text-moon-dim">
           {wasMe
             ? state.caught ? "They got you." : "You got away with it."
-            : state.caught ? t(t(t("You found them."))) : t(t("They slipped past."))}
+            : state.caught ? t("You found them.") : t("They slipped past.")}
         </p>
-        <p className="text-moon-deep">{t(t(t("Look up.")))}</p>
+        <p className="text-moon-deep">{t("Look up.")}</p>
       </Centre>
     );
   }
@@ -74,26 +74,26 @@ export function OddPlayer({ room, state, me, onAnswer, onVote }: Props) {
       return (
         <Centre>
           <p className="text-6xl">{me.emoji}</p>
-          <p className="font-display text-xl uppercase tracking-wide text-accent">{t(t(t("Locked in")))}</p>
-          <p className="text-moon-deep">{t(t(t("Waiting for everyone else.")))}</p>
+          <p className="font-display text-xl uppercase tracking-wide text-accent">{t("Locked in")}</p>
+          <p className="text-moon-deep">{t("Waiting for everyone else.")}</p>
         </Centre>
       );
     }
     return (
       <main className="flex min-h-dvh flex-col justify-center gap-5 p-6">
-        <p className="t-label text-center font-display uppercase text-moon-deep">{t(t(t("Your question")))}</p>
+        <p className="t-label text-center font-display uppercase text-moon-deep">{t("Your question")}</p>
         <p className="text-balance text-center text-2xl leading-snug text-moon">{state.yourQuestion ?? "…"}</p>
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && text.trim() && onAnswer(text)}
-          placeholder={t(t(t(t("Your answer"))))}
+          placeholder={t("Your answer")}
           autoFocus
           maxLength={ODD_MAX_ANSWER}
           className="field py-5 text-center text-2xl"
         />
-        <button onClick={() => text.trim() && onAnswer(text)} disabled={!text.trim()} className="btn-accent w-full py-6 text-2xl">{t(t(t("Lock it in")))}</button>
-        <p className="text-center text-sm text-moon-deep">{t(t(t("One of you has a different question. Answer like you don't.")))}</p>
+        <button onClick={() => text.trim() && onAnswer(text)} disabled={!text.trim()} className="btn-accent w-full py-6 text-2xl">{t("Lock it in")}</button>
+        <p className="text-center text-sm text-moon-deep">{t("One of you has a different question. Answer like you don't.")}</p>
       </main>
     );
   }
@@ -103,7 +103,7 @@ export function OddPlayer({ room, state, me, onAnswer, onVote }: Props) {
   return (
     <main className="flex min-h-dvh flex-col justify-center gap-3 p-5">
       <p className="t-label text-center font-display uppercase text-moon-deep">
-        {voted ? t(t(t("Vote's in"))) : t(t("Who had the other question?"))}
+        {voted ? t("Vote's in") : t("Who had the other question?")}
       </p>
       {suspects.map((p) => {
         const mine = state.votes[me.id] === p.id;

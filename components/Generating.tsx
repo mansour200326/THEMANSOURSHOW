@@ -73,7 +73,7 @@ export function Generating({
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-[4vmin] px-6 text-center">
       <div>
-        <p className="t-label font-display uppercase text-moon-deep">{t(t(t("Big Night presents")))}</p>
+        <p className="t-label font-display uppercase text-moon-deep">{t("Big Night presents")}</p>
         <h1 className="accent-text mt-1 font-display text-[clamp(2.2rem,6vw,6rem)] font-bold uppercase leading-none tracking-tight">
           {title}
         </h1>
@@ -110,7 +110,7 @@ export function Generating({
                   />
                 </span>
                 <span className="font-display text-[clamp(0.75rem,1vw,1.2rem)] uppercase tracking-[0.2em] text-moon-deep">
-                  {done ? t(t(t("Written"))) : i === working ? t(t(t("Writing…"))) : t(t("Waiting"))}
+                  {done ? t("Written") : i === working ? t("Writing…") : t("Waiting")}
                 </span>
                 {i === working && !done && (
                   <motion.span
@@ -153,7 +153,7 @@ export function Generating({
         )}
       </div>
 
-      <button onClick={onCancel} className="btn-ghost text-[clamp(0.9rem,1.2vw,1.4rem)]">{t(t(t("Cancel")))}</button>
+      <button onClick={onCancel} className="btn-ghost text-[clamp(0.9rem,1.2vw,1.4rem)]">{t("Cancel")}</button>
     </main>
   );
 }

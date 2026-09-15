@@ -27,7 +27,7 @@ export function ConnectionBar() {
           animate={{ y: 0 }}
           exit={{ y: -48 }}
           className="fixed inset-x-0 top-0 z-50 bg-rose-600/90 px-4 py-2 text-center font-display text-sm uppercase tracking-widest text-white shadow-lg"
-        >{t(t(t(t("Lost the room — reconnecting…"))))}</motion.div>
+        >{t("Lost the room — reconnecting…")}</motion.div>
       )}
     </AnimatePresence>
   );

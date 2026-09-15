@@ -45,7 +45,7 @@ export function ScoreBar({
             ].join(" ")}
           >
             {active && (
-              <span className="absolute -top-2 rounded-full bg-accent px-2.5 py-0.5 font-display text-[0.6rem] uppercase tracking-[0.2em] text-midnight-deep">{t(t(t("Up")))}</span>
+              <span className="absolute -top-2 rounded-full bg-accent px-2.5 py-0.5 font-display text-[0.6rem] uppercase tracking-[0.2em] text-midnight-deep">{t("Up")}</span>
             )}
             <span
               className={[

@@ -31,7 +31,7 @@ export function UpgradeScreen({
       </Link>
 
       <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}>
-        <p className="t-label font-display uppercase text-moon-deep">{t(t(t("Still here")))}</p>
+        <p className="t-label font-display uppercase text-moon-deep">{t("Still here")}</p>
         <h1 className="brand-text mt-1 font-display text-[clamp(2rem,6vw,3.6rem)] font-bold uppercase leading-none tracking-tight">
           {copy.title}
         </h1>
@@ -68,9 +68,9 @@ export function UpgradeScreen({
             account gets switched over by hand.
           </p>
         ) : (
-          <Link href="/account/sign-in" className="btn-brand px-8 py-4 text-lg">{t(t(t("Sign in to upgrade")))}</Link>
+          <Link href="/account/sign-in" className="btn-brand px-8 py-4 text-lg">{t("Sign in to upgrade")}</Link>
         )}
-        <Link href="/" className="btn-ghost px-6 py-4">{t(t(t("Keep playing free")))}</Link>
+        <Link href="/" className="btn-ghost px-6 py-4">{t("Keep playing free")}</Link>
       </div>
     </main>
   );

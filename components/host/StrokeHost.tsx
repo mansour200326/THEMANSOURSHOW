@@ -40,7 +40,7 @@ export function StrokeHost({ room, state, onForce, onNext, onQuit }: Props) {
     const ranked = [...players].sort((a, b) => b.score - a.score);
     return (
       <main className="flex min-h-dvh lg:h-dvh flex-col items-center justify-center gap-[2vmin] p-[3vmin] text-center pb-16 lg:pb-[1.6vmin]">
-        <WinnerMoment>{ranked[0] ? t(t(t("{name} wins")), { name: `${ranked[0].emoji} ${ranked[0].name}` }) : t(t(t("Nobody")))}</WinnerMoment>
+        <WinnerMoment>{ranked[0] ? t("{name} wins", { name: `${ranked[0].emoji} ${ranked[0].name}` }) : t("Nobody")}</WinnerMoment>
         <div className="w-full max-w-3xl space-y-2">
           {ranked.map((p, i) => (
             <div key={p.id} className={["flex items-center justify-between rounded-xl border px-5 py-3", i === 0 ? "border-accent/50 bg-accent/[0.08]" : "border-line/10"].join(" ")}>
@@ -53,7 +53,7 @@ export function StrokeHost({ room, state, onForce, onNext, onQuit }: Props) {
             </div>
           ))}
         </div>
-        <button onClick={onQuit} className="btn-brand px-10 py-4 text-lg">{t(t(t("Back to the lobby")))}</button>
+        <button onClick={onQuit} className="btn-brand px-10 py-4 text-lg">{t("Back to the lobby")}</button>
       </main>
     );
   }
@@ -74,10 +74,10 @@ export function StrokeHost({ room, state, onForce, onNext, onQuit }: Props) {
 
       <aside className="flex w-[28vw] min-w-[260px] shrink-0 flex-col gap-[1.5vmin]">
         <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.2em] text-moon-dim">
-          {t(t(t("Round {n} of {total}")), { n: state.round + 1, total: state.pairs.length })}
+          {t("Round {n} of {total}", { n: state.round + 1, total: state.pairs.length })}
         </span>
         <div>
-          <p className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-dim">{t(t(t("Category")))}</p>
+          <p className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-dim">{t("Category")}</p>
           <p className="accent-text font-display text-[clamp(1.6rem,3.4vw,3.4rem)] font-bold uppercase leading-none">
             {pair?.category}
           </p>
@@ -89,30 +89,30 @@ export function StrokeHost({ room, state, onForce, onNext, onQuit }: Props) {
               className="mr-2 inline-block h-[0.8em] w-[0.8em] rounded-full align-middle"
               style={{ backgroundColor: SKETCH_COLOURS[drawerId ? strokeColourFor(state, drawerId) : 0] }}
             />
-            {t(t(t("{name} draws")), { name: `${drawer?.emoji ?? ""} ${drawer?.name ?? ""}` })}
-            <span className="ml-2 text-moon-dim">· {t(t(t("line {n} of {total}")), { n: Math.min(state.turn + 1, strokeTotal(state)), total: strokeTotal(state) })}</span>
+            {t("{name} draws", { name: `${drawer?.emoji ?? ""} ${drawer?.name ?? ""}` })}
+            <span className="ml-2 text-moon-dim">· {t("line {n} of {total}", { n: Math.min(state.turn + 1, strokeTotal(state)), total: strokeTotal(state) })}</span>
           </p>
         )}
         {state.phase === "vote" && (
-          <p className="font-display text-[clamp(1.1rem,1.8vw,1.8rem)] uppercase tracking-wide text-moon">{t(t(t("Who was faking it?")))}<span className="ml-2 text-moon-dim">{t(t(t("{n}/{total} voted")), { n: votesIn, total: players.length })}</span>
+          <p className="font-display text-[clamp(1.1rem,1.8vw,1.8rem)] uppercase tracking-wide text-moon">{t("Who was faking it?")}<span className="ml-2 text-moon-dim">{t("{n}/{total} voted", { n: votesIn, total: players.length })}</span>
           </p>
         )}
         {state.phase === "guess" && (
           <p className="font-display text-[clamp(1.1rem,1.8vw,1.8rem)] uppercase tracking-wide text-moon">
-            {t(t(t("Caught — {name} gets one guess")), { name: `${fake?.emoji ?? ""} ${fake?.name ?? ""}` })}
+            {t("Caught — {name} gets one guess", { name: `${fake?.emoji ?? ""} ${fake?.name ?? ""}` })}
           </p>
         )}
         {state.phase === "reveal" && (
           <p className="font-display text-[clamp(1.1rem,1.8vw,1.8rem)] uppercase tracking-wide text-moon">
-            {t(t(t("{name} was the fake")), { name: `${fake?.emoji ?? ""} ${fake?.name ?? ""}` })}
+            {t("{name} was the fake", { name: `${fake?.emoji ?? ""} ${fake?.name ?? ""}` })}
             <span className="block text-moon-dim">
               {state.caught === false
                 ? t("and got away with it")
                 : state.fakeWon
-                  ? t(t(t("caught, but guessed “{guess}”")), { guess: state.guess ?? "" })
+                  ? t("caught, but guessed “{guess}”", { guess: state.guess ?? "" })
                   : state.guess
-                    ? t(t(t("caught, and guessed “{guess}”")), { guess: state.guess ?? "" })
-                    : t(t(t("caught")))}
+                    ? t("caught, and guessed “{guess}”", { guess: state.guess ?? "" })
+                    : t("caught")}
             </span>
           </p>
         )}
@@ -148,7 +148,7 @@ export function StrokeHost({ room, state, onForce, onNext, onQuit }: Props) {
         )}
         {state.phase === "reveal" && (
           <div className="hidden lg:block">
-            <p className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-dim">{t(t(t("It was")))}</p>
+            <p className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-dim">{t("It was")}</p>
             <p className="accent-text font-display text-[clamp(1.6rem,3.2vw,3.4rem)] font-bold uppercase leading-none">
               {pair?.word}
             </p>
@@ -156,7 +156,7 @@ export function StrokeHost({ room, state, onForce, onNext, onQuit }: Props) {
         )}
         {state.phase === "reveal" && (
           <button onClick={onNext} className="btn-accent w-full py-4 text-lg">
-            {state.round + 1 >= state.pairs.length ? t(t(t("Final scores"))) : t(t("Next picture"))}
+            {state.round + 1 >= state.pairs.length ? t("Final scores") : t("Next picture")}
           </button>
         )}
       </aside>

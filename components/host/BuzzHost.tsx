@@ -68,7 +68,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
       <header className="flex shrink-0 items-center justify-between">
         <span className="font-display text-[clamp(0.8rem,1.15vw,1.35rem)] uppercase tracking-[0.25em] text-moon-dim">
           {state.mode === "sequence"
-            ? t(t(t("Riddle {n} of {total}")), { n: Math.min(state.index + 1, state.items.length), total: state.items.length })
+            ? t("Riddle {n} of {total}", { n: Math.min(state.index + 1, state.items.length), total: state.items.length })
             : "Pick a tile, then race for it"}
         </span>
       </header>
@@ -145,7 +145,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
                   <span className="accent-text font-display text-[clamp(2rem,5vw,5rem)] font-bold uppercase">
                     {buzzer.name}
                   </span>
-                  <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.25em] text-moon-dim">{t(t(t("Answer out loud")))}</span>
+                  <span className="font-display text-[clamp(0.95rem,1.4vw,1.7rem)] uppercase tracking-[0.25em] text-moon-dim">{t("Answer out loud")}</span>
                 </motion.div>
               ) : state.phase === "open" ? (
                 armed ? (
@@ -154,14 +154,14 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
                     animate={{ opacity: [0.45, 1, 0.45] }}
                     transition={{ duration: 1.6, repeat: Infinity }}
                     className="font-display text-[clamp(1.1rem,2.4vw,2.6rem)] uppercase tracking-[0.3em] text-accent"
-                  >{t(t(t(t("Buzz in"))))}</motion.p>
+                  >{t("Buzz in")}</motion.p>
                 ) : (
                   <motion.p
                     key="arming"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="font-display text-[clamp(1.1rem,2.4vw,2.6rem)] uppercase tracking-[0.3em] text-moon-dim"
-                  >{t(t(t(t("Read it…"))))}</motion.p>
+                  >{t("Read it…")}</motion.p>
                 )
               ) : null}
             </AnimatePresence>
@@ -216,7 +216,7 @@ export function BuzzHost({ room, state, send, onAdjust }: Props) {
               onClick={() => setPeek((v) => !v)}
               className="btn-ghost px-3 py-1.5 text-[clamp(0.8rem,1.15vw,1.35rem)]"
             >
-              {peek ? t(t(t("Hide"))) : t(t("Peek"))}
+              {peek ? t("Hide") : t("Peek")}
             </button>
             <span
               className={[
@@ -288,7 +288,7 @@ function Standings({ room }: { room: Room }) {
         </WinnerMoment>
       )}
       <div className="w-full space-y-2">
-      <p className="mb-[2vmin] text-center font-display text-[clamp(1.5rem,4vw,4rem)] uppercase text-accent">{t(t(t("Game over")))}</p>
+      <p className="mb-[2vmin] text-center font-display text-[clamp(1.5rem,4vw,4rem)] uppercase text-accent">{t("Game over")}</p>
       {ranked.map((p, i) => (
         <div
           key={p.id}

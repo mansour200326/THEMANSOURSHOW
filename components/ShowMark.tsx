@@ -54,14 +54,14 @@ export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
 
   if (size === "sm") {
     return (
-      <span className="brand-text whitespace-nowrap font-display text-base uppercase tracking-[0.2em] sm:text-lg sm:tracking-[0.24em]">{t(t(t("Big Night")))}</span>
+      <span dir="ltr" className="brand-text whitespace-nowrap font-display text-base uppercase tracking-[0.2em] sm:text-lg sm:tracking-[0.24em]">{t("Big Night")}</span>
     );
   }
 
   if (still) {
     return (
       <div className="flex flex-col items-center font-display uppercase">
-        <h1 className="brand-text t-hero tracking-[0.08em] drop-shadow-[0_0_50px_rgba(255,107,87,0.35)]">{t(t(t("Big Night")))}</h1>
+        <h1 dir="ltr" className="brand-text t-hero tracking-[0.08em] drop-shadow-[0_0_50px_rgba(255,107,87,0.35)]">{t("Big Night")}</h1>
         <Rule />
       </div>
     );
@@ -136,7 +136,7 @@ export function ShowMark({ size = "lg" }: { size?: "lg" | "sm" }) {
         );
       })}
 
-      <h1 className="t-hero flex flex-wrap justify-center gap-x-[0.3em] tracking-[0.08em]">
+      <h1 dir="ltr" className="t-hero flex flex-wrap justify-center gap-x-[0.3em] tracking-[0.08em]">
         {WORDS.map((word, w) => (
           <span key={word} className="flex">
             {[...word].map((letter, i) => {
@@ -197,7 +197,7 @@ function Rule({ animated }: { animated?: boolean }) {
     return (
       <div className="mt-2 flex w-full items-center gap-4">
         <span className={line} />
-        <span className="t-label whitespace-nowrap text-moon-dim">{t(t(t("Games for the room")))}</span>
+        <span className="t-label whitespace-nowrap text-moon-dim">{t("Games for the room")}</span>
         <span className={`${line} rotate-180`} />
       </div>
     );
@@ -215,7 +215,7 @@ function Rule({ animated }: { animated?: boolean }) {
         initial={{ opacity: 0, letterSpacing: "0.8em" }}
         animate={{ opacity: 1, letterSpacing: "0.22em" }}
         transition={{ duration: 0.6, delay: IMPACT + 0.08, ease: [0.2, 1, 0.3, 1] }}
-      >{t(t(t(t("Games for the room"))))}</motion.span>
+      >{t("Games for the room")}</motion.span>
       <motion.span
         className={`${line} origin-left rotate-180`}
         initial={{ scaleX: 0 }}

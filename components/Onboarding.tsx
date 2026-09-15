@@ -75,7 +75,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         transition={{ type: "spring", stiffness: 300, damping: 26 }}
         className="w-full max-w-3xl rounded-3xl border border-line/12 bg-dusk p-6 shadow-tile sm:p-8"
       >
-        <p className="t-label font-display uppercase text-moon-deep">{t(t(t("How it works")))}</p>
+        <p className="t-label font-display uppercase text-moon-deep">{t("How it works")}</p>
 
         <Scene beat={beat} />
 
@@ -102,7 +102,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
               <button
                 key={i}
                 onClick={() => setBeat(i)}
-                aria-label={t(t(t("Step {n}")), { n: i + 1 })}
+                aria-label={t("Step {n}", { n: i + 1 })}
                 className={[
                   "h-2 rounded-full transition-all",
                   i === beat ? "w-8 bg-accent" : "w-2 bg-line/20",
@@ -112,13 +112,13 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
           </div>
           <div className="flex items-center gap-2">
             {beat > 0 && (
-              <button onClick={() => setBeat(beat - 1)} className="btn-ghost px-5 py-3">{t(t(t("Back")))}</button>
+              <button onClick={() => setBeat(beat - 1)} className="btn-ghost px-5 py-3">{t("Back")}</button>
             )}
             <button
               onClick={() => (last ? onDone() : setBeat(beat + 1))}
               className="btn-brand px-8 py-3"
             >
-              {last ? t(t(t("Got it"))) : t(t("Next"))}
+              {last ? t("Got it") : t("Next")}
             </button>
           </div>
         </div>
