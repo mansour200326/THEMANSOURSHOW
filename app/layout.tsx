@@ -8,6 +8,13 @@ import { currentLang } from "@/lib/i18n/server";
 import "./globals.css";
 
 const display = Oswald({
+  /*
+   * No automatic local stand-in for this face. The stand-in next/font adds
+   * covers every character, so Arabic letters were being drawn by it — a
+   * system font — before Cairo, which comes later in the stack, was ever
+   * consulted. Without it, a glyph this face lacks falls through to Cairo.
+   */
+  adjustFontFallback: false,
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-display",
@@ -15,6 +22,13 @@ const display = Oswald({
 });
 
 const body = Inter({
+  /*
+   * No automatic local stand-in for this face. The stand-in next/font adds
+   * covers every character, so Arabic letters were being drawn by it — a
+   * system font — before Cairo, which comes later in the stack, was ever
+   * consulted. Without it, a glyph this face lacks falls through to Cairo.
+   */
+  adjustFontFallback: false,
   subsets: ["latin"],
   variable: "--font-body",
   display: "swap",

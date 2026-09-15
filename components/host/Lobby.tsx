@@ -139,9 +139,7 @@ export function Lobby({ room, onStart, onAddBots, onClearBots, onKick, onNight, 
                 </motion.span>
               ))}
             </AnimatePresence>
-            {live.length === 0 && (
-              <p className="self-center text-sm text-moon-deep">{t("Waiting for the first phone — the four screen-only games below don't need one.")}</p>
-            )}
+
           </div>
         </div>
       </header>
